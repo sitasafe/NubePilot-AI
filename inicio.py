@@ -29,7 +29,7 @@ st.markdown("""
         font-size: 3rem; font-weight: 800; margin-bottom: 0;
     }
     
-    /* Cuadros de Review Intelligence (Basados en la imagen) */
+    /* Cuadros de Review Intelligence */
     .review-card-urgent {
         background-color: #ffebee; padding: 15px; border-radius: 10px;
         border-left: 5px solid #ff4b4b; margin-bottom: 15px;
@@ -38,7 +38,7 @@ st.markdown("""
         background-color: #e8f5e9; padding: 15px; border-radius: 10px;
         border-left: 5px solid #4caf50; margin-bottom: 15px;
     }
-    
+
     /* Tarjetas de Equipo */
     .team-card {
         text-align: center; padding: 15px; border-radius: 15px;
@@ -48,7 +48,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- BARRA LATERAL (Panel de Control Restaurado) ---
+# --- BARRA LATERAL (Panel de Control con Store ID y Token) ---
 with st.sidebar:
     st.image("https://logowik.com/content/uploads/images/tiendanube1485.logowik.com.webp", use_container_width=True)
     st.write("---")
@@ -57,11 +57,17 @@ with st.sidebar:
     st.markdown("## ⚙️ Panel de Control")
     
     with st.expander("🔑 Conexión API Tiendanube", expanded=True):
-        st.info("Estatus: Secure Link")
-        st.markdown("**Store ID:** `sitasafe_6621` ")
+        st.info("Estatus: Tiendanube Secure Link")
+        
+        # ID de la Tienda (Como en tu imagen)
+        st.markdown("**ID de la Tienda:**")
+        st.code("sitasafe_6621_mx")
+        
+        # Access Token (Como en tu imagen)
         st.markdown("**Access Token:**")
         st.code("shpat_live_942_growth_copilot_2026")
-        st.success("Acceso Validado ✅")
+        
+        st.success("Conexión Validada ✅")
 
     st.divider()
     st.markdown("### 📊 Estado de Tienda")
@@ -76,6 +82,7 @@ st.write("---")
 tab_dash, tab_ins, tab_team = st.tabs(["📊 Dashboard General", "🧠 Insights Avanzados", "👥 Equipo"])
 
 with tab_dash:
+    # MÉTRICAS
     st.markdown("### 📊 Estado Actual de la Tienda")
     m_col1, m_col2, m_col3 = st.columns(3)
     m_col1.metric("Carritos Abandonados", "12", "↑ 2", delta_color="inverse")
@@ -87,10 +94,7 @@ with tab_dash:
 
     with col_left:
         with st.chat_message("assistant"):
-            st.write("🤖 **Ejecutando algoritmos de crecimiento...**")
-            placeholder = st.empty()
-            mensaje_ia = """**Análisis finalizado:** He detectado **12 carritos abandonados**. El cupón **GROWTH10** es la herramienta óptima con una probabilidad de éxito del 88%."""
-            placeholder.markdown(mensaje_ia)
+            st.write("🤖 **Análisis finalizado:** He detectado **12 carritos abandonados**. El cupón **GROWTH10** es la herramienta óptima con una probabilidad de éxito del 88%.")
         
         if st.button("🎯 Activar Estrategia de Recuperación"):
             with st.status("Sincronizando con Tiendanube...", expanded=True) as status:
@@ -99,56 +103,58 @@ with tab_dash:
                 time.sleep(1)
                 status.update(label="¡Estrategia Activa!", state="complete", expanded=False)
             st.balloons()
-            st.success("### ✅ ¡CUPÓN 'GROWTH10' CREADO EXITOSAMENTE!")
+            st.success("### ✅ ¡CUPÓN 'GROWTH10' CREADO EXITOSAMENTE EN TIENDANUBE!")
+
+        st.markdown("### 📈 Impacto Estimado")
+        st.line_chart(pd.DataFrame({"Ventas": [10, 20, 15, 40, 50, 65, 80]}))
 
     with col_right:
         st.markdown("### 💬 Asesor Inteligente")
         u_input = st.text_input("Consulta a la IA:", placeholder="¿Cómo mejorar ventas?")
         if st.button("Enviar"):
             if u_input:
-                st.info(f"📊 **IA:** Para mejorar en '{u_input}', recomiendo optimizar stock hoy.")
+                st.info(f"📊 **IA:** Analizando '{u_input}'... Recomiendo optimizar stock en 'Cámaras WiFi' para el fin de semana.")
 
 with tab_ins:
-    # SECCIÓN DE REVIEW INTELLIGENCE (NLP) AGREGADA
-    st.markdown("### 🔍 Decodificador de Opiniones (NLP)")
-    st.write("Análisis de sentimiento y benchmarking competitivo automático.")
+    # SECCIÓN: REVIEW INTELLIGENCE (NLP)
+    st.markdown("### 🔍 Review Intelligence (Análisis NLP)")
+    st.write("Análisis de sentimiento automatizado sobre las opiniones de tus clientes.")
     
     col_a, col_b = st.columns(2)
     with col_a:
         st.markdown("#### 🚨 Acciones Urgentes")
         st.markdown("""<div class="review-card-urgent">
             <strong>⚠️ Dificultad de armado (42% de quejas)</strong><br>
-            <small>➜ Acción: Crear video tutorial e incluirlo en el QR de envío.</small>
+            <small>➜ Acción IA: Crear video tutorial para la página de producto.</small>
             </div>""", unsafe_allow_html=True)
         st.markdown("""<div class="review-card-urgent">
             <strong>⚠️ Dudas de Impermeabilidad</strong><br>
-            <small>➜ Acción: Actualizar FAQ y descripción del producto hoy mismo.</small>
+            <small>➜ Acción IA: Actualizar FAQ técnica y descripción hoy.</small>
             </div>""", unsafe_allow_html=True)
 
     with col_b:
         st.markdown("#### 💡 Ventaja Competitiva")
         st.markdown("""<div class="review-card-advantage">
-            <strong>✨ Calidad de Cremalleras (Mención Positiva)</strong><br>
-            <small>➜ Acción: Resaltar este atributo en las campañas de Ads.</small>
+            <strong>✨ Calidad de Materiales (89% Positivo)</strong><br>
+            <small>➜ Acción IA: Resaltar 'Durabilidad' en campañas de Facebook Ads.</small>
             </div>""", unsafe_allow_html=True)
         st.markdown("""<div class="review-card-advantage">
-            <strong>✨ Eco-Packaging (Diferenciador)</strong><br>
-            <small>➜ Acción: Añadir sello de sustentabilidad en la Home.</small>
+            <strong>✨ Eco-Packaging valorado</strong><br>
+            <small>➜ Acción IA: Incluir sello sustentable en el checkout.</small>
             </div>""", unsafe_allow_html=True)
-    
+
     st.write("---")
     c_ins_1, c_ins_2 = st.columns(2)
     with c_ins_1:
         st.markdown("#### 🛒 Productos con más Abandonos")
-        df = pd.DataFrame({
+        st.table(pd.DataFrame({
             "Producto": ["Playera Algodón", "Gorra Trucker", "Tenis Sport"],
             "Abandonos": [8, 3, 1],
             "Pérdida": ["$800 MXN", "$450 MXN", "$250 MXN"]
-        })
-        st.table(df)
+        }))
     with c_ins_2:
-        st.markdown("#### 📈 Impacto Estimado")
-        st.line_chart(pd.DataFrame({"Ventas": [10, 20, 15, 40, 50, 65, 80]}))
+        st.markdown("#### 📈 Proyección de Recuperación")
+        st.line_chart(pd.DataFrame({"Recuperado": [5, 15, 12, 35, 45, 60, 75]}))
 
 with tab_team:
     st.markdown("### 👥 Equipo 3 - Desarrollo y Estrategia")
