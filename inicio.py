@@ -52,12 +52,3 @@ with col_right:
     st.markdown("### 📊 Métricas de Impacto")
     st.metric("Ventas Recuperables", "$450.00", "+12%")
     st.metric("Tasa de Conversión", "3.5%", "+0.8%")
-    
-    st.divider()
-    st.markdown("#### **Equipo 10:**")
-    st.markdown("👤 **Dalia Paola R.** (Capitana / PM)")
-    st.markdown("👤 **William L.** (Lead Architect)")
-    st.markdown("👤 **Montse** (Strategy)")
-
-st.write("---")
-st.caption("AI Growth Copilot | Hackathon UTEL 2026
