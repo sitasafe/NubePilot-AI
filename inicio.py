@@ -172,5 +172,6 @@ with col_right:
         with c2: st.markdown(f'**{nombre}**\n*{skill}*')
 
 st.write("---")
-st.caption("AI Growth Copilot | Powered by Tiendanube | Hackathon UTEL 2026")
+st.caption("AI Growth Copilot | Equipo 3 | Hackathon UTEL 2026")
+
 
