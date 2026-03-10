@@ -25,14 +25,14 @@ with st.sidebar:
     st.success("Conectado a: **Sitasafe Store**")
 
 # --- CUERPO PRINCIPAL ---
-st.markdown("# AI Growth Copilot")
+st.markdown("# 🚀 AI Growth Copilot")
 st.subheader("Tu estratega de crecimiento con IA")
 st.write("---")
 
 col_left, col_right = st.columns([2, 1])
 
 with col_left:
-    # Mensaje de la IA - Versión Profesional de Datos
+    # Mensaje de la IA - Versión Profesional
     with st.chat_message("assistant"):
         st.markdown("""
         **AI Growth Copilot:** Hola William, he detectado **12 carritos abandonados** en la última hora. 
@@ -54,27 +54,32 @@ with col_left:
         st.balloons()
         st.success("### ✅ ¡CUPÓN 'GROWTH10' CREADO EXITOSAMENTE!")
 
-    # --- NUEVA SECCIÓN: ANÁLISIS DE PRODUCTOS ---
+    # --- SECCIÓN DE PRODUCTOS CON NOMBRES REALES ---
     st.write("---")
     st.markdown("### 📦 Análisis de Productos (Top Abandonados)")
     
-    # Datos simulados de productos
+    # Datos con nombres de productos reales
     chart_data = pd.DataFrame({
-        "Productos": ["Producto A", "Producto B", "Producto C", "Producto D"],
+        "Productos": [
+            "Cámara de Seguridad WiFi", 
+            "Sensor de Movimiento Pro", 
+            "Kit de Primeros Auxilios", 
+            "Cerradura Inteligente"
+        ],
         "Vistos": [120, 95, 80, 45],
         "Abandonados": [42, 28, 15, 10]
     })
     
     # Gráfico de barras comparativo
     st.bar_chart(chart_data.set_index("Productos"))
-    st.caption("Comparativa entre visualizaciones y productos que se quedaron en el carrito.")
+    st.caption("Filtro: Productos con mayor tasa de abandono en checkout durante las últimas 24 horas.")
 
 with col_right:
     st.markdown("### 📊 Métricas de Impacto")
     st.metric("Ventas Recuperables", "$450.00", "+12%")
     st.metric("Tasa de Conversión", "3.5%", "+0.8%")
     
-    # --- NUEVA SECCIÓN: GRÁFICO DE TENDENCIA ---
+    # --- GRÁFICO DE TENDENCIA ---
     st.write("---")
     st.markdown("#### Tendencia de Recuperación")
     # Generar datos de tendencia
@@ -89,5 +94,3 @@ with col_right:
 
 st.write("---")
 st.caption("AI Growth Copilot | Hackathon UTEL 2026 - Equipo 3")
-
-
