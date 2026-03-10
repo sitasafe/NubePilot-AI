@@ -189,3 +189,4 @@ with tab_team:
 
 st.write("---")
 st.caption("AI Growth Copilot | Equipo 10 | Hackathon UTEL 2026")
+
