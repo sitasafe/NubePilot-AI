@@ -48,7 +48,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- BARRA LATERAL (Panel de Control Simulado) ---
+# --- BARRA LATERAL ---
 with st.sidebar:
     st.image("https://logowik.com/content/uploads/images/tiendanube1485.logowik.com.webp", use_container_width=True)
     st.write("---")
@@ -68,7 +68,7 @@ with st.sidebar:
 
     st.divider()
     
-    api_token = st.text_input("Access Token de API", type="password", help="Pega aquí el token generado")
+    api_token = st.text_input("Access Token de API", type="password")
     id_tienda = st.text_input("ID de Tienda", value="2831942")
     
     if api_token:
@@ -99,19 +99,3 @@ with tab_dash:
         
         if st.button("🎯 Activar Estrategia de Recuperación"):
             with st.status("Conectando con la API de Tiendanube...", expanded=True) as status:
-                time.sleep(1.2)
-                status.update(label="Generando cupón inteligente...", state="running")
-                time.sleep(1.2)
-                status.update(label="¡Estrategia Desplegada!", state="complete", expanded=False)
-            
-            st.balloons()
-            st.success("### ✅ ¡CUPÓN 'SITASAFE10' ACTIVO EN LA TIENDA!")
-
-    with col_right:
-        st.markdown("### 💬 Asesor Inteligente")
-        u_input = st.text_input("Consulta a la IA:", placeholder="¿Cómo mejorar ventas?")
-        if st.button("Enviar"):
-            st.info(f"📊 **IA:** Analizando tendencias... Recomiendo activar envíos gratis en compras > $999.")
-
-with tab_ins:
-    st.markdown("### 📈 Análisis
