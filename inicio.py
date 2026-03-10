@@ -54,8 +54,7 @@ st.markdown("""
 
 # --- BARRA LATERAL ---
 with st.sidebar:
-    # --- LOGO DE TIENDANUBE (URL DIRECTA PARA EVITAR ERRORES) ---
-    # Usamos la versión oficial de la nube para asegurar que cargue en Streamlit Cloud
+    # --- LOGO DE TIENDANUBE (SOLUCIÓN AL ERROR: USANDO URL) ---
     st.image("https://logowik.com/content/uploads/images/tiendanube1485.logowik.com.webp", use_container_width=True)
     st.write("---")
     
@@ -76,7 +75,7 @@ st.markdown('<h1 class="main-title">🚀 AI Growth Copilot</h1>', unsafe_allow_h
 st.subheader("Tu estratega de crecimiento inteligente")
 st.write("---")
 
-# --- SECCIÓN: ESTADO ACTUAL DE LA TIENDA ---
+# --- SECCIÓN: MÉTRICAS (Basado en tus imágenes) ---
 st.markdown("### 📊 Estado Actual de la Tienda")
 m_col1, m_col2, m_col3 = st.columns(3)
 with m_col1:
@@ -92,4 +91,83 @@ col_left, col_right = st.columns([2, 1])
 
 with col_left:
     # --- MÓDULO DE IA GENERATIVA ---
-    with st.chat_message("assistant
+    with st.chat_message("assistant"):
+        st.write("🤖 **Ejecutando algoritmos de crecimiento...**")
+        placeholder = st.empty()
+        
+        mensaje_ia = """**Análisis del Copilot finalizado:** He detectado una ventana de oportunidad en **12 carritos abandonados**. 
+
+Tras procesar los patrones de demanda y la disponibilidad actual en el inventario, el sistema ha diseñado la siguiente estrategia de conversión:
+
+El cupón **GROWTH10** es la herramienta óptima para incentivar el cierre de estas ventas con una probabilidad de éxito del 88%. ¿Deseas aplicar esta acción ahora?"""
+        
+        full_response = ""
+        for char in mensaje_ia:
+            full_response += char
+            placeholder.markdown(full_response + "▌")
+            time.sleep(0.01)
+        placeholder.markdown(full_response)
+    
+    st.write("")
+    if st.button("🎯 Activar Estrategia de Recuperación"):
+        with st.status("Sincronizando con Tiendanube...", expanded=True) as status:
+            time.sleep(1)
+            st.write("Configurando descuentos dinámicos...")
+            time.sleep(1)
+            status.update(label="¡Estrategia Activa!", state="complete", expanded=False)
+        st.balloons()
+        st.success("### ✅ ¡CUPÓN 'GROWTH10' CREADO EXITOSAMENTE EN TIENDANUBE!")
+
+    # --- SECCIÓN: PRODUCTOS (Basado en tu tabla) ---
+    st.write("---")
+    st.markdown("### 🛒 Productos con más Abandonos")
+    df_productos = pd.DataFrame({
+        "Producto": ["Playera Algodón", "Gorra Trucker", "Tenis Sport"],
+        "Abandonos": [8, 3, 1],
+        "Perdida Est.": ["$800 MXN", "$450 MXN", "$250 MXN"]
+    })
+    st.table(df_productos)
+
+    # --- SECCIÓN: GRÁFICA DE IMPACTO ---
+    st.write("---")
+    st.markdown("### 📈 Impacto Estimado de NubePilot")
+    chart_data = pd.DataFrame({
+        "Semana": [0, 1, 2, 3, 4, 5, 6],
+        "Ventas ($)": [10, 20, 15, 40, 50, 65, 80]
+    })
+    st.line_chart(chart_data.set_index("Semana"))
+
+with col_right:
+    # --- CHAT ---
+    st.markdown("### 💬 Asesor Inteligente")
+    user_input = st.text_input("Consulta a la IA:", placeholder="¿Cómo mejorar ventas?")
+    if st.button("Enviar"):
+        if user_input:
+            with st.chat_message("assistant"):
+                st.write("📊 **Análisis:** Recomiendo optimizar stock en 'Cámaras WiFi' hoy.")
+
+    st.write("---")
+    st.markdown("#### 🚀 Próximos Pasos")
+    st.markdown("""<div class="next-steps"><strong>Roadmap:</strong><br>• Google Trends<br>• Ads Automáticos</div>""", unsafe_allow_html=True)
+    
+    st.write("---")
+    st.markdown("#### 👥 Equipo 3")
+    
+    equipo = [
+        ("Dalia Paola Rodríguez Trejo", "Capitana", "https://cdn-icons-png.flaticon.com/512/6997/6997662.png"),
+        ("Willan Álvarez Carmona", "Lead Architect", "https://cdn-icons-png.flaticon.com/512/6840/6840478.png"),
+        ("Montserrat Garcia Barona", "Fotografía", "https://cdn-icons-png.flaticon.com/512/6997/6997674.png"),
+        ("Jiram Cabrera Ramos", "Organización", "https://cdn-icons-png.flaticon.com/512/4333/4333609.png"),
+        ("Cesar Augusto Fernandez Delgado", "Estrategia", "https://cdn-icons-png.flaticon.com/512/3001/3001764.png"),
+        ("Edwing Garcia Juarez", "Ventas", "https://cdn-icons-png.flaticon.com/512/9431/9431149.png"),
+        ("Carlos Andrés Almeida Rangel", "Liderazgo", "https://cdn-icons-png.flaticon.com/512/2354/2354573.png"),
+        ("Amarilis Elizabeth Vera García", "Gestión", "https://cdn-icons-png.flaticon.com/512/201/201634.png")
+    ]
+    
+    for nombre, skill, icon in equipo:
+        c1, c2 = st.columns([1, 4])
+        with c1: st.image(icon, width=30)
+        with c2: st.markdown(f'**{nombre}**\n*{skill}*')
+
+st.write("---")
+st.caption("AI Growth Copilot | Powered by Ti
