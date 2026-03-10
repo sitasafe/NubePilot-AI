@@ -62,7 +62,7 @@ El cupón **GROWTH10** tiene una probabilidad del **88% de éxito** para estos p
 
     # --- NUEVO: CHAT INTERACTIVO (PUNTO 3 DEL DOCUMENTO) ---
     st.write("---")
-    st.markdown("### 💬 Chat con tu Asesor Inteligente")
+    st.markdown("### 💬 Asesor Inteligente")
     user_input = st.text_input("Hazle una pregunta a tu Copilot (Ej: ¿Por qué bajaron mis ventas?):")
     
     if user_input:
@@ -116,3 +116,4 @@ with col_right:
 
 st.write("---")
 st.caption("AI Growth Copilot | IA Generativa | Hackathon UTEL 2026 - Equipo 3")
+
