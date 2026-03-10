@@ -54,7 +54,7 @@ st.markdown("""
 
 # --- BARRA LATERAL ---
 with st.sidebar:
-    # --- LOGO DE TIENDANUBE (SOLUCIÓN AL ERROR: USANDO URL) ---
+    # --- LOGO DE TIENDANUBE (URL de Logowik proporcionada) ---
     st.image("https://logowik.com/content/uploads/images/tiendanube1485.logowik.com.webp", use_container_width=True)
     st.write("---")
     
@@ -75,7 +75,7 @@ st.markdown('<h1 class="main-title">🚀 AI Growth Copilot</h1>', unsafe_allow_h
 st.subheader("Tu estratega de crecimiento inteligente")
 st.write("---")
 
-# --- SECCIÓN: MÉTRICAS (Basado en tus imágenes) ---
+# --- SECCIÓN: ESTADO ACTUAL (Métricas) ---
 st.markdown("### 📊 Estado Actual de la Tienda")
 m_col1, m_col2, m_col3 = st.columns(3)
 with m_col1:
@@ -118,7 +118,7 @@ El cupón **GROWTH10** es la herramienta óptima para incentivar el cierre de es
         st.balloons()
         st.success("### ✅ ¡CUPÓN 'GROWTH10' CREADO EXITOSAMENTE EN TIENDANUBE!")
 
-    # --- SECCIÓN: PRODUCTOS (Basado en tu tabla) ---
+    # --- SECCIÓN: TABLA DE PRODUCTOS ---
     st.write("---")
     st.markdown("### 🛒 Productos con más Abandonos")
     df_productos = pd.DataFrame({
@@ -128,7 +128,7 @@ El cupón **GROWTH10** es la herramienta óptima para incentivar el cierre de es
     })
     st.table(df_productos)
 
-    # --- SECCIÓN: GRÁFICA DE IMPACTO ---
+    # --- SECCIÓN: GRÁFICA DE TENDENCIA ---
     st.write("---")
     st.markdown("### 📈 Impacto Estimado de NubePilot")
     chart_data = pd.DataFrame({
@@ -138,17 +138,19 @@ El cupón **GROWTH10** es la herramienta óptima para incentivar el cierre de es
     st.line_chart(chart_data.set_index("Semana"))
 
 with col_right:
-    # --- CHAT ---
+    # --- CHAT INTERACTIVO ---
     st.markdown("### 💬 Asesor Inteligente")
     user_input = st.text_input("Consulta a la IA:", placeholder="¿Cómo mejorar ventas?")
     if st.button("Enviar"):
         if user_input:
             with st.chat_message("assistant"):
-                st.write("📊 **Análisis:** Recomiendo optimizar stock en 'Cámaras WiFi' hoy.")
+                st.write(f"📊 **Análisis:** Para mejorar en '{user_input}', recomiendo optimizar stock en 'Cámaras WiFi' hoy.")
+        else:
+            st.warning("Escribe una consulta primero.")
 
     st.write("---")
     st.markdown("#### 🚀 Próximos Pasos")
-    st.markdown("""<div class="next-steps"><strong>Roadmap:</strong><br>• Google Trends<br>• Ads Automáticos</div>""", unsafe_allow_html=True)
+    st.markdown("""<div class="next-steps"><strong>Roadmap 2026:</strong><br>• Google Trends<br>• Ads Automáticos</div>""", unsafe_allow_html=True)
     
     st.write("---")
     st.markdown("#### 👥 Equipo 3")
@@ -170,4 +172,4 @@ with col_right:
         with c2: st.markdown(f'**{nombre}**\n*{skill}*')
 
 st.write("---")
-st.caption("AI Growth Copilot | Powered by Ti
+st.caption("AI Growth Copilot | Powered by Tiendanube | Hackathon UTEL 2026")
