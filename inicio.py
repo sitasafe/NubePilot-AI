@@ -112,7 +112,7 @@ with tab_dash:
                 st.error("❌ Error: Falta el Access Token en el Panel de Control.")
             else:
                 with st.status("Conectando con la API de Tiendanube...", expanded=True) as status:
-                    url = f"https://api.tiendanube.com/v1/{id_tienda}/coupons"
+                    url = f"https://api.tiendanube.com/v1/{id_tienda.strip()}/coupons"
                     headers = {
                         "Authentication": f"bearer {api_token.strip()}",
                         "Content-Type": "application/json",
@@ -133,12 +133,19 @@ with tab_dash:
                             st.success("### ✅ ¡CUPÓN 'SITASAFE10' ACTIVO EN LA TIENDA!")
                         elif response.status_code == 422:
                             status.update(label="Validación finalizada", state="complete", expanded=False)
-                            st.warning("⚠️ El cupón ya existe en la tienda. ¡La conexión es correcta!")
+                            st.warning("⚠️ El cupón ya existe o los datos son inválidos. ¡La conexión es correcta!")
+                        elif response.status_code == 401:
+                            status.update(label="Error de autenticación", state="error", expanded=False)
+                            st.error("❌ Token inválido o expirado. Genera uno nuevo.")
+                        elif response.status_code == 404:
+                            status.update(label="Tienda no encontrada", state="error", expanded=False)
+                            st.error("❌ ID de Tienda incorrecto. Verifica el número en tu panel.")
                         else:
                             status.update(label="Error en la conexión", state="error", expanded=False)
                             st.error(f"Falla de API: {response.status_code}")
+                            st.json(response.json())
                     except Exception as e:
-                        st.error(f"Falla de red: {e}")
+                        st.error(f"Falla de red crítica: {e}")
 
     with col_right:
         st.markdown("### 💬 Asesor Inteligente")
@@ -189,6 +196,3 @@ with tab_team:
 
 st.write("---")
 st.caption("AI Growth  | Equipo 3 | Hackathon UTEL 2026 | TiendaNube|")
-
-
-
