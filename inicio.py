@@ -54,8 +54,8 @@ st.markdown("""
 
 # --- BARRA LATERAL ---
 with st.sidebar:
-    # 1. LOGO DE TIENDANUBE
-    st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Tiendanube_logo.svg/2560px-Tiendanube_logo.svg.png", width=180)
+    # --- LOGO DE TIENDANUBE SUBIDO (image_4e641f.png) ---
+    st.image("image_4e641f.png", use_container_width=True)
     st.write("---")
     
     st.image("https://cdn-icons-png.flaticon.com/512/2103/2103633.png", width=50)
@@ -75,7 +75,7 @@ st.markdown('<h1 class="main-title">🚀 AI Growth Copilot</h1>', unsafe_allow_h
 st.subheader("Tu estratega de crecimiento inteligente")
 st.write("---")
 
-# --- SECCIÓN: ESTADO ACTUAL DE LA TIENDA (Basado en imagen_4e5bbb.png) ---
+# --- SECCIÓN: ESTADO ACTUAL DE LA TIENDA ---
 st.markdown("### 📊 Estado Actual de la Tienda")
 m_col1, m_col2, m_col3 = st.columns(3)
 with m_col1:
@@ -118,7 +118,7 @@ El cupón **GROWTH10** es la herramienta óptima para incentivar el cierre de es
         st.balloons()
         st.success("### ✅ ¡CUPÓN 'GROWTH10' CREADO EXITOSAMENTE EN TIENDANUBE!")
 
-    # --- SECCIÓN: PRODUCTOS CON MÁS ABANDONOS (Basado en imagen_4e5c58.png) ---
+    # --- SECCIÓN: PRODUCTOS CON MÁS ABANDONOS ---
     st.write("---")
     st.markdown("### 🛒 Productos con más Abandonos")
     st.write("Detalle de productos que requieren atención inmediata:")
@@ -129,7 +129,7 @@ El cupón **GROWTH10** es la herramienta óptima para incentivar el cierre de es
     })
     st.table(df_productos)
 
-    # --- SECCIÓN: IMPACTO ESTIMADO (Basado en imagen_4e5bc2.png) ---
+    # --- SECCIÓN: IMPACTO ESTIMADO (Tendencia) ---
     st.write("---")
     st.markdown("### 📈 Impacto Estimado de NubePilot")
     st.write("Proyección de recuperación de ventas al aplicar las estrategias de la IA:")
