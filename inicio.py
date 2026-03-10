@@ -1,10 +1,12 @@
 import streamlit as st
 import time
+import pandas as pd
+import numpy as np
 
 # --- CONFIGURACIÓN DE PÁGINA ---
 st.set_page_config(page_title="AI Growth Copilot - Hackathon", page_icon="🚀", layout="wide")
 
-# --- BARRA LATERAL (DISEÑO PROFESIONAL) ---
+# --- BARRA LATERAL ---
 with st.sidebar:
     st.markdown("# ⚙️ Panel de Control")
     st.write("---")
@@ -22,7 +24,7 @@ with st.sidebar:
     st.markdown("### 📊 Estado de Tienda")
     st.success("Conectado a: **Sitasafe Store**")
 
-# --- CUERPO PRINCIPAL (IDENTIDAD OFICIAL) ---
+# --- CUERPO PRINCIPAL ---
 st.markdown("# 🚀 AI Growth Copilot")
 st.subheader("Tu estratega de crecimiento con IA")
 st.write("---")
@@ -30,14 +32,14 @@ st.write("---")
 col_left, col_right = st.columns([2, 1])
 
 with col_left:
-    # Mensaje de la IA con el nuevo nombre de cupón: GROWTH10
+    # Mensaje de la IA
     with st.chat_message("assistant"):
-        st.markdown("**AI Growth Copilot:** Hola William, he analizado los datos de Sitasafe. Detecté **12 carritos abandonados** en la última hora. El cupón **GROWTH10** recuperaría el 22% de estas ventas potenciales. ¿Deseas activarlo ahora?")
+        st.markdown("**AI Growth Copilot:** Hola William, he detectado **12 carritos abandonados**. Basado en el inventario de **Sitasafe**, el cupón **GROWTH10** es la mejor opción para recuperar estas ventas. ¿Deseas activarlo?")
     
     st.write("")
     if st.button("🎯 Activar Estrategia de Recuperación"):
         with st.status("Sincronizando con Tiendanube API...", expanded=True) as status:
-            st.write("Analizando métricas de conversión...")
+            st.write("Analizando comportamiento de productos...")
             time.sleep(1)
             st.write("Creando cupón dinámico GROWTH10...")
             time.sleep(1)
@@ -45,12 +47,33 @@ with col_left:
         
         st.balloons()
         st.success("### ✅ ¡CUPÓN 'GROWTH10' CREADO EXITOSAMENTE!")
-        st.info("Estrategia activa: El Copilot ha configurado el descuento para tus clientes en la tienda.")
+
+    # --- NUEVA SECCIÓN: ANÁLISIS DE PRODUCTOS ---
+    st.write("---")
+    st.markdown("### 📦 Análisis de Productos (Top Abandonados)")
+    
+    # Datos simulados de productos
+    chart_data = pd.DataFrame({
+        "Productos": ["Producto A", "Producto B", "Producto C", "Producto D"],
+        "Vistos": [120, 95, 80, 45],
+        "Abandonados": [42, 28, 15, 10]
+    })
+    
+    # Gráfico de barras comparativo
+    st.bar_chart(chart_data.set_index("Productos"))
+    st.caption("Comparativa entre visualizaciones y productos que se quedaron en el carrito.")
 
 with col_right:
     st.markdown("### 📊 Métricas de Impacto")
     st.metric("Ventas Recuperables", "$450.00", "+12%")
     st.metric("Tasa de Conversión", "3.5%", "+0.8%")
+    
+    # --- NUEVA SECCIÓN: GRÁFICO DE TENDENCIA ---
+    st.write("---")
+    st.markdown("#### Tendencia de Recuperación")
+    # Generar datos de tendencia
+    tendencia_data = np.random.randn(20, 1).cumsum()
+    st.area_chart(tendencia_data)
     
     st.divider()
     st.markdown("#### **Equipo 10:**")
