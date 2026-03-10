@@ -6,7 +6,7 @@ import numpy as np
 # --- CONFIGURACIÓN DE PÁGINA ---
 st.set_page_config(page_title="AI Growth Copilot - Hackathon", page_icon="🚀", layout="wide")
 
-# --- ESTILOS CSS PERSONALIZADOS (COLORES, BOTONES Y AVATARES) ---
+# --- ESTILOS CSS PERSONALIZADOS ---
 st.markdown("""
     <style>
     .stApp { background-color: #f8f9fa; }
@@ -41,14 +41,25 @@ st.markdown("""
     /* Estilo para los nombres del equipo */
     .member-name { font-weight: bold; font-size: 14px; margin-bottom: -5px; }
     .member-skill { color: #6c757d; font-size: 12px; font-style: italic; }
+    
+    /* Tarjeta de Próximos Pasos */
+    .next-steps {
+        background-color: #eef2ff;
+        padding: 15px;
+        border-left: 5px solid #0056ff;
+        border-radius: 10px;
+    }
     </style>
     """, unsafe_allow_html=True)
 
 # --- BARRA LATERAL ---
 with st.sidebar:
-    st.image("https://cdn-icons-png.flaticon.com/512/2103/2103633.png", width=70)
-    st.markdown("## ⚙️ Panel de Control")
+    # 1. LOGO DE TIENDANUBE (Alianza Estratégica)
+    st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Tiendanube_logo.svg/2560px-Tiendanube_logo.svg.png", width=180)
     st.write("---")
+    
+    st.image("https://cdn-icons-png.flaticon.com/512/2103/2103633.png", width=50)
+    st.markdown("## ⚙️ Panel de Control")
     
     with st.expander("🔑 Conexión API", expanded=True):
         st.info("Estatus: Tiendanube Secure Link")
@@ -93,16 +104,30 @@ El cupón **GROWTH10** es la herramienta óptima para incentivar el cierre de es
             time.sleep(1)
             status.update(label="¡Estrategia Activa!", state="complete", expanded=False)
         st.balloons()
-        st.success("### ✅ ¡CUPÓN 'GROWTH10' CREADO EXITOSAMENTE!")
+        st.success("### ✅ ¡CUPÓN 'GROWTH10' CREADO EXITOSAMENTE EN TIENDANUBE!")
 
-    # --- CHAT INTERACTIVO ---
+    # --- 3. CHAT INTERACTIVO MEJORADO (Factor Humano) ---
     st.write("---")
     st.markdown("### 💬 Asesor Inteligente")
-    user_input = st.text_input("Hazle una pregunta a tu Copilot (Ej: ¿Cómo mejorar mis ventas?):")
     
-    if user_input:
-        with st.chat_message("assistant"):
-            st.write("📊 **Análisis Generativo:** Basado en el stock de **Sitasafe**, recomiendo una promoción en 'Cámaras WiFi' para el fin de semana, ya que la competencia ha subido precios.")
+    # Mensaje sugerido si no hay entrada
+    prompt_placeholder = "Ej: ¿Qué producto debería promocionar hoy?"
+    
+    with st.container():
+        user_input = st.text_input("Consulta a la IA sobre tu negocio:", placeholder=prompt_placeholder)
+        enviar = st.button("Enviar Consulta")
+
+    if enviar or user_input:
+        if user_input:
+            with st.chat_message("assistant"):
+                with st.spinner("Analizando tendencias de mercado..."):
+                    time.sleep(1.2)
+                    if "venta" in user_input.lower() or "promocion" in user_input.lower():
+                        st.write("📊 **Análisis Generativo:** Basado en el stock actual de **Sitasafe**, recomiendo una promoción relámpago en 'Cámaras WiFi'. La competencia ha subido precios un 5% hoy, dándote una ventaja competitiva inmediata.")
+                    else:
+                        st.write("🔍 **Sugerencia del Copilot:** He detectado que el 'Kit de Primeros Auxilios' tiene muchas visitas pero pocas ventas. Recomiendo revisar las fotos del producto o añadir un video testimonial.")
+        else:
+            st.warning("Por favor, escribe una pregunta para que el Asesor pueda ayudarte.")
 
     # --- SECCIÓN DE PRODUCTOS ---
     st.write("---")
@@ -124,10 +149,21 @@ with col_right:
     st.markdown("#### 🏷️ Inteligencia de Precios")
     st.info("Tu precio promedio está **3% por debajo** de la competencia.")
     
+    # 2. SECCIÓN DE PRÓXIMOS PASOS (Escalabilidad)
+    st.write("---")
+    st.markdown("#### 🚀 Próximos Pasos")
+    st.markdown(f"""
+    <div class="next-steps">
+        <strong>Roadmap 2026:</strong><br>
+        • Integración con Google Trends para predicción de stock.<br>
+        • Automatización de campañas en Meta Ads.<br>
+        • IA de reconocimiento visual para catálogo.
+    </div>
+    """, unsafe_allow_html=True)
+    
     st.write("---")
     st.markdown("#### 👥 Equipo 3")
     
-    # Lista de los 8 integrantes con ICONOS DIFERENTES
     equipo = [
         ("Dalia Paola Rodríguez Trejo", "Capitana / Comunicación", "https://cdn-icons-png.flaticon.com/512/6997/6997662.png"),
         ("Willan Álvarez Carmona", "Lead Architect / AI Dev", "https://cdn-icons-png.flaticon.com/512/6840/6840478.png"),
@@ -149,5 +185,4 @@ with col_right:
             st.write("")
 
 st.write("---")
-st.caption("AI Growth Copilot | Hackathon UTEL 2026 - Equipo 3")
-
+st.caption("AI Growth Copilot | Powered by Tiendanube | Hackathon UTEL 2026")
