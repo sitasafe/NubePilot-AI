@@ -8,17 +8,15 @@ st.set_page_config(page_title="NubePilot AI - Hackathon", page_icon="🚀", layo
 CLIENT_ID = "27483"
 CLIENT_SECRET = "d45072c95b889632ad3040bfd1dd951d981e0c38ff25877a"
 
-# Inicializar sesión
-if 'access_token' not in st.session_state:
-    st.session_state['access_token'] = ""
-
 # --- BARRA LATERAL (EL DISEÑO QUE TE GUSTA) ---
 with st.sidebar:
     st.markdown("# ⚙️ Panel de Control")
     st.write("---")
     
     with st.expander("🔑 Generador de Access Token", expanded=True):
-        temp_code = st.text_input("Pega el 'Code' de Partners")
+        st.caption("Pega el 'Code' de Partners abajo")
+        temp_code = st.text_input("Code", label_visibility="collapsed")
+        
         if st.button("Generar Token"):
             if temp_code:
                 payload = {
@@ -29,41 +27,43 @@ with st.sidebar:
                 }
                 res = requests.post("https://www.tiendanube.com/apps/authorize/token", json=payload)
                 if res.status_code == 200:
-                    st.session_state['access_token'] = res.json().get('access_token')
-                    st.success("¡Token Creado! ✅")
-                    st.code(st.session_state['access_token'])
+                    nuevo_token = res.json().get('access_token')
+                    st.success("¡Token creado!")
+                    st.code(nuevo_token)
+                    st.info("⬆️ COPIA este código y pégalo abajo")
                 else:
-                    st.error("Error: Code expirado.")
+                    st.error("Error: Code inválido")
             else:
-                st.warning("Escribe el código.")
+                st.warning("Escribe el código")
 
     st.write("---")
-    token_api = st.text_input("Access Token de API", type="password", value=st.session_state['access_token'])
+    # Este es el campo clave: Aquí debes pegar el token que generaste arriba
+    api_token = st.text_input("Access Token de API", type="password", help="Pega el código que generaste arriba")
     id_tienda = st.text_input("ID de Tienda", value="2831942")
     
-    if token_api:
-        st.sidebar.success("Estado: Conectado ✅")
+    if api_token:
+        st.success("Estado: Conectado ✅")
     else:
-        st.sidebar.warning("Estado: Desconectado ⚠️")
+        st.warning("Estado: Desconectado ⚠️")
 
-# --- CUERPO PRINCIPAL (DINÁMICO) ---
-st.title("🚀 NubePilot AI")
+# --- CUERPO PRINCIPAL (DISEÑO DINÁMICO) ---
+st.markdown("# 🚀 NubePilot AI")
 st.subheader("Optimización en Tiempo Real para Sitasafe")
 st.write("---")
 
-col_main, col_side = st.columns([2, 1])
+col_left, col_right = st.columns([2, 1])
 
-with col_main:
-    with st.chat_message("assistant"):
-        st.markdown("**IA:** Hola William, he detectado carritos abandonados. ¿Activamos el cupón del 10%?")
+with col_left:
+    # Mensaje de la IA
+    st.info("🤖 **IA:** Hola William, he detectado carritos abandonados. ¿Creamos el cupón **SITASAFE10** ahora?")
     
     if st.button("🎯 Activar Estrategia"):
-        if not token_api:
+        if not api_token:
             st.error("❌ Falta el Access Token en el panel lateral.")
         else:
             url = f"https://api.tiendanube.com/2025-03/{id_tienda}/coupons"
             headers = {
-                "Authentication": f"bearer {token_api.strip()}",
+                "Authentication": f"bearer {api_token.strip()}",
                 "Content-Type": "application/json",
                 "User-Agent": "NubePilot AI (willysitasafe@gmail.com)"
             }
@@ -73,25 +73,25 @@ with col_main:
                 response = requests.post(url, headers=headers, json=payload)
                 if response.status_code == 201:
                     st.balloons()
-                    st.success("### ✅ ¡CUPÓN CREADO!")
+                    st.success("### ✅ ¡CUPÓN CREADO EXITOSAMENTE!")
                 elif response.status_code == 422:
-                    st.warning("⚠️ El cupón ya existe en la tienda.")
+                    st.warning("⚠️ El cupón ya existe en tu tienda.")
                 else:
-                    st.error(f"Error {response.status_code}")
+                    st.error(f"Error {response.status_code}: Token inválido.")
             except Exception as e:
-                st.error(f"Falla: {e}")
+                st.error(f"Error de conexión: {e}")
 
-with col_side:
+with col_right:
     st.markdown("### 📊 Métricas Clave")
     st.metric("Ventas Recuperables", "$450.00", "+12%")
     st.metric("Conversión", "3.5%", "+0.8%")
     
     st.write("---")
     st.markdown("#### **Equipo 10:**")
-    st.caption("👤 **William L.** (Lead Architect)")
-    st.caption("👤 **Dalia** (Product Manager)")
-    st.caption("👤 **Montse** (Strategy)")
-    st.caption("👤 **Integrantes Equipo 10**")
+    st.markdown("👤 **William L.** (Lead Architect)")
+    st.markdown("👤 **Dalia** (Product Manager)")
+    st.markdown("👤 **Montse** (Strategy)")
+    st.markdown("👤 **Integrantes Equipo 10**")
 
 st.write("---")
-st.caption("NubePilot AI | Hackathon 2026")
+st.caption("NubePilot AI | Hackathon UTEL 2026")
