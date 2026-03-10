@@ -85,7 +85,7 @@ with st.sidebar:
         st.warning("Estado: Desconectado ⚠️")
 
 # --- CUERPO PRINCIPAL ---
-st.markdown('<h1 class="main-title">🚀 AI Growth Copilot</h1>', unsafe_allow_html=True)
+st.markdown('<h1 class="main-title">🚀 AI Growth</h1>', unsafe_allow_html=True)
 st.subheader("Optimización en Tiempo Real para Sitasafe")
 st.write("---")
 
@@ -104,7 +104,7 @@ with tab_dash:
 
     with col_left:
         with st.chat_message("assistant"):
-            st.write("🤖 **IA:** Hola William, detecté carritos abandonados. ¿Activamos el cupón **SITASAFE10**?")
+            st.write("🤖 **IA:** Hola Jiriam, detecté carritos abandonados. ¿Activamos el cupón **SITASAFE10**?")
         
         # LÓGICA DE ACTIVACIÓN REAL
         if st.button("🎯 Activar Estrategia de Recuperación"):
@@ -188,5 +188,6 @@ with tab_team:
                 """, unsafe_allow_html=True)
 
 st.write("---")
-st.caption("AI Growth Copilot | Equipo 10 | Hackathon UTEL 2026")
+st.caption("AI Growth Copilot | Equipo 3 | Hackathon UTEL 2026")
+
 
