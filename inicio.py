@@ -86,7 +86,7 @@ with st.sidebar:
 
 # --- CUERPO PRINCIPAL ---
 st.markdown('<h1 class="main-title">🚀 AI Growth</h1>', unsafe_allow_html=True)
-st.subheader("Optimización en Tiempo Real para Sitasafe")
+st.subheader("Optimización en Tiempo Real")
 st.write("---")
 
 # --- NAVEGACIÓN ---
@@ -163,7 +163,7 @@ with tab_ins:
         st.line_chart(pd.DataFrame({"Ventas": [10, 20, 15, 40, 50, 65, 80]}))
 
 with tab_team:
-    st.markdown("### 👥 Equipo 10 - Desarrollo y Estrategia")
+    st.markdown("### 👥 Equipo 3 - Desarrollo y Estrategia")
     equipo = [
         ("William L.", "Lead Architect", "https://cdn-icons-png.flaticon.com/512/6840/6840478.png"),
         ("Dalia Paola R.", "Product Manager", "https://cdn-icons-png.flaticon.com/512/6997/6997662.png"),
@@ -188,6 +188,7 @@ with tab_team:
                 """, unsafe_allow_html=True)
 
 st.write("---")
-st.caption("AI Growth Copilot | Equipo 3 | Hackathon UTEL 2026")
+st.caption("AI Growth  | Equipo 3 | Hackathon UTEL 2026 | TiendaNube|")
+
 
 
