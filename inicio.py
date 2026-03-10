@@ -2,17 +2,17 @@ import streamlit as st
 import time
 
 # --- CONFIGURACIÓN DE PÁGINA ---
-st.set_page_config(page_title="NubePilot AI - Hackathon", page_icon="🚀", layout="wide")
+st.set_page_config(page_title="AI Growth Copilot - Hackathon", page_icon="🚀", layout="wide")
 
-# --- BARRA LATERAL (EL DISEÑO QUE TE GUSTA) ---
+# --- BARRA LATERAL (DISEÑO PROFESIONAL) ---
 with st.sidebar:
     st.markdown("# ⚙️ Panel de Control")
     st.write("---")
     
     with st.expander("🔑 Autenticación API", expanded=True):
         st.info("Conexión Segura con Tiendanube")
-        # Mostramos un token ficticio profesional
-        st.code("shpat_live_942_sitasafetoken_2026")
+        # Token simulado para el Pitch
+        st.code("shpat_live_942_growth_copilot_2026")
         st.success("Access Token Validado ✅")
 
     st.write("---")
@@ -23,30 +23,30 @@ with st.sidebar:
     st.markdown("### 📊 Estado de Tienda")
     st.success("Conectado a: **Sitasafe Store**")
 
-# --- CUERPO PRINCIPAL (DISEÑO DINÁMICO) ---
-st.markdown("# 🚀 NubePilot AI")
-st.subheader("Tu Estratega de Crecimiento con IA para Tiendanube")
+# --- CUERPO PRINCIPAL (IDENTIDAD OFICIAL) ---
+st.markdown("# 🚀 AI Growth Copilot")
+st.subheader("Tu estratega de crecimiento con IA")
 st.write("---")
 
 col_left, col_right = st.columns([2, 1])
 
 with col_left:
-    # Mensaje de la IA
+    # Mensaje de la IA con el nuevo nombre
     with st.chat_message("assistant"):
-        st.markdown("**IA NubePilot:** Hola William, he analizado Sitasafe. Detecté **12 carritos abandonados** en la última hora. El cupón **SITASAFE10** recuperaría el 22% de estas ventas. ¿Deseas activarlo?")
+        st.markdown("**AI Growth Copilot:** Hola William, he analizado los datos de Sitasafe. Detecté **12 carritos abandonados** en la última hora. El cupón **SITASAFE10** recuperaría el 22% de estas ventas potenciales. ¿Deseas activarlo ahora?")
     
     st.write("")
     if st.button("🎯 Activar Estrategia de Recuperación"):
         with st.status("Sincronizando con Tiendanube API...", expanded=True) as status:
-            st.write("Verificando credenciales de NubePilot...")
+            st.write("Analizando métricas de conversión...")
             time.sleep(1)
-            st.write("Inyectando cupón SITASAFE10 vía REST API...")
+            st.write("Inyectando cupón SITASAFE10 en la base de datos de Sitasafe...")
             time.sleep(1)
             status.update(label="¡Sincronización Exitosa!", state="complete", expanded=False)
         
         st.balloons()
         st.success("### ✅ ¡CUPÓN 'SITASAFE10' CREADO EXITOSAMENTE!")
-        st.info("Estrategia activa: El cupón ya está disponible para tus clientes en Sitasafe.")
+        st.info("Estrategia activa: El Copilot ha configurado el descuento para tus clientes.")
 
 with col_right:
     st.markdown("### 📊 Métricas de Impacto")
@@ -55,9 +55,9 @@ with col_right:
     
     st.divider()
     st.markdown("#### **Equipo 10:**")
+    st.markdown("👤 **Dalia Paola R.** (Capitana / PM)")
     st.markdown("👤 **William L.** (Lead Architect)")
-    st.markdown("👤 **Dalia** (Product Manager)")
     st.markdown("👤 **Montse** (Strategy)")
 
 st.write("---")
-st.caption("NubePilot AI | Hackathon UTEL 2026 - Presentación Final")
+st.caption("AI Growth Copilot | Hackathon UTEL 2026
