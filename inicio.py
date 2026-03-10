@@ -25,7 +25,7 @@ with st.sidebar:
     st.success("Conectado a: **Sitasafe Store**")
 
 # --- CUERPO PRINCIPAL ---
-st.markdown("# 🚀 AI Growth Copilot")
+st.markdown("#  AI Growth Copilot")
 st.subheader("Tu estratega de crecimiento con IA")
 st.write("---")
 
@@ -107,3 +107,4 @@ with col_right:
 
 st.write("---")
 st.caption("AI Growth Copilot | Hackathon UTEL 2026 - Equipo 3")
+
