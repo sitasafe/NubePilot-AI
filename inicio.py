@@ -8,7 +8,7 @@ st.set_page_config(page_title="NubePilot AI - Hackathon", page_icon="🚀", layo
 CLIENT_ID = "27483"
 CLIENT_SECRET = "d45072c95b889632ad3040bfd1dd951d981e0c38ff25877a"
 
-# --- BARRA LATERAL (EL DISEÑO QUE TE GUSTA) ---
+# --- BARRA LATERAL (DISEÑO PROFESIONAL) ---
 with st.sidebar:
     st.markdown("# ⚙️ Panel de Control")
     st.write("---")
@@ -37,7 +37,7 @@ with st.sidebar:
                 st.warning("Escribe el código")
 
     st.write("---")
-    # Este es el campo clave: Aquí debes pegar el token que generaste arriba
+    # Campo donde pegas el token manualmente para asegurar la conexión
     api_token = st.text_input("Access Token de API", type="password", help="Pega el código que generaste arriba")
     id_tienda = st.text_input("ID de Tienda", value="2831942")
     
@@ -46,7 +46,7 @@ with st.sidebar:
     else:
         st.warning("Estado: Desconectado ⚠️")
 
-# --- CUERPO PRINCIPAL (DISEÑO DINÁMICO) ---
+# --- CUERPO PRINCIPAL (INTERFAZ DINÁMICA) ---
 st.markdown("# 🚀 NubePilot AI")
 st.subheader("Optimización en Tiempo Real para Sitasafe")
 st.write("---")
@@ -54,14 +54,16 @@ st.write("---")
 col_left, col_right = st.columns([2, 1])
 
 with col_left:
-    # Mensaje de la IA
+    # Mensaje de la IA (Esto es lo que el equipo quería mostrar)
     st.info("🤖 **IA:** Hola William, he detectado carritos abandonados. ¿Creamos el cupón **SITASAFE10** ahora?")
     
     if st.button("🎯 Activar Estrategia"):
         if not api_token:
             st.error("❌ Falta el Access Token en el panel lateral.")
         else:
-            url = f"https://api.tiendanube.com/2025-03/{id_tienda}/coupons"
+            # CAMBIO A V1: Ruta estándar ultra estable para el concurso
+            url = f"https://api.tiendanube.com/v1/{id_tienda}/coupons"
+            
             headers = {
                 "Authentication": f"bearer {api_token.strip()}",
                 "Content-Type": "application/json",
@@ -71,7 +73,7 @@ with col_left:
             
             try:
                 response = requests.post(url, headers=headers, json=payload)
-                if response.status_code == 201:
+                if response.status_code in [200, 201]:
                     st.balloons()
                     st.success("### ✅ ¡CUPÓN CREADO EXITOSAMENTE!")
                 elif response.status_code == 422:
