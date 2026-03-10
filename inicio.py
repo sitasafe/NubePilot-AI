@@ -34,12 +34,15 @@ col_left, col_right = st.columns([2, 1])
 with col_left:
     # --- MÓDULO DE IA GENERATIVA (ANÁLISIS PROACTIVO) ---
     with st.chat_message("assistant"):
-        st.write("🤖 **Analizando datos en tiempo real...**")
+        st.write("🤖 **Ejecutando algoritmos de crecimiento...**")
         placeholder = st.empty()
-        # Simulación de IA Generativa redactando
-        mensaje_ia = """¡Hola equipo! Tras analizar el comportamiento de los **12 carritos abandonados** y cruzarlo con el stock de **Sitasafe**, he generado una estrategia personalizada: 
         
-El cupón **GROWTH10** tiene una probabilidad del **88% de éxito** para estos perfiles de cliente. ¿Deseas activarlo?"""
+        # FRASE PROFESIONAL EN SINTONÍA CON EL NEGOCIO
+        mensaje_ia = """**Análisis del Copilot finalizado:** He detectado una ventana de oportunidad en **12 carritos abandonados**. 
+
+Tras procesar los patrones de demanda y la disponibilidad actual en el inventario, el sistema ha diseñado la siguiente estrategia de conversión:
+
+El cupón **GROWTH10** es la herramienta óptima para incentivar el cierre de estas ventas con una probabilidad de éxito del 88%. ¿Deseas aplicar esta acción ahora?"""
         
         # Efecto de escritura tipo ChatGPT
         full_response = ""
@@ -60,7 +63,7 @@ El cupón **GROWTH10** tiene una probabilidad del **88% de éxito** para estos p
         st.balloons()
         st.success("### ✅ ¡CUPÓN 'GROWTH10' CREADO EXITOSAMENTE!")
 
-    # --- NUEVO: CHAT INTERACTIVO (PUNTO 3 DEL DOCUMENTO) ---
+    # --- CHAT INTERACTIVO ---
     st.write("---")
     st.markdown("### 💬 Asesor Inteligente")
     user_input = st.text_input("Hazle una pregunta a tu Copilot (Ej: ¿Por qué bajaron mis ventas?):")
@@ -70,9 +73,9 @@ El cupón **GROWTH10** tiene una probabilidad del **88% de éxito** para estos p
             with st.spinner("IA procesando datos de la tienda..."):
                 time.sleep(1.5)
                 if "ventas" in user_input.lower():
-                    st.write("📊 **Análisis Generativo:** Tus ventas bajaron un 5% debido a que la competencia redujo precios en 'Cámaras WiFi'. Sugiero ajustar el precio un 2% o crear un bundle.")
+                    st.write("📊 **Análisis Generativo:** Las métricas indican una fluctuación del 5% debido a la estacionalidad y competencia en el sector de seguridad. Sugiero activar una campaña de 'Bundle' en productos de alta rotación.")
                 else:
-                    st.write("Basado en el contexto actual de tu tienda, mi recomendación es enfocar el marketing en el 'Kit de Primeros Auxilios' ya que tiene alta demanda este mes.")
+                    st.write("Basado en el análisis de inventario, recomiendo optimizar la descripción de la 'Cerradura Inteligente' para mejorar la conversión orgánica.")
 
     # --- SECCIÓN DE PRODUCTOS ---
     st.write("---")
@@ -91,7 +94,7 @@ with col_right:
     
     st.write("---")
     st.markdown("#### 🏷️ Inteligencia de Precios")
-    st.info("Tu precio promedio está **3% por debajo** de la competencia. Hay oportunidad de optimización.")
+    st.info("Tu precio promedio está **3% por debajo** de la competencia. Hay oportunidad de optimización de margen.")
     
     st.write("---")
     st.markdown("#### Tendencia de Recuperación")
@@ -116,5 +119,3 @@ with col_right:
 
 st.write("---")
 st.caption("AI Growth Copilot | IA Generativa | Hackathon UTEL 2026 - Equipo 3")
-
-
