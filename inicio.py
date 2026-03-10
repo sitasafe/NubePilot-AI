@@ -25,7 +25,7 @@ with st.sidebar:
     st.success("Conectado a: **Sitasafe Store**")
 
 # --- CUERPO PRINCIPAL ---
-st.markdown("# 🚀 AI Growth Copilot")
+st.markdown("# AI Growth Copilot")
 st.subheader("Tu estratega de crecimiento con IA")
 st.write("---")
 
@@ -76,10 +76,11 @@ with col_right:
     st.area_chart(tendencia_data)
     
     st.divider()
-    st.markdown("#### **Equipo 10:**")
+    st.markdown("#### **Equipo 3:**")
     st.markdown("👤 **Dalia Paola R.** (Capitana / PM)")
     st.markdown("👤 **William L.** (Lead Architect)")
     st.markdown("👤 **Montse** (Strategy)")
 
 st.write("---")
-st.caption("AI Growth Copilot | Hackathon UTEL 2026 - Presentación Final")
+st.caption("AI Growth Copilot | Hackathon UTEL 2026 - Equipo 3")
+
