@@ -35,7 +35,7 @@ with col_left:
     # Mensaje de la IA - Versión Profesional
     with st.chat_message("assistant"):
         st.markdown("""
-        **AI Growth Copilot:** Hola William, he detectado **12 carritos abandonados** en la última hora. 
+        **AI Growth Copilot:** Hola equipo, he detectado **12 carritos abandonados** en la última hora. 
         Tras analizar el **comportamiento de compra y el stock disponible**, el algoritmo ha determinado 
         que el cupón **GROWTH10** es la estrategia óptima para recuperar el 22% de estas ventas. 
         
@@ -54,11 +54,10 @@ with col_left:
         st.balloons()
         st.success("### ✅ ¡CUPÓN 'GROWTH10' CREADO EXITOSAMENTE!")
 
-    # --- SECCIÓN DE PRODUCTOS CON NOMBRES REALES ---
+    # --- SECCIÓN DE PRODUCTOS ---
     st.write("---")
     st.markdown("### 📦 Análisis de Productos (Top Abandonados)")
     
-    # Datos con nombres de productos reales
     chart_data = pd.DataFrame({
         "Productos": [
             "Cámara de Seguridad WiFi", 
@@ -70,32 +69,41 @@ with col_left:
         "Abandonados": [42, 28, 15, 10]
     })
     
-    # Gráfico de barras comparativo
     st.bar_chart(chart_data.set_index("Productos"))
-    st.caption("Filtro: Productos con mayor tasa de abandono en checkout durante las últimas 24 horas.")
+    st.caption("Filtro: Productos con mayor tasa de abandono en checkout (Últimas 24h).")
 
 with col_right:
     st.markdown("### 📊 Métricas de Impacto")
     st.metric("Ventas Recuperables", "$450.00", "+12%")
     st.metric("Tasa de Conversión", "3.5%", "+0.8%")
     
-    # --- SECCIÓN DE INTELIGENCIA DE PRECIOS ---
     st.write("---")
     st.markdown("#### 🏷️ Inteligencia de Precios")
-    st.info("Tu precio promedio está **3% por debajo** de la competencia. Hay oportunidad de ajuste.")
+    st.info("Tu precio promedio está **3% por debajo** de la competencia. Oportunidad de ajuste.")
     
-    # --- GRÁFICO DE TENDENCIA ---
     st.write("---")
     st.markdown("#### Tendencia de Recuperación")
-    # Generar datos de tendencia
     tendencia_data = np.random.randn(20, 1).cumsum()
     st.area_chart(tendencia_data)
     
     st.divider()
-    st.markdown("#### **Equipo 3:**")
-    st.markdown("👤 **Dalia Paola R.** (Capitana / PM)")
-    st.markdown("👤 **William L.** (Lead Architect)")
-    st.markdown("👤 **Montse** (Strategy)")
+    st.markdown("### 👥 Equipo 3")
+    
+    # Lista de integrantes con apellidos y skills
+    equipo = [
+        ("Dalia Paola Rodríguez Trejo", "Capitana / Comunicación"),
+        ("William Álvarez Carmona", "Lead Architect "),
+        ("Montserrat Garcia Barona", "Fotografía / Redacción"),
+        ("Jiram Cabrera Ramos", "Organización"),
+        ("Cesar Augusto Fernandez Delgado", "Estrategia / Operaciones"),
+        ("Edwing Garcia Juarez", "Ventas / Publicidad / Comunicación"),
+        ("Carlos Andrés Almeida Rangel", "Liderazgo / Organización"),
+        ("Amarilis Elizabeth Vera García", "Gestión / Análisis")
+    ]
+    
+    for nombre, skill in equipo:
+        st.markdown(f"**{nombre}**")
+        st.caption(f"_{skill}_")
 
 st.write("---")
 st.caption("AI Growth Copilot | Hackathon UTEL 2026 - Equipo 3")
