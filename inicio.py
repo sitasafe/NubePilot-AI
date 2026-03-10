@@ -92,11 +92,11 @@ with col_right:
     # Lista de integrantes con apellidos y skills
     equipo = [
         ("Dalia Paola Rodríguez Trejo", "Capitana / Comunicación"),
-        ("William Álvarez Carmona", "Lead Architect "),
+        ("Willan Álvarez Carmona", "Lead Architect"),
         ("Montserrat Garcia Barona", "Fotografía / Redacción"),
         ("Jiram Cabrera Ramos", "Organización"),
         ("Cesar Augusto Fernandez Delgado", "Estrategia / Operaciones"),
-        ("Edwing Garcia Juarez", "Ventas / Publicidad / Comunicación"),
+        ("Edwing Garcia Juarez", "Ventas / Publicidad"),
         ("Carlos Andrés Almeida Rangel", "Liderazgo / Organización"),
         ("Amarilis Elizabeth Vera García", "Gestión / Análisis")
     ]
@@ -107,4 +107,5 @@ with col_right:
 
 st.write("---")
 st.caption("AI Growth Copilot | Hackathon UTEL 2026 - Equipo 3")
+
 
