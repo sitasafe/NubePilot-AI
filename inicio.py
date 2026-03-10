@@ -41,26 +41,25 @@ st.markdown("""
     /* Estilo para los nombres del equipo */
     .member-name { font-weight: bold; font-size: 14px; margin-bottom: -5px; }
     .member-skill { color: #6c757d; font-size: 12px; font-style: italic; }
-    
-    /* Tarjeta de Próximos Pasos */
-    .next-steps {
-        background-color: #eef2ff;
-        padding: 15px;
-        border-left: 5px solid #0056ff;
-        border-radius: 10px;
+
+    /* Estilo para Próximos Pasos */
+    .next-steps-box {
+        background-color: #ffffff;
+        padding: 20px;
+        border-radius: 15px;
+        border: 1px solid #e0e0e0;
+        box-shadow: 2px 2px 10px rgba(0,0,0,0.05);
     }
     </style>
     """, unsafe_allow_html=True)
 
 # --- BARRA LATERAL ---
 with st.sidebar:
-    # 1. LOGO DE TIENDANUBE (Alianza Estratégica)
-    st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Tiendanube_logo.svg/2560px-Tiendanube_logo.svg.png", width=180)
+    # LOGO DE TIENDANUBE (Símbolo que elegiste)
+    st.image("https://logowik.com/content/uploads/images/tiendanube1485.logowik.com.webp", use_container_width=True)
     st.write("---")
     
-    st.image("https://cdn-icons-png.flaticon.com/512/2103/2103633.png", width=50)
     st.markdown("## ⚙️ Panel de Control")
-    
     with st.expander("🔑 Conexión API", expanded=True):
         st.info("Estatus: Tiendanube Secure Link")
         st.code("shpat_live_942_growth_copilot_2026")
@@ -82,7 +81,6 @@ with col_left:
     with st.chat_message("assistant"):
         st.write("🤖 **Ejecutando algoritmos de crecimiento...**")
         placeholder = st.empty()
-        
         mensaje_ia = """**Análisis del Copilot finalizado:** He detectado una ventana de oportunidad en **12 carritos abandonados**. 
 
 Tras procesar los patrones de demanda y la disponibilidad actual en el inventario, el sistema ha diseñado la siguiente estrategia de conversión:
@@ -104,30 +102,22 @@ El cupón **GROWTH10** es la herramienta óptima para incentivar el cierre de es
             time.sleep(1)
             status.update(label="¡Estrategia Activa!", state="complete", expanded=False)
         st.balloons()
-        st.success("### ✅ ¡CUPÓN 'GROWTH10' CREADO EXITOSAMENTE EN TIENDANUBE!")
+        st.success("### ✅ ¡CUPÓN 'GROWTH10' CREADO EXITOSAMENTE!")
 
-    # --- 3. CHAT INTERACTIVO MEJORADO (Factor Humano) ---
+    # --- CHAT INTERACTIVO (MEJORADO CON FACTOR HUMANO) ---
     st.write("---")
     st.markdown("### 💬 Asesor Inteligente")
-    
-    # Mensaje sugerido si no hay entrada
-    prompt_placeholder = "Ej: ¿Qué producto debería promocionar hoy?"
-    
-    with st.container():
-        user_input = st.text_input("Consulta a la IA sobre tu negocio:", placeholder=prompt_placeholder)
-        enviar = st.button("Enviar Consulta")
+    user_input = st.text_input("Hazle una pregunta a tu Copilot:", placeholder="¿Cómo puedo mejorar mis ventas hoy?")
+    col_btn_1, col_btn_2 = st.columns([1, 4])
+    with col_btn_1:
+        btn_enviar = st.button("Enviar")
 
-    if enviar or user_input:
-        if user_input:
-            with st.chat_message("assistant"):
-                with st.spinner("Analizando tendencias de mercado..."):
-                    time.sleep(1.2)
-                    if "venta" in user_input.lower() or "promocion" in user_input.lower():
-                        st.write("📊 **Análisis Generativo:** Basado en el stock actual de **Sitasafe**, recomiendo una promoción relámpago en 'Cámaras WiFi'. La competencia ha subido precios un 5% hoy, dándote una ventaja competitiva inmediata.")
-                    else:
-                        st.write("🔍 **Sugerencia del Copilot:** He detectado que el 'Kit de Primeros Auxilios' tiene muchas visitas pero pocas ventas. Recomiendo revisar las fotos del producto o añadir un video testimonial.")
-        else:
-            st.warning("Por favor, escribe una pregunta para que el Asesor pueda ayudarte.")
+    if btn_enviar or user_input:
+        with st.chat_message("assistant"):
+            if user_input:
+                st.write(f"📊 **Análisis Generativo:** Basado en el stock de **Sitasafe**, para responder a tu duda sobre '{user_input}', recomiendo una promoción en 'Cámaras WiFi'. La competencia ha subido precios y tú tienes stock suficiente para cubrir la demanda.")
+            else:
+                st.warning("Escribe una pregunta para que la IA pueda analizar tu tienda.")
 
     # --- SECCIÓN DE PRODUCTOS ---
     st.write("---")
@@ -149,15 +139,15 @@ with col_right:
     st.markdown("#### 🏷️ Inteligencia de Precios")
     st.info("Tu precio promedio está **3% por debajo** de la competencia.")
     
-    # 2. SECCIÓN DE PRÓXIMOS PASOS (Escalabilidad)
+    # SECCIÓN: PRÓXIMOS PASOS
     st.write("---")
     st.markdown("#### 🚀 Próximos Pasos")
-    st.markdown(f"""
-    <div class="next-steps">
-        <strong>Roadmap 2026:</strong><br>
-        • Integración con Google Trends para predicción de stock.<br>
-        • Automatización de campañas en Meta Ads.<br>
-        • IA de reconocimiento visual para catálogo.
+    st.markdown("""
+    <div class="next-steps-box">
+    <strong>Escalabilidad del Proyecto:</strong><br>
+    🔹 Integración con Google Trends para predicción de stock.<br>
+    🔹 Análisis de sentimientos en reseñas de clientes.<br>
+    🔹 Automatización de Smart Ads en Instagram.
     </div>
     """, unsafe_allow_html=True)
     
