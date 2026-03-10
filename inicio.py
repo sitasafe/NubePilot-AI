@@ -79,6 +79,11 @@ with col_right:
     st.metric("Ventas Recuperables", "$450.00", "+12%")
     st.metric("Tasa de Conversión", "3.5%", "+0.8%")
     
+    # --- SECCIÓN DE INTELIGENCIA DE PRECIOS ---
+    st.write("---")
+    st.markdown("#### 🏷️ Inteligencia de Precios")
+    st.info("Tu precio promedio está **3% por debajo** de la competencia. Hay oportunidad de ajuste.")
+    
     # --- GRÁFICO DE TENDENCIA ---
     st.write("---")
     st.markdown("#### Tendencia de Recuperación")
