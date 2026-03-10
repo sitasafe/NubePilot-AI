@@ -19,13 +19,13 @@ with st.sidebar:
     
     if st.button("Generar Access Token"):
         if temp_code:
-            payload = {
+            token_params = {
                 "client_id": CLIENT_ID,
                 "client_secret": CLIENT_SECRET,
                 "grant_type": "authorization_code",
                 "code": temp_code.strip()
             }
-            res = requests.post("https://www.tiendanube.com/apps/authorize/token", json=payload)
+            res = requests.post("https://www.tiendanube.com/apps/authorize/token", json=token_params)
             if res.status_code == 200:
                 st.session_state['access_token'] = res.json().get('access_token')
                 st.success("¡Token vinculado! ✅")
@@ -54,14 +54,33 @@ with col1:
         if not st.session_state['access_token']:
             st.error("❌ Error: Falta el token en la barra lateral.")
         else:
-            url = f"https://api.tiendanube.com/2025-03/{user_id}/coupons"
-            headers = {
+            api_url = f"https://api.tiendanube.com/2025-03/{user_id}/coupons"
+            api_headers = {
                 "Authentication": f"bearer {st.session_state['access_token']}",
                 "Content-Type": "application/json",
                 "User-Agent": "NubePilot AI (willysitasafe@gmail.com)"
             }
-            payload = {
+            api_payload = {
                 "code": "SITASAFE10",
                 "type": "percentage",
                 "value": "10",
                 "max_uses": 50
+            }
+
+            with st.spinner("Conectando con Tiendanube..."):
+                try:
+                    response = requests.post(api_url, headers=api_headers, json=api_payload)
+                    if response.status_code == 201:
+                        st.balloons()
+                        st.success("### ¡Éxito! Cupón creado en la tienda.")
+                    elif response.status_code == 422:
+                        st.warning("El cupón ya existe.")
+                    else:
+                        st.error(f"Error {response.status_code}")
+                except Exception as e:
+                    st.error(f"Error de conexión: {e}")
+
+with col2:
+    st.subheader("📊 Métricas Clave")
+    st.metric(label="Ventas Recuperables", value="$450.00", delta="+12%")
+    st.metric(label="Tasa de Conversión", value="3.5%", delta="0.8%")
