@@ -78,7 +78,7 @@ with st.sidebar:
 
 # --- CUERPO PRINCIPAL ---
 st.markdown('<h1 class="main-title">🚀 AI Growth</h1>', unsafe_allow_html=True)
-st.subheader("Optimización y Review Intelligence en Tiempo Real")
+st.subheader("Optimización  en Tiempo Real")
 st.write("---")
 
 tab_dash, tab_ins, tab_team = st.tabs(["📊 Dashboard General", "🧠 Insights Avanzados", "👥 Equipo"])
@@ -188,3 +188,4 @@ with tab_team:
 
 st.write("---")
 st.caption("AI Growth | Equipo 3 | Hackathon UTEL 2026 | TiendaNube")
+
