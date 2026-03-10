@@ -116,13 +116,13 @@ with tab_dash:
 
 # --- TAB 2: INSIGHTS AVANZADOS (Fusión con Review Intelligence) ---
 with tab_ins:
-    st.markdown("### 🧠 Review Intelligence: De Opiniones a Estrategia")
+    st.markdown("### 🧠 Review Intelligence")
     st.caption("Nuestra IA analiza el sentimiento del mercado y las reseñas de la competencia para priorizar tu crecimiento.")
     
     col_ins1, col_ins2 = st.columns([1, 1])
 
     with col_ins1:
-        st.markdown("#### 🚩 Hoja de Ruta Estratégica (Priorizada)")
+        st.markdown("#### 🚩 Hoja de Ruta Estratégica")
         st.error("🚨 **URGENTE:** El 42% menciona 'dificultad de armado'. Recomendación: Crear video tutorial.")
         st.warning("⚠️ **OPORTUNIDAD:** Clientes piden empaques sustentables. Tu competencia ya lo ofrece.")
         st.info("💡 **INSIGHT:** Hay dudas recurrentes sobre impermeabilidad. Actualizar descripción hoy.")
@@ -188,4 +188,5 @@ with tab_team:
 
 st.write("---")
 st.caption("AI Growth | Equipo 3 | Hackathon UTEL 2026 | TiendaNube")
+
 
