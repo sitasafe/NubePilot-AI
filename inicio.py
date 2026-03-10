@@ -32,9 +32,15 @@ st.write("---")
 col_left, col_right = st.columns([2, 1])
 
 with col_left:
-    # Mensaje de la IA
+    # Mensaje de la IA - Versión Profesional de Datos
     with st.chat_message("assistant"):
-        st.markdown("**AI Growth Copilot:** Hola William, he detectado **12 carritos abandonados**. Basado en el inventario de **Sitasafe**, el cupón **GROWTH10** es la mejor opción para recuperar estas ventas. ¿Deseas activarlo?")
+        st.markdown("""
+        **AI Growth Copilot:** Hola William, he detectado **12 carritos abandonados** en la última hora. 
+        Tras analizar el **comportamiento de compra y el stock disponible**, el algoritmo ha determinado 
+        que el cupón **GROWTH10** es la estrategia óptima para recuperar el 22% de estas ventas. 
+        
+        ¿Deseas activarlo ahora?
+        """)
     
     st.write("")
     if st.button("🎯 Activar Estrategia de Recuperación"):
@@ -83,4 +89,5 @@ with col_right:
 
 st.write("---")
 st.caption("AI Growth Copilot | Hackathon UTEL 2026 - Equipo 3")
+
 
