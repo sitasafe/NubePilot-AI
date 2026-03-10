@@ -99,3 +99,49 @@ with tab_dash:
         
         if st.button("🎯 Activar Estrategia de Recuperación"):
             with st.status("Conectando con la API de Tiendanube...", expanded=True) as status:
+                time.sleep(1.2)
+                status.update(label="Generando cupón inteligente...", state="running")
+                time.sleep(1.2)
+                status.update(label="¡Estrategia Desplegada!", state="complete", expanded=False)
+            
+            st.balloons()
+            st.success("### ✅ ¡CUPÓN 'SITASAFE10' ACTIVO EN LA TIENDA!")
+
+    with col_right:
+        st.markdown("### 💬 Asesor Inteligente")
+        u_input = st.text_input("Consulta a la IA:", placeholder="¿Cómo mejorar ventas?")
+        if st.button("Enviar"):
+            st.info(f"📊 **IA:** Analizando tendencias... Recomiendo activar envíos gratis en compras mayores a $999.")
+
+with tab_ins:
+    st.markdown("### 📈 Análisis de Rendimiento IA")
+    st.line_chart(pd.DataFrame({"Proyección Ventas": [10, 20, 15, 45, 55, 80, 105]}))
+
+with tab_team:
+    st.markdown("### 👥 Equipo 3 - Desarrollo y Estrategia")
+    
+    equipo = [
+        ("William L.", "Lead Architect", "https://cdn-icons-png.flaticon.com/512/6840/6840478.png"),
+        ("Dalia Paola R.", "Product Manager", "https://cdn-icons-png.flaticon.com/512/6997/6997662.png"),
+        ("Montserrat G.", "Strategy", "https://cdn-icons-png.flaticon.com/512/6997/6997674.png"),
+        ("Jiram Cabrera", "Organización", "https://cdn-icons-png.flaticon.com/512/4333/4333609.png"),
+        ("Cesar Augusto F.", "Estrategia", "https://cdn-icons-png.flaticon.com/512/3001/3001764.png"),
+        ("Edwing Garcia", "Ventas", "https://cdn-icons-png.flaticon.com/512/9431/9431149.png"),
+        ("Carlos Andrés A.", "Liderazgo", "https://cdn-icons-png.flaticon.com/512/2354/2354573.png"),
+        ("Amarilis Elizabeth", "Gestión", "https://cdn-icons-png.flaticon.com/512/201/201634.png")
+    ]
+    
+    for i in range(0, len(equipo), 4):
+        cols = st.columns(4)
+        for j, (nombre, cargo, icono) in enumerate(equipo[i:i+4]):
+            with cols[j]:
+                st.markdown(f"""
+                <div class="team-card">
+                    <img src="{icono}" class="team-img"><br>
+                    <strong>{nombre}</strong><br>
+                    <small style="color: #666;">{cargo}</small>
+                </div>
+                """, unsafe_allow_html=True)
+
+st.write("---")
+st.caption("AI Growth | Equipo 3 | Hackathon UTEL 2026 | TiendaNube")
