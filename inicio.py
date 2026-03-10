@@ -48,7 +48,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- BARRA LATERAL ---
+# --- BARRA LATERAL (Panel de Control) ---
 with st.sidebar:
     st.image("https://logowik.com/content/uploads/images/tiendanube1485.logowik.com.webp", use_container_width=True)
     st.write("---")
@@ -68,7 +68,7 @@ with st.sidebar:
 
     st.divider()
     
-    api_token = st.text_input("Access Token de API", type="password")
+    api_token = st.text_input("Access Token de API", type="password", help="Pega el token generado arriba")
     id_tienda = st.text_input("ID de Tienda", value="2831942")
     
     if api_token:
@@ -78,11 +78,12 @@ with st.sidebar:
 
 # --- CUERPO PRINCIPAL ---
 st.markdown('<h1 class="main-title">🚀 AI Growth</h1>', unsafe_allow_html=True)
-st.subheader("Optimización en Tiempo Real")
+st.subheader("Optimización y Review Intelligence en Tiempo Real")
 st.write("---")
 
 tab_dash, tab_ins, tab_team = st.tabs(["📊 Dashboard General", "🧠 Insights Avanzados", "👥 Equipo"])
 
+# --- TAB 1: DASHBOARD GENERAL ---
 with tab_dash:
     st.markdown("### 📊 Estado Actual de la Tienda")
     m_col1, m_col2, m_col3 = st.columns(3)
@@ -95,51 +96,70 @@ with tab_dash:
 
     with col_left:
         with st.chat_message("assistant"):
-            st.write("🤖 **IA:** Hola Jiriam, detecté carritos abandonados. ¿Activamos el cupón **SITASAFE10**?")
+            st.write("🤖 **IA:** Hola Jiriam, detecté un aumento en carritos abandonados. ¿Activamos el cupón **SITASAFE10** para recuperar esas ventas?")
         
         if st.button("🎯 Activar Estrategia de Recuperación"):
             with st.status("Conectando con la API de Tiendanube...", expanded=True) as status:
                 time.sleep(1.2)
-                status.update(label="Generando cupón inteligente...", state="running")
+                status.update(label="Generando cupón inteligente en la tienda...", state="running")
                 time.sleep(1.2)
                 status.update(label="¡Estrategia Desplegada!", state="complete", expanded=False)
             
             st.balloons()
-            st.success("### ✅ ¡CUPÓN 'SITASAFE10' ACTIVO EN LA TIENDA!")
+            st.success("### 🚀 Estrategia de Recuperación Desplegada: Cupón SITASAFE10 activado.")
 
     with col_right:
         st.markdown("### 💬 Asesor Inteligente")
         u_input = st.text_input("Consulta a la IA:", placeholder="¿Cómo mejorar ventas?")
         if st.button("Enviar"):
-            st.info(f"📊 **IA:** Analizando tendencias... Recomiendo activar envíos gratis en compras mayores a $999.")
+            st.info(f"📊 **IA:** Analizando tendencias... Recomiendo activar envíos gratis en compras mayores a $999 para reducir el abandono en el checkout.")
 
+# --- TAB 2: INSIGHTS AVANZADOS (Fusión con Review Intelligence) ---
 with tab_ins:
-    st.markdown("### 🧠 Análisis de Productos e Insights")
+    st.markdown("### 🧠 Review Intelligence: De Opiniones a Estrategia")
+    st.caption("Nuestra IA analiza el sentimiento del mercado y las reseñas de la competencia para priorizar tu crecimiento.")
     
-    # Datos de ejemplo para la tabla y gráfico
-    df_abandonos = pd.DataFrame({
-        "Producto": ["Playera Algodón", "Gorra Trucker", "Tenis Sport", "Sudadera Minimal", "Calcetines Pack"],
-        "Abandonos": [45, 28, 15, 12, 8],
-        "Valor Perdido (MXN)": [13500, 7000, 18000, 9600, 1600],
-        "Tasa de Rebote": ["12%", "8%", "25%", "5%", "2%"]
-    })
-
     col_ins1, col_ins2 = st.columns([1, 1])
 
     with col_ins1:
-        st.markdown("#### 🛒 Productos con más Abandonos")
-        st.dataframe(df_abandonos, use_container_width=True, hide_index=True)
-        st.caption("Nota: El 'Tenis Sport' tiene menos abandonos pero mayor impacto financiero.")
+        st.markdown("#### 🚩 Hoja de Ruta Estratégica (Priorizada)")
+        st.error("🚨 **URGENTE:** El 42% menciona 'dificultad de armado'. Recomendación: Crear video tutorial.")
+        st.warning("⚠️ **OPORTUNIDAD:** Clientes piden empaques sustentables. Tu competencia ya lo ofrece.")
+        st.info("💡 **INSIGHT:** Hay dudas recurrentes sobre impermeabilidad. Actualizar descripción hoy.")
 
     with col_ins2:
-        st.markdown("#### 📊 Impacto Financiero por Producto")
-        # Gráfico de barras para comparar el valor perdido
+        st.markdown("#### 📊 Sentimiento del Mercado")
+        data_sentimiento = pd.DataFrame({
+            "Categoría": ["Calidad", "Envío", "Atención", "Precio"],
+            "Tu Tienda": [85, 70, 90, 65],
+            "Competencia": [80, 85, 75, 70]
+        }).set_index("Categoría")
+        st.bar_chart(data_sentimiento)
+
+    st.divider()
+
+    st.markdown("#### 🛒 Análisis de Productos con más Abandonos")
+    df_abandonos = pd.DataFrame({
+        "Producto": ["Playera Algodón", "Gorra Trucker", "Tenis Sport", "Sudadera Minimal"],
+        "Abandonos": [45, 28, 15, 12],
+        "Valor Perdido (MXN)": [13500, 7000, 18000, 9600],
+        "Impacto": ["Crítico", "Medio", "Alto", "Bajo"]
+    })
+
+    col_table, col_chart = st.columns([2, 1])
+    
+    with col_table:
+        st.dataframe(df_abandonos, use_container_width=True, hide_index=True)
+    
+    with col_chart:
+        st.markdown("**Fuga de Capital Est.**")
         st.bar_chart(df_abandonos.set_index("Producto")["Valor Perdido (MXN)"])
 
     st.divider()
-    st.markdown("#### 📈 Proyección de Crecimiento con IA")
-    st.line_chart(pd.DataFrame({"Ventas Proyectadas": [10, 20, 15, 45, 55, 80, 105]}))
+    st.markdown("#### 📈 Proyección de Recuperación con IA")
+    st.line_chart(pd.DataFrame({"Ventas Proyectadas": [10, 25, 20, 50, 65, 90, 115]}))
 
+# --- TAB 3: EQUIPO ---
 with tab_team:
     st.markdown("### 👥 Equipo 3 - Desarrollo y Estrategia")
     
@@ -168,4 +188,3 @@ with tab_team:
 
 st.write("---")
 st.caption("AI Growth | Equipo 3 | Hackathon UTEL 2026 | TiendaNube")
-
