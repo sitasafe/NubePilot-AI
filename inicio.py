@@ -130,7 +130,7 @@ El cupón **GROWTH10** es la herramienta óptima para incentivar el cierre de es
 
     # --- SECCIÓN: GRÁFICA DE TENDENCIA ---
     st.write("---")
-    st.markdown("### 📈 Impacto Estimado de NubePilot")
+    st.markdown("### 📈 Impacto Estimado")
     chart_data = pd.DataFrame({
         "Semana": [0, 1, 2, 3, 4, 5, 6],
         "Ventas ($)": [10, 20, 15, 40, 50, 65, 80]
@@ -173,3 +173,4 @@ with col_right:
 
 st.write("---")
 st.caption("AI Growth Copilot | Powered by Tiendanube | Hackathon UTEL 2026")
+
