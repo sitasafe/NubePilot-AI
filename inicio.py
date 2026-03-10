@@ -114,8 +114,31 @@ with tab_dash:
             st.info(f"📊 **IA:** Analizando tendencias... Recomiendo activar envíos gratis en compras mayores a $999.")
 
 with tab_ins:
-    st.markdown("### 📈 Análisis de Rendimiento IA")
-    st.line_chart(pd.DataFrame({"Proyección Ventas": [10, 20, 15, 45, 55, 80, 105]}))
+    st.markdown("### 🧠 Análisis de Productos e Insights")
+    
+    # Datos de ejemplo para la tabla y gráfico
+    df_abandonos = pd.DataFrame({
+        "Producto": ["Playera Algodón", "Gorra Trucker", "Tenis Sport", "Sudadera Minimal", "Calcetines Pack"],
+        "Abandonos": [45, 28, 15, 12, 8],
+        "Valor Perdido (MXN)": [13500, 7000, 18000, 9600, 1600],
+        "Tasa de Rebote": ["12%", "8%", "25%", "5%", "2%"]
+    })
+
+    col_ins1, col_ins2 = st.columns([1, 1])
+
+    with col_ins1:
+        st.markdown("#### 🛒 Productos con más Abandonos")
+        st.dataframe(df_abandonos, use_container_width=True, hide_index=True)
+        st.caption("Nota: El 'Tenis Sport' tiene menos abandonos pero mayor impacto financiero.")
+
+    with col_ins2:
+        st.markdown("#### 📊 Impacto Financiero por Producto")
+        # Gráfico de barras para comparar el valor perdido
+        st.bar_chart(df_abandonos.set_index("Producto")["Valor Perdido (MXN)"])
+
+    st.divider()
+    st.markdown("#### 📈 Proyección de Crecimiento con IA")
+    st.line_chart(pd.DataFrame({"Ventas Proyectadas": [10, 20, 15, 45, 55, 80, 105]}))
 
 with tab_team:
     st.markdown("### 👥 Equipo 3 - Desarrollo y Estrategia")
