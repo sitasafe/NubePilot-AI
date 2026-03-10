@@ -29,6 +29,16 @@ st.markdown("""
         font-size: 3rem; font-weight: 800; margin-bottom: 0;
     }
     
+    /* Cuadros de Review Intelligence (Basados en la imagen) */
+    .review-card-urgent {
+        background-color: #ffebee; padding: 15px; border-radius: 10px;
+        border-left: 5px solid #ff4b4b; margin-bottom: 15px;
+    }
+    .review-card-advantage {
+        background-color: #e8f5e9; padding: 15px; border-radius: 10px;
+        border-left: 5px solid #4caf50; margin-bottom: 15px;
+    }
+    
     /* Tarjetas de Equipo */
     .team-card {
         text-align: center; padding: 15px; border-radius: 15px;
@@ -46,11 +56,12 @@ with st.sidebar:
     st.image("https://cdn-icons-png.flaticon.com/512/2103/2103633.png", width=50)
     st.markdown("## ⚙️ Panel de Control")
     
-    # Expandido por defecto como lo tenías
-    with st.expander("🔑 Conexión API", expanded=True):
-        st.info("Estatus: Tiendanube Secure Link")
+    with st.expander("🔑 Conexión API Tiendanube", expanded=True):
+        st.info("Estatus: Secure Link")
+        st.markdown("**Store ID:** `sitasafe_6621` ")
+        st.markdown("**Access Token:**")
         st.code("shpat_live_942_growth_copilot_2026")
-        st.success("Access Token Validado ✅")
+        st.success("Acceso Validado ✅")
 
     st.divider()
     st.markdown("### 📊 Estado de Tienda")
@@ -65,7 +76,6 @@ st.write("---")
 tab_dash, tab_ins, tab_team = st.tabs(["📊 Dashboard General", "🧠 Insights Avanzados", "👥 Equipo"])
 
 with tab_dash:
-    # MÉTRICAS
     st.markdown("### 📊 Estado Actual de la Tienda")
     m_col1, m_col2, m_col3 = st.columns(3)
     m_col1.metric("Carritos Abandonados", "12", "↑ 2", delta_color="inverse")
@@ -99,9 +109,37 @@ with tab_dash:
                 st.info(f"📊 **IA:** Para mejorar en '{u_input}', recomiendo optimizar stock hoy.")
 
 with tab_ins:
+    # SECCIÓN DE REVIEW INTELLIGENCE (NLP) AGREGADA
+    st.markdown("### 🔍 Decodificador de Opiniones (NLP)")
+    st.write("Análisis de sentimiento y benchmarking competitivo automático.")
+    
+    col_a, col_b = st.columns(2)
+    with col_a:
+        st.markdown("#### 🚨 Acciones Urgentes")
+        st.markdown("""<div class="review-card-urgent">
+            <strong>⚠️ Dificultad de armado (42% de quejas)</strong><br>
+            <small>➜ Acción: Crear video tutorial e incluirlo en el QR de envío.</small>
+            </div>""", unsafe_allow_html=True)
+        st.markdown("""<div class="review-card-urgent">
+            <strong>⚠️ Dudas de Impermeabilidad</strong><br>
+            <small>➜ Acción: Actualizar FAQ y descripción del producto hoy mismo.</small>
+            </div>""", unsafe_allow_html=True)
+
+    with col_b:
+        st.markdown("#### 💡 Ventaja Competitiva")
+        st.markdown("""<div class="review-card-advantage">
+            <strong>✨ Calidad de Cremalleras (Mención Positiva)</strong><br>
+            <small>➜ Acción: Resaltar este atributo en las campañas de Ads.</small>
+            </div>""", unsafe_allow_html=True)
+        st.markdown("""<div class="review-card-advantage">
+            <strong>✨ Eco-Packaging (Diferenciador)</strong><br>
+            <small>➜ Acción: Añadir sello de sustentabilidad en la Home.</small>
+            </div>""", unsafe_allow_html=True)
+    
+    st.write("---")
     c_ins_1, c_ins_2 = st.columns(2)
     with c_ins_1:
-        st.markdown("### 🛒 Productos con más Abandonos")
+        st.markdown("#### 🛒 Productos con más Abandonos")
         df = pd.DataFrame({
             "Producto": ["Playera Algodón", "Gorra Trucker", "Tenis Sport"],
             "Abandonos": [8, 3, 1],
@@ -109,7 +147,7 @@ with tab_ins:
         })
         st.table(df)
     with c_ins_2:
-        st.markdown("### 📈 Impacto Estimado")
+        st.markdown("#### 📈 Impacto Estimado")
         st.line_chart(pd.DataFrame({"Ventas": [10, 20, 15, 40, 50, 65, 80]}))
 
 with tab_team:
@@ -125,7 +163,6 @@ with tab_team:
         ("Amarilis Elizabeth", "Gestión", "https://cdn-icons-png.flaticon.com/512/201/201634.png")
     ]
     
-    # Grid de 4 columnas para que se vea ordenado y pequeño
     for i in range(0, len(equipo), 4):
         cols = st.columns(4)
         for j, (nombre, skill, icon) in enumerate(equipo[i:i+4]):
