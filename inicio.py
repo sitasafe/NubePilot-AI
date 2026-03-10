@@ -1,62 +1,88 @@
 import streamlit as st
 import requests
 
-# --- CONFIGURACIÓN DE LA PÁGINA ---
+# --- CONFIGURACIÓN DE PÁGINA ---
 st.set_page_config(page_title="NubePilot AI - Hackathon", page_icon="🚀", layout="wide")
 
-# DATOS DE IDENTIFICACIÓN
+# DATOS DE IDENTIFICACIÓN DE TU APP (PARTNERS)
 CLIENT_ID = "27483"
 CLIENT_SECRET = "d45072c95b889632ad3040bfd1dd951d981e0c38ff25877a"
 
-# Mantener el token en la sesión
+# --- INICIALIZACIÓN DE VARIABLES (SESSION STATE) ---
 if 'access_token' not in st.session_state:
     st.session_state['access_token'] = ""
 
-# --- BARRA LATERAL ---
-with st.sidebar:
-    st.title("⚙️ Configuración")
-    temp_code = st.text_input("Código de Instalación (de Partners)")
-    
-    if st.button("Generar Access Token"):
-        if temp_code:
-            token_params = {
-                "client_id": CLIENT_ID,
-                "client_secret": CLIENT_SECRET,
-                "grant_type": "authorization_code",
-                "code": temp_code.strip()
-            }
-            res = requests.post("https://www.tiendanube.com/apps/authorize/token", json=token_params)
-            if res.status_code == 200:
-                st.session_state['access_token'] = res.json().get('access_token')
-                st.success("¡Token vinculado! ✅")
-            else:
-                st.error("Error: El código expiró.")
-        else:
-            st.warning("Ingresa el código.")
+if 'code_usado' not in st.session_state:
+    st.session_state['code_usado'] = ""
 
-    st.markdown("---")
-    user_id = st.text_input("ID de la Tienda", value="2831942")
+# --- BARRA LATERAL (RECUPERANDO EL DISEÑO QUE TE GUSTABA) ---
+with st.sidebar:
+    st.markdown("# ⚙️ Panel de Control")
+    st.write("---")
+    
+    # Menú desplegable "Generador de Access Token" con el logo de la llave 🔑
+    with st.expander("🔑 Generador de Access Token"):
+        st.write("---")
+        temp_code = st.text_input("Pega el 'Code' de Partners", help="Solo el código después de ?code=")
+        
+        # Guardamos el código que se va a usar para evitar errores si el usuario cambia el input
+        st.session_state['code_usado'] = temp_code
+
+        # Botón de "Generar Token"
+        st.write("---")
+        if st.button("Generar Token"):
+            if st.session_state['code_usado']:
+                token_params = {
+                    "client_id": CLIENT_ID,
+                    "client_secret": CLIENT_SECRET,
+                    "grant_type": "authorization_code",
+                    "code": st.session_state['code_usado'].strip()
+                }
+                res = requests.post("https://www.tiendanube.com/apps/authorize/token", json=token_params)
+                
+                if res.status_code == 200:
+                    st.session_state['access_token'] = res.json().get('access_token')
+                    st.success("¡Token Creado! Cópialo y pégalo abajo. ✅")
+                    # Mostramos el token para copiar (Cuadro gris con icono)
+                    st.code(st.session_state['access_token'])
+                else:
+                    st.error("Error: El código expiró.")
+            else:
+                st.warning("Escribe el código primero.")
+
+    st.write("---")
+    
+    # Campo "Access Token de API" (Oculto como en image_1.png)
+    token_api = st.text_input("Access Token de API", type="password", value=st.session_state['access_token'], help="Pega aquí el token generado arriba")
+    
+    st.write("---")
+    
+    # Campo "ID de Tienda"
+    id_tienda = st.text_input("ID de Tienda", value="2831942")
+
+st.markdown("---")
 
 # --- CUERPO PRINCIPAL ---
-st.title("🚀 NubePilot AI")
+st.markdown("# 🚀 NubePilot AI")
 st.markdown("### *Tu estratega de crecimiento con IA*")
 
-col1, col2 = st.columns([2, 1])
+# Simulamos la Inteligencia de la IA
+st.write("---")
+col_info, col_chart = st.columns([2, 1])
 
-with col1:
-    st.subheader("💬 Asesor Inteligente (Modo Chat)")
-    
+with col_info:
+    # Simulación del Chat de la IA que te gustaba
     with st.chat_message("assistant"):
-        st.write("Hola William, analicé tu tienda **Sitasafe**. He detectado **12 carritos abandonados**.")
-        st.write("**Recomendación:** Crea un cupón de descuento 'SITASAFE10'.")
-
-    if st.button("🎯 Ejecutar Recomendación: Crear Cupón"):
-        if not st.session_state['access_token']:
-            st.error("❌ Error: Falta el token en la barra lateral.")
+        st.markdown(f"**IA:** Hola William, analicé tu tienda Sitasafe. He detectado 12 carritos abandonados. ¿Activamos el cupón **SITASAFE10**?")
+    
+    # Botón de "🎯 Activar Estrategia" (El original que funciona)
+    if st.button("🎯 Activar Estrategia"):
+        if not token_api:
+            st.error("❌ Error: Primero genera y pega el Access Token en la barra lateral.")
         else:
-            api_url = f"https://api.tiendanube.com/2025-03/{user_id}/coupons"
+            api_url = f"https://api.tiendanube.com/2025-03/{id_tienda}/coupons"
             api_headers = {
-                "Authentication": f"bearer {st.session_state['access_token']}",
+                "Authentication": f"bearer {token_api.strip()}",
                 "Content-Type": "application/json",
                 "User-Agent": "NubePilot AI (willysitasafe@gmail.com)"
             }
@@ -67,20 +93,10 @@ with col1:
                 "max_uses": 50
             }
 
-            with st.spinner("Conectando con Tiendanube..."):
+            with st.spinner("Sincronizando con Tiendanube..."):
                 try:
                     response = requests.post(api_url, headers=api_headers, json=api_payload)
                     if response.status_code == 201:
                         st.balloons()
-                        st.success("### ¡Éxito! Cupón creado en la tienda.")
-                    elif response.status_code == 422:
-                        st.warning("El cupón ya existe.")
-                    else:
-                        st.error(f"Error {response.status_code}")
-                except Exception as e:
-                    st.error(f"Error de conexión: {e}")
-
-with col2:
-    st.subheader("📊 Métricas Clave")
-    st.metric(label="Ventas Recuperables", value="$450.00", delta="+12%")
-    st.metric(label="Tasa de Conversión", value="3.5%", delta="0.8%")
+                        st.success("### ✅ ¡ÉXITO! Cupón 'SITASAFE10' creado automáticamente en Sitasafe.")
+                    elif response.status_code == 4
