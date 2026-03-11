@@ -6,7 +6,7 @@ import numpy as np
 # --- CONFIGURACIÓN DE PÁGINA ---
 st.set_page_config(page_title="Impulsa IA - Hackathon", page_icon="🚀", layout="wide")
 
-# --- ESTILOS CSS PERSONALIZADOS ---
+# --- ESTILOS CSS PERSONALIZADOS (MANTENIDOS Y MEJORADOS) ---
 st.markdown("""
 <style>
     .stApp { background-color: #f8f9fa; }
@@ -28,7 +28,6 @@ st.markdown("""
         box-shadow: 0px 8px 20px rgba(0, 86, 255, 0.3) !important;
     }
 
-    /* Título con estilo moderno */
     .main-title {
         background: -webkit-linear-gradient(#0056ff, #00c6ff);
         -webkit-background-clip: text; 
@@ -38,7 +37,6 @@ st.markdown("""
         margin-bottom: 0;
     }
     
-    /* Tarjetas de Equipo */
     .team-card-large {
         text-align: center; 
         padding: 25px; 
@@ -48,13 +46,22 @@ st.markdown("""
         margin-bottom: 25px;
     }
 
-    /* Estilo para las métricas de Ads/SEO */
     .problem-box {
         background-color: white;
         padding: 20px;
         border-radius: 15px;
         border-left: 5px solid #0056ff;
         box-shadow: 0px 4px 10px rgba(0,0,0,0.05);
+        height: 100%;
+    }
+    
+    .status-tag {
+        background: #e1e7ff;
+        color: #0056ff;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: bold;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -67,108 +74,109 @@ with st.sidebar:
     st.image("https://cdn-icons-png.flaticon.com/512/2103/2103633.png", width=50)
     st.markdown("## ⚙️ Panel de Control")
     
-    with st.expander("🔑 Generador de Access Token", expanded=True):
+    # NUEVO: Selector de Integración Operativa
+    erp_mode = st.selectbox("Sincronización ERP", ["Holded (Recomendado)", "Odoo", "SAP Business One", "Manual"])
+    
+    with st.expander("🔑 Generador de Access Token", expanded=False):
         temp_code = st.text_input("Pega el 'Code' de Partners aquí")
         if st.button("Generar Token"):
             if temp_code:
                 st.success("¡Token Creado!")
                 st.code("shpat_6f8b9e2d4c1a5b0z9y8x7w6v5u4t3s2r1")
-                st.info("⬆️ COPIA este código y pégalo abajo")
-            else:
-                st.warning("Escribe el código primero.")
-
-    st.divider()
     
-    api_token = st.text_input("Access Token de API", type="password", help="Pega el token generado arriba")
+    st.divider()
+    api_token = st.text_input("Access Token de API", type="password")
     id_tienda = st.text_input("ID de Tienda", value="2831942")
     
     if api_token:
-        st.success("Estado: Conectado ✅")
+        st.success("Conectado a TiendaNube ✅")
     else:
-        st.warning("Estado: Desconectado ⚠️")
+        st.warning("Esperando Conexión... ⚠️")
 
 # --- CUERPO PRINCIPAL ---
 st.markdown('<h1 class="main-title">🚀 Impulsa IA</h1>', unsafe_allow_html=True)
 st.subheader("Tu Copiloto Estratégico para Vender Más en TiendaNube")
 st.write("---")
 
-tab_dash, tab_ins, tab_team = st.tabs(["📊 Dashboard General", "🧠 Insights y Optimización", "👥 Equipo"])
+tab_dash, tab_ins, tab_team = st.tabs(["📊 Dashboard General", "🧠 Estrategia y AIO", "👥 Equipo"])
 
-# --- TAB 1: DASHBOARD GENERAL (Incluyendo problemáticas Ads/SEO) ---
+# --- TAB 1: DASHBOARD GENERAL ---
 with tab_dash:
-    st.markdown("### 📊 Salud de la Tienda y Rendimiento")
+    st.markdown("### 📊 Salud de la Tienda")
     m_col1, m_col2, m_col3, m_col4 = st.columns(4)
     m_col1.metric("Carritos Abandonados", "12", "↑ 2", delta_color="inverse")
     m_col2.metric("Ventas del Mes", "$12,450 MXN", "↑ 12%")
-    m_col3.metric("ROAS Promedio", "4.2x", "+0.5")
-    m_col4.metric("SEO Score", "82/100", "↑ 5%")
+    m_col3.metric("ROAS Publicidad", "4.2x", "+0.5")
+    m_col4.metric("Eficiencia ERP", "98%", "Sincronizado")
 
     st.write("---")
-    
     col_left, col_right = st.columns([2, 1])
 
     with col_left:
         with st.chat_message("assistant"):
-            st.write("🤖 **IA de Impulsa:** Hola, detecté que tu **ROAS** en Meta Ads bajó un 10% hoy. ¿Quieres que optimice el presupuesto hacia los productos con mejor margen?")
+            st.write("🤖 **IA:** He detectado una anomalía: el ROAS de tus campañas bajó mientras que las búsquedas de 'ropa sustentable' subieron. ¿Sincronizamos stock del ERP y optimizamos el SEO para IA?")
         
-        if st.button("🎯 Activar Estrategia de Recuperación"):
-            with st.status("Conectando con la API de Tiendanube y Meta Ads...", expanded=True) as status:
+        if st.button("🎯 Ejecutar Optimización Operativa"):
+            with st.status("Procesando...", expanded=True) as status:
                 time.sleep(1)
-                status.update(label="Analizando eficiencia en Ads...", state="running")
+                status.update(label="Sincronizando inventario con ERP...", state="running")
                 time.sleep(1)
-                status.update(label="Sincronizando con ERP para verificar stock...", state="running")
+                status.update(label="Generando Metatags AIO (AI Optimization)...", state="running")
                 time.sleep(1)
-                status.update(label="¡Optimización Desplegada!", state="complete", expanded=False)
-            
+                status.update(label="Ajustando pujas de Ads por ROAS...", state="complete", expanded=False)
             st.balloons()
-            st.success("### 🚀 Estrategia aplicada: Presupuesto optimizado y Cupón SITASAFE10 activado.")
+            st.success("### 🚀 Sistema Optimizado: Stock actualizado y Ads ajustados.")
 
     with col_right:
-        st.markdown("### 💬 Asesor Inteligente")
-        u_input = st.text_input("Consulta a la IA (Ads, SEO, Stock):", placeholder="¿Por qué bajó mi ROAS?")
-        if st.button("Enviar"):
-            st.info(f"📊 **IA:** El ROAS bajó porque el producto 'Playera Algodón' se quedó sin stock en el ERP. He pausado ese anuncio automáticamente.")
+        st.markdown("### 💬 Consulta IA")
+        u_input = st.text_input("Pregunta sobre Ads o Stock:", placeholder="¿Cuál es mi producto más rentable?")
+        if st.button("Analizar"):
+            st.info(f"📊 **Análisis:** Tu producto 'Playera Algodón' tiene un ROAS de 5.1x pero stock crítico en ERP (5 unidades). Sugiero reponer stock antes de escalar Ads.")
 
-# --- TAB 2: INSIGHTS AVANZADOS (Alineado a las necesidades del Hackathon) ---
+# --- TAB 2: ESTRATEGIA Y AIO ---
 with tab_ins:
-    st.markdown("### 🧠 Solución a Problemáticas Críticas")
+    st.markdown("### 🧠 Soluciones Estratégicas (Pit Stop)")
     
     c1, c2, c3 = st.columns(3)
     with c1:
-        st.markdown("""<div class="problem-box">
-            <h4>📈 Eficiencia en Ads</h4>
-            <p>Monitoreo de ROAS en tiempo real y ajuste de pujas automático.</p>
+        st.markdown(f"""<div class="problem-box">
+            <span class="status-tag">ADS & ROAS</span>
+            <h4>Eficiencia Publicitaria</h4>
+            <p>Ajuste dinámico de inversión según el rendimiento de ventas reales.</p>
             </div>""", unsafe_allow_html=True)
     with c2:
-        st.markdown("""<div class="problem-box">
-            <h4>🌐 SEO / AIO</h4>
-            <p>Generación de descripciones optimizadas para buscadores y asistentes de IA.</p>
+        st.markdown(f"""<div class="problem-box">
+            <span class="status-tag">AIO / SEO</span>
+            <h4>Optimización para IA</h4>
+            <p>Adaptamos tu contenido para ser la primera respuesta en ChatGPT y Gemini.</p>
             </div>""", unsafe_allow_html=True)
     with c3:
-        st.markdown("""<div class="problem-box">
-            <h4>🔌 ERP Connect</h4>
-            <p>Sincronización total de inventario para evitar ventas sin stock.</p>
+        st.markdown(f"""<div class="problem-box">
+            <span class="status-tag">ERP CONNECT</span>
+            <h4>Automatización Operativa</h4>
+            <p>Conexión fluida con sistemas externos para control de inventario total.</p>
             </div>""", unsafe_allow_html=True)
 
     st.write("---")
     
     col_ins1, col_ins2 = st.columns([1, 1])
     with col_ins1:
-        st.markdown("#### 🚩 Hoja de Ruta SEO")
-        st.error("🚨 **ALERTA:** 5 productos no tienen Meta-descripción.")
-        st.warning("⚠️ **OPORTUNIDAD:** Tu competencia está posicionando mejor en 'Ropa Sustentable'.")
-        st.info("💡 **DATO:** Optimizar imágenes reduciría el rebote en un 15%.")
+        st.markdown("#### 🚩 Hoja de Ruta SEO/AIO")
+        st.error("🚨 **CRÍTICO:** 3 categorías principales sin etiquetas optimizadas para IA.")
+        st.warning("⚠️ **ALERTA:** Desfase de stock detectado entre ERP y TiendaNube.")
+        st.info("💡 **TIP:** Activar envíos gratis aumentó conversiones un 20% en tu nicho.")
 
     with col_ins2:
-        st.markdown("#### 📊 Comparativa de Sentimiento")
+        st.markdown("#### 📊 Sentimiento y Mercado")
+        # Gráfico que muestra por qué es necesaria la IA
         data_sentimiento = pd.DataFrame({
-            "Categoría": ["Calidad", "Envío", "Atención", "Precio"],
-            "Tu Tienda": [85, 70, 90, 65],
-            "Competencia": [80, 85, 75, 70]
+            "Categoría": ["Atención", "Envío", "Stock", "Precio"],
+            "Tu Tienda": [90, 75, 60, 85],
+            "Media Competencia": [80, 82, 85, 78]
         }).set_index("Categoría")
-        st.bar_chart(data_sentimiento)
+        st.area_chart(data_sentimiento)
 
-# --- TAB 3: EQUIPO (FOTOS GRANDES) ---
+# --- TAB 3: EQUIPO (MANTENIDO) ---
 with tab_team:
     st.markdown("### 👥 Equipo 3 - Desarrollo y Estrategia")
     
@@ -189,15 +197,7 @@ with tab_team:
             with cols[j]:
                 st.markdown(f"""
                 <div class="team-card-large">
-                    <img src="{img_url}" style="
-                        width: 200px; 
-                        height: 200px; 
-                        border-radius: 50%; 
-                        object-fit: cover; 
-                        border: 6px solid #0056ff; 
-                        margin-bottom: 15px;
-                        box-shadow: 0px 8px 15px rgba(0,0,0,0.1);
-                    ">
+                    <img src="{img_url}" style="width: 200px; height: 200px; border-radius: 50%; object-fit: cover; border: 6px solid #0056ff; margin-bottom: 15px;">
                     <br><strong style="font-size: 1.4rem;">{nombre}</strong>
                     <br><span style="color: #0056ff; font-weight: 600;">{cargo}</span>
                 </div>
@@ -205,4 +205,3 @@ with tab_team:
 
 st.write("---")
 st.caption("Impulsa IA | Equipo 3 | Hackathon UTEL 2026 | TiendaNube")
-
