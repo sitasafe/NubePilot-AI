@@ -44,112 +44,106 @@ def obtener_token_real(code):
         return None
     return None
 
-# --- ESTILOS CSS PERSONALIZADOS (MEJORADOS PARA DINAMISMO) ---
+# --- ESTILOS CSS PERSONALIZADOS (POTENCIADOS) ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap');
     
+    /* Fondo con sutil gradiente */
     .stApp { 
-        background-color: #f8f9fa; 
+        background: radial-gradient(circle at top right, #ffffff, #f1f4f9);
         font-family: 'Inter', sans-serif;
     }
     
-    /* Botón con efecto de elevación y gradiente dinámico */
+    /* Botón con efecto de elevación 3D y resplandor */
     div.stButton > button:first-child {
-        background: linear-gradient(90deg, #0056ff 0%, #00c6ff 100%) !important;
+        background: linear-gradient(135deg, #0056ff 0%, #00c6ff 100%) !important;
         color: white !important; 
-        border-radius: 25px !important; 
+        border-radius: 50px !important; 
         border: none !important; 
-        padding: 12px 30px !important;
-        font-weight: bold !important; 
-        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important; 
+        padding: 14px 40px !important;
+        font-weight: 800 !important; 
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important; 
         width: 100% !important; 
-        font-size: 18px !important;
-        box-shadow: 0px 4px 15px rgba(0, 86, 255, 0.2) !important;
+        box-shadow: 0px 8px 20px rgba(0, 86, 255, 0.3) !important;
     }
     div.stButton > button:hover {
-        transform: translateY(-3px) scale(1.02) !important;
-        box-shadow: 0px 8px 25px rgba(0, 86, 255, 0.4) !important;
+        transform: translateY(-5px);
+        box-shadow: 0px 15px 30px rgba(0, 86, 255, 0.5) !important;
+        filter: brightness(1.1);
     }
 
-    /* Título con gradiente animado */
+    /* Título con gradiente animado fluido */
     .main-title {
-        background: linear-gradient(90deg, #0056ff, #00c6ff, #0056ff);
-        background-size: 200% auto;
+        background: linear-gradient(90deg, #0056ff, #00c6ff, #6200ea, #0056ff);
+        background-size: 300% auto;
         -webkit-background-clip: text; 
         -webkit-text-fill-color: transparent;
-        font-size: 3.5rem; 
+        font-size: 4.5rem !important; 
         font-weight: 800; 
-        margin-bottom: 0;
-        animation: gradient-move 3s linear infinite;
+        animation: gradient-move 4s ease infinite;
     }
     @keyframes gradient-move {
-        to { background-position: 200% center; }
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
     }
     
-    /* Cards de equipo con efecto hover suave */
+    /* Cards de equipo: Glassmorphism y Elevación */
     .team-card-large {
         text-align: center; 
-        padding: 25px; 
-        border-radius: 20px;
-        background: white; 
-        box-shadow: 0px 10px 20px rgba(0,0,0,0.05); 
+        padding: 35px; 
+        border-radius: 30px;
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(0, 86, 255, 0.1);
+        box-shadow: 0px 20px 40px rgba(0,0,0,0.05); 
         margin-bottom: 25px;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        border: 1px solid #f0f0f0;
+        transition: all 0.4s ease;
     }
     .team-card-large:hover {
-        transform: translateY(-10px);
-        box-shadow: 0px 15px 30px rgba(0, 86, 255, 0.1);
+        transform: translateY(-15px) scale(1.02);
+        box-shadow: 0px 30px 60px rgba(0, 86, 255, 0.15);
+        border: 1px solid #0056ff;
     }
 
-    /* Problem boxes con interacción */
+    /* Problem boxes con neón lateral interactivo */
     .problem-box {
         background-color: white;
-        padding: 20px;
-        border-radius: 15px;
-        border-left: 5px solid #0056ff;
-        box-shadow: 0px 4px 10px rgba(0,0,0,0.05);
+        padding: 25px;
+        border-radius: 20px;
+        border-left: 8px solid #0056ff;
+        box-shadow: 0px 10px 25px rgba(0,0,0,0.03);
         height: 100%;
         transition: all 0.3s ease;
     }
     .problem-box:hover {
-        transform: scale(1.02);
-        border-left: 5px solid #00c6ff;
+        background: #fdfdff;
+        border-left: 8px solid #00c6ff;
+        transform: translateX(10px);
     }
     
-    .status-tag {
-        background: #e1e7ff;
-        color: #0056ff;
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: bold;
+    /* Estilo de métricas mejorado */
+    [data-testid="stMetricValue"] {
+        font-weight: 800 !important;
+        color: #0056ff !important;
     }
 
-    .big-data-stat {
-        background: #0e1117;
-        color: #00c6ff;
-        padding: 15px;
-        border-radius: 10px;
-        border: 1px solid #0056ff;
-        text-align: center;
-        box-shadow: 0px 0px 15px rgba(0, 198, 255, 0.2);
-    }
-
-    /* Estilo para las Tabs */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 10px;
-    }
+    /* Tabs modernas */
+    .stTabs [data-baseweb="tab-list"] { gap: 15px; }
     .stTabs [data-baseweb="tab"] {
         background-color: #f1f3f6;
-        border-radius: 10px 10px 0 0;
-        padding: 10px 20px;
-        font-weight: bold;
+        border-radius: 15px 15px 0 0;
+        padding: 12px 25px;
+        font-weight: 700;
+        color: #555;
     }
     .stTabs [aria-selected="true"] {
-        background-color: #0056ff !important;
+        background: linear-gradient(90deg, #0056ff, #00c6ff) !important;
         color: white !important;
+        box-shadow: 0px 5px 15px rgba(0, 86, 255, 0.2);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -321,9 +315,9 @@ with tab_team:
             with cols[j]:
                 st.markdown(f"""
                 <div class="team-card-large">
-                    <img src="{img_url}" style="width: 200px; height: 200px; border-radius: 50%; object-fit: cover; border: 6px solid #0056ff; margin-bottom: 15px;">
-                    <br><strong style="font-size: 1.4rem;">{nombre}</strong>
-                    <br><span style="color: #0056ff; font-weight: 600;">{cargo}</span>
+                    <img src="{img_url}" style="width: 220px; height: 220px; border-radius: 50%; object-fit: cover; border: 8px solid #0056ff; margin-bottom: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.15);">
+                    <br><strong style="font-size: 1.6rem; color: #1a1c2e;">{nombre}</strong>
+                    <br><span style="color: #0056ff; font-weight: 700; font-size: 1.1rem; text-transform: uppercase;">{cargo}</span>
                 </div>
                 """, unsafe_allow_html=True)
 
