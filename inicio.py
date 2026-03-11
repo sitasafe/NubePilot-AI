@@ -178,7 +178,7 @@ with tab_team:
         ("Montserrat G.", "Strategy", "https://cdn-icons-png.flaticon.com/512/6997/6997674.png"),
         ("Jiram Cabrera", "Organización", "https://imgur.com/eamMDmE.jpeg"),
         ("Carlos Andrés A.", "Liderazgo", "https://cdn-icons-png.flaticon.com/512/2354/2354573.png"),
-        ("Edwing Garcia", "Ventas", "https://cdn-icons-png.flaticon.com/512/9431/9431149.png"),
+        ("Edwing Garcia", "Ventas", "https://imgur.com/CQJu9xm.jpeg"),
         ("Amarilis Elizabeth", "Gestión", "https://cdn-icons-png.flaticon.com/512/201/201634.png"),
         ("Cesar Augusto F.", "Estrategia", "https://cdn-icons-png.flaticon.com/512/3001/3001764.png")
     ]
@@ -205,3 +205,4 @@ with tab_team:
 
 st.write("---")
 st.caption("Impulsa IA | Equipo 3 | Hackathon UTEL 2026 | TiendaNube")
+
