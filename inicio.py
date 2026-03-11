@@ -44,11 +44,17 @@ def obtener_token_real(code):
         return None
     return None
 
-# --- ESTILOS CSS PERSONALIZADOS ---
+# --- ESTILOS CSS PERSONALIZADOS (MEJORADOS PARA DINAMISMO) ---
 st.markdown("""
 <style>
-    .stApp { background-color: #f8f9fa; }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap');
     
+    .stApp { 
+        background-color: #f8f9fa; 
+        font-family: 'Inter', sans-serif;
+    }
+    
+    /* Botón con efecto de elevación y gradiente dinámico */
     div.stButton > button:first-child {
         background: linear-gradient(90deg, #0056ff 0%, #00c6ff 100%) !important;
         color: white !important; 
@@ -56,24 +62,32 @@ st.markdown("""
         border: none !important; 
         padding: 12px 30px !important;
         font-weight: bold !important; 
-        transition: all 0.3s ease !important; 
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important; 
         width: 100% !important; 
         font-size: 18px !important;
+        box-shadow: 0px 4px 15px rgba(0, 86, 255, 0.2) !important;
     }
     div.stButton > button:hover {
-        transform: translateY(-2px) !important;
-        box-shadow: 0px 8px 20px rgba(0, 86, 255, 0.3) !important;
+        transform: translateY(-3px) scale(1.02) !important;
+        box-shadow: 0px 8px 25px rgba(0, 86, 255, 0.4) !important;
     }
 
+    /* Título con gradiente animado */
     .main-title {
-        background: -webkit-linear-gradient(#0056ff, #00c6ff);
+        background: linear-gradient(90deg, #0056ff, #00c6ff, #0056ff);
+        background-size: 200% auto;
         -webkit-background-clip: text; 
         -webkit-text-fill-color: transparent;
         font-size: 3.5rem; 
         font-weight: 800; 
         margin-bottom: 0;
+        animation: gradient-move 3s linear infinite;
+    }
+    @keyframes gradient-move {
+        to { background-position: 200% center; }
     }
     
+    /* Cards de equipo con efecto hover suave */
     .team-card-large {
         text-align: center; 
         padding: 25px; 
@@ -81,8 +95,15 @@ st.markdown("""
         background: white; 
         box-shadow: 0px 10px 20px rgba(0,0,0,0.05); 
         margin-bottom: 25px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: 1px solid #f0f0f0;
+    }
+    .team-card-large:hover {
+        transform: translateY(-10px);
+        box-shadow: 0px 15px 30px rgba(0, 86, 255, 0.1);
     }
 
+    /* Problem boxes con interacción */
     .problem-box {
         background-color: white;
         padding: 20px;
@@ -90,6 +111,11 @@ st.markdown("""
         border-left: 5px solid #0056ff;
         box-shadow: 0px 4px 10px rgba(0,0,0,0.05);
         height: 100%;
+        transition: all 0.3s ease;
+    }
+    .problem-box:hover {
+        transform: scale(1.02);
+        border-left: 5px solid #00c6ff;
     }
     
     .status-tag {
@@ -108,6 +134,22 @@ st.markdown("""
         border-radius: 10px;
         border: 1px solid #0056ff;
         text-align: center;
+        box-shadow: 0px 0px 15px rgba(0, 198, 255, 0.2);
+    }
+
+    /* Estilo para las Tabs */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 10px;
+    }
+    .stTabs [data-baseweb="tab"] {
+        background-color: #f1f3f6;
+        border-radius: 10px 10px 0 0;
+        padding: 10px 20px;
+        font-weight: bold;
+    }
+    .stTabs [aria-selected="true"] {
+        background-color: #0056ff !important;
+        color: white !important;
     }
 </style>
 """, unsafe_allow_html=True)
