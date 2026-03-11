@@ -7,10 +7,10 @@ import requests
 # --- CONFIGURACIÓN DE PÁGINA ---
 st.set_page_config(page_title="Impulsa IA - Hackathon", page_icon="🚀", layout="wide")
 
-# --- CONFIGURACIÓN DE CREDENCIALES TIENDANUBE (Basado en tus imágenes) ---
+# --- CONFIGURACIÓN DE CREDENCIALES TIENDANUBE (ACTUALIZADO CON TUS DATOS REALES) ---
 CLIENT_ID = "27483" 
-CLIENT_SECRET = "27483-3XU9X7-Y8Y9Z0-A1B2C3-D4E5F6" 
-REDIRECT_URI = "http://localhost:8501" 
+CLIENT_SECRET = "d45072c95b889632ad3040bfd1dd951d981e0c38ff25877a" 
+REDIRECT_URI = "https://nubepilot-ai.vercel.app/" 
 
 # --- FUNCIONES DE CONEXIÓN API ---
 def obtener_token_real(code):
@@ -20,15 +20,19 @@ def obtener_token_real(code):
         "client_id": CLIENT_ID,
         "client_secret": CLIENT_SECRET,
         "grant_type": "authorization_code",
-        "code": code
+        "code": code.strip()
     }
     try:
         response = requests.post(url, json=payload)
+        data = response.json()
         if response.status_code == 200:
-            return response.json().get("access_token")
-    except:
+            return data.get("access_token")
+        else:
+            st.error(f"Error de la API: {data.get('error_description', data.get('error'))}")
+            return None
+    except Exception as e:
+        st.error(f"Error de conexión: {str(e)}")
         return None
-    return None
 
 # --- ESTILOS CSS PERSONALIZADOS ---
 st.markdown("""
@@ -122,7 +126,6 @@ with st.sidebar:
                 st.error("Error en vinculación. Revisa tus credenciales.")
 
     st.divider()
-    # Mantenemos el input manual por si acaso, pero se llena automáticamente con el proceso de arriba
     api_token_val = st.session_state.get('api_token', "")
     api_token_input = st.text_input("Access Token de API", type="password", value=api_token_val)
     id_tienda = st.text_input("ID de Tienda", value="2831942")
