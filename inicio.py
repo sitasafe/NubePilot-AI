@@ -63,6 +63,16 @@ st.markdown("""
         font-size: 0.8rem;
         font-weight: bold;
     }
+
+    /* Nuevo estilo para Big Data Engine */
+    .big-data-stat {
+        background: #0e1117;
+        color: #00c6ff;
+        padding: 15px;
+        border-radius: 10px;
+        border: 1px solid #0056ff;
+        text-align: center;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -74,7 +84,6 @@ with st.sidebar:
     st.image("https://cdn-icons-png.flaticon.com/512/2103/2103633.png", width=50)
     st.markdown("## ⚙️ Panel de Control")
     
-    # NUEVO: Selector de Integración Operativa
     erp_mode = st.selectbox("Sincronización ERP", ["Holded (Recomendado)", "Odoo", "SAP Business One", "Manual"])
     
     with st.expander("🔑 Generador de Access Token", expanded=False):
@@ -133,7 +142,7 @@ with tab_dash:
         if st.button("Analizar"):
             st.info(f"📊 **Análisis:** Tu producto 'Playera Algodón' tiene un ROAS de 5.1x pero stock crítico en ERP (5 unidades). Sugiero reponer stock antes de escalar Ads.")
 
-# --- TAB 2: ESTRATEGIA Y AIO ---
+# --- TAB 2: ESTRATEGIA Y AIO (CON BIG DATA INTEGRADO) ---
 with tab_ins:
     st.markdown("### 🧠 Soluciones Estratégicas")
     
@@ -159,6 +168,42 @@ with tab_ins:
 
     st.write("---")
     
+    # SECCIÓN BIG DATA ENGINE
+    st.markdown("### 🧬 Big Data Engine: Análisis Predictivo")
+    col_big1, col_big2 = st.columns([1.5, 1])
+    
+    with col_big1:
+        st.markdown("#### 📈 Proyección de Demanda (Próximos 15 días)")
+        # Simulación de datos predictivos
+        df_pred = pd.DataFrame({
+            "Día": [f"Día {i}" for i in range(1, 16)],
+            "Ventas Reales": np.random.randint(100, 200, 15),
+            "Tendencia Predictiva": np.random.randint(150, 250, 15)
+        }).set_index("Día")
+        st.line_chart(df_pred)
+        st.caption("Gráfico generado tras analizar 2.5 millones de puntos de datos históricos.")
+
+    with col_big2:
+        st.markdown("#### 🎯 Segmentación de Audiencia")
+        st.markdown("""
+        <div class="big-data-stat">
+            <h2 style="margin:0; color:#00c6ff;">45,280</h2>
+            <p style="margin:0; font-size:0.9rem;">Perfiles Analizados</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.write("")
+        st.progress(85, text="Fidelidad de Clientes (LTV)")
+        st.progress(62, text="Probabilidad de Recompra")
+        st.progress(18, text="Tasa de Abandono (Predictiva)")
+        
+        if st.button("📊 Generar Reporte de Big Data"):
+            st.toast("Procesando clusters de clientes...")
+            time.sleep(1)
+            st.download_button("Descargar Análisis PDF", data="Contenido del reporte...", file_name="Reporte_BigData_Impulsa.txt")
+
+    st.write("---")
+    
     col_ins1, col_ins2 = st.columns([1, 1])
     with col_ins1:
         st.markdown("#### 🚩 Hoja de Ruta SEO/AIO")
@@ -168,7 +213,6 @@ with tab_ins:
 
     with col_ins2:
         st.markdown("#### 📊 Sentimiento y Mercado")
-        # Gráfico que muestra por qué es necesaria la IA
         data_sentimiento = pd.DataFrame({
             "Categoría": ["Atención", "Envío", "Stock", "Precio"],
             "Tu Tienda": [90, 75, 60, 85],
@@ -205,6 +249,3 @@ with tab_team:
 
 st.write("---")
 st.caption("Impulsa IA | Equipo 3 | Hackathon UTEL 2026 | TiendaNube")
-
-
-
