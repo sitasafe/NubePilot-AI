@@ -38,7 +38,7 @@ def obtener_token_real(code):
         return None
     return None
 
-# --- ESTILOS CSS PERSONALIZADOS (COMPLETOS Y POTENCIADOS) ---
+# --- ESTILOS CSS PERSONALIZADOS (COMPLETOS) ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap');
@@ -165,7 +165,7 @@ with tab_dash:
                 time.sleep(1)
                 status.update(label="Generando Metatags AIO...", state="running")
                 time.sleep(1)
-                status.update(label="Optimización Completa!", state="complete")
+                status.update(label="Ajustando pujas de Ads por ROAS...", state="complete")
             st.balloons()
     with col_right:
         st.info("💡 **Dato IA:** Tu 'Playera Algodón' tiene un ROAS de 5.1x. Escala inversión ahora.")
@@ -173,7 +173,7 @@ with tab_dash:
 # --- TAB 2: REVIEW INTELLIGENCE ---
 with tab_rev:
     st.markdown("### ✨ Review Intelligence: El Decodificador de Opiniones")
-    st.info("Transformamos el caos de los comentarios en una hoja de ruta estratégica.")
+    st.info("Transformamos el caos de los comentarios en una hoja de ruta estratégica para vender más.")
     
     col_a, col_b = st.columns(2)
     with col_a:
@@ -183,13 +183,17 @@ with tab_rev:
             <strong>🔴 URGENTE:</strong> "El 42% menciona 'dificultad de armado'." <br>
             <small>Tarea: Crea un video tutorial esta semana.</small>
         </div>
+        <div class="review-action-card">
+            <strong>💡 INSIGHT:</strong> "Dudas recurrentes sobre impermeabilidad." <br>
+            <small>Tarea: Actualiza la descripción hoy mismo.</small>
+        </div>
         """, unsafe_allow_html=True)
     with col_b:
         st.markdown("#### ⚔️ Inteligencia Competitiva")
         st.markdown("""
         <div class="review-action-card" style="border-left-color: #00c6ff;">
-            <strong>⚖️ OPORTUNIDAD:</strong> Tus competidores fallan en logística.<br>
-            <small>Acción: Resalta tu rapidez de entrega.</small>
+            <strong>⚖️ OPORTUNIDAD:</strong> Tus competidores destacan por "cremallera duradera", tú recibes quejas aquí.<br>
+            <small>Acción: Mejora el insumo o comunica mejor tu control de calidad.</small>
         </div>
         """, unsafe_allow_html=True)
 
@@ -208,13 +212,21 @@ with tab_ins:
     st.markdown("### 🧬 Big Data Engine: Análisis Predictivo")
     col_big1, col_big2 = st.columns([1.5, 1])
     with col_big1:
-        data_p = pd.DataFrame({"Ventas": np.random.randint(100, 200, 15), "Tendencia": np.random.randint(150, 250, 15)})
-        st.line_chart(data_p)
+        st.markdown("#### 📈 Proyección de Demanda")
+        df_pred = pd.DataFrame({
+            "Día": [f"Día {i}" for i in range(1, 16)],
+            "Ventas Reales": np.random.randint(100, 200, 15),
+            "Tendencia Predictiva": np.random.randint(150, 250, 15)
+        }).set_index("Día")
+        st.line_chart(df_pred)
     with col_big2:
-        st.markdown('<div class="big-data-stat"><h2 style="margin:0; color:#00c6ff;">45,280</h2><p>Perfiles Analizados</p></div>', unsafe_allow_html=True)
+        st.markdown("#### 🎯 Segmentación")
+        st.markdown('<div class="big-data-stat"><h2 style="margin:0; color:#00c6ff;">45,280</h2><p style="margin:0; font-size:0.9rem;">Perfiles Analizados</p></div>', unsafe_allow_html=True)
+        st.write("")
         st.progress(85, text="Fidelidad de Clientes")
+        st.progress(62, text="Probabilidad de Recompra")
 
-# --- TAB 4: EQUIPO (RESTAURADO) ---
+# --- TAB 4: EQUIPO ---
 with tab_team:
     st.markdown("### 👥 Nuestro Equipo ")
     equipo = [
@@ -227,10 +239,20 @@ with tab_team:
         ("Amarilis Elizabeth", "Gestión", "https://cdn-icons-png.flaticon.com/512/201/201634.png"),
         ("Cesar Augusto F.", "Estrategia", "https://cdn-icons-png.flaticon.com/512/3001/3001764.png")
     ]
+    
     for i in range(0, len(equipo), 3):
         cols = st.columns(3)
         for j, (nombre, cargo, img_url) in enumerate(equipo[i:i+3]):
             with cols[j]:
-                st.markdown(f"""<div class="team-card-large">
+                # Estructura limpia para evitar SyntaxError
+                card_html = f"""
+                <div class="team-card-large">
                     <img src="{img_url}" style="width: 220px; height: 220px; border-radius: 50%; object-fit: cover; border: 8px solid #0056ff; margin-bottom: 20px;">
-                    <br><strong>{nombre}</strong><br><span style="color: #0056ff;">{cargo}</span></div>""", unsafe_allow_html
+                    <br><strong>{nombre}</strong><br>
+                    <span style="color: #0056ff;">{cargo}</span>
+                </div>
+                """
+                st.markdown(card_html, unsafe_allow_html=True)
+
+st.write("---")
+st.caption("Impulsa IA | Equipo 3 | Hackathon UTEL 2026 | TiendaNube")
