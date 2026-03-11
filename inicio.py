@@ -297,7 +297,7 @@ with tab_ins:
         st.info("💡 **TIP:** Activar envíos gratis aumentó conversiones un 20% en tu nicho.")
 
     with col_ins2:
-        st.markdown("#### 📊 Sentimiento y Mercado")
+        st.markdown("#### 📊 Mercado")
         # AGREGADO: Mención a jerga local (Punto 3)
         st.caption("Análisis ajustado a modismos de MX, AR y BR.")
         data_sentimiento = pd.DataFrame({
@@ -334,5 +334,6 @@ with tab_team:
 
 st.write("---")
 st.caption("Impulsa IA | Equipo 3 | Hackathon UTEL 2026 | TiendaNube")
+
 
 
