@@ -16,18 +16,29 @@ REDIRECT_URI = "https://nubepilot-ai-jenadpeumuumeahkmnjmwr.streamlit.app/"
 def obtener_token_real(code):
     """Intercambia el 'Code' de Tiendanube por un Access Token real."""
     url = "https://www.tiendanube.com/apps/authorize/token"
+    
+    # AJUSTE 1: User-Agent obligatorio para que Tiendanube no bloquee la petición
+    headers = {
+        "Content-Type": "application/json",
+        "User-Agent": "ImpulsaIA (socios@tiendanube.com)"
+    }
+    
+    # AJUSTE 2: Aseguramos que el ID sea enviado como número y limpiamos el code
     payload = {
-        "client_id": CLIENT_ID,
+        "client_id": int(CLIENT_ID),
         "client_secret": CLIENT_SECRET,
         "grant_type": "authorization_code",
         "code": code.strip()
     }
+    
     try:
-        response = requests.post(url, json=payload)
+        response = requests.post(url, json=payload, headers=headers)
         if response.status_code == 200:
             return response.json().get("access_token")
         else:
-            st.error(f"Error de la API: {response.json().get('error_description', 'Desconocido')}")
+            # Mostramos el error exacto para debugear en el Hackathon
+            error_desc = response.json().get('error_description', 'Desconocido')
+            st.error(f"Error de la API: {error_desc}")
     except Exception as e:
         st.error(f"Error de conexión: {e}")
         return None
