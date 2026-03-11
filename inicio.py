@@ -3,51 +3,45 @@ import time
 import pandas as pd
 import numpy as np
 import requests
-# --- AGREGADO: Librería para que el micrófono sea funcional ---
-from streamlit_mic_recorder import mic_recorder 
+# LIBRERÍA ADICIONAL PARA EL MICROFONO (Asegúrate de ponerla en requirements.txt)
+from streamlit_mic_recorder import mic_recorder
 
 # --- CONFIGURACIÓN DE PÁGINA ---
 st.set_page_config(page_title="Impulsa IA - Hackathon", page_icon="🚀", layout="wide")
-
-# --- AGREGADO: DICCIONARIO PARA TRADUCCIONES REALES ---
-# Esto permite que al cambiar el selector, los textos cambien de verdad
-textos_idioma = {
-    "Español": {
-        "sub": "Tu Copiloto Estratégico e Inclusivo para Vender Más en TiendaNube",
-        "tab1": "📊 Monitor de Crecimiento & ROI",
-        "carrito": "Carritos Abandonados",
-        "ventas": "Ventas del Mes"
-    },
-    "Português": {
-        "sub": "Seu Copiloto Estratégico e Inclusivo para Vender Mais na TiendaNube",
-        "tab1": "📊 Monitor de Crescimento & ROI",
-        "carrito": "Carrinhos Abandonados",
-        "ventas": "Vendas do Mês"
-    },
-    "English": {
-        "sub": "Your Strategic and Inclusive Copilot to Sell More on TiendaNube",
-        "tab1": "📊 Growth & ROI Monitor",
-        "carrito": "Abandoned Carts",
-        "ventas": "Monthly Sales"
-    },
-    "Náhuatl": {
-        "sub": "Itechpahuic tlanamacaliztli - Tehuantin ticpalehuia",
-        "tab1": "📊 Tlanamacaliztli Monitor",
-        "carrito": "Tlacualiztli",
-        "ventas": "Tlanamacaliztli Metztli"
-    },
-    "Maya": {
-        "sub": "A wéet meyaj ti'al a konik ma'alob ti' TiendaNube",
-        "tab1": "📊 Kanáantik konol",
-        "carrito": "P'áat kóonol",
-        "ventas": "Konol ti' le meso'"
-    }
-}
 
 # --- CONFIGURACIÓN DE CREDENCIALES TIENDANUBE ---
 CLIENT_ID = "27483"
 CLIENT_SECRET = "d45072c95b889632ad3040bfd1dd951d981e0c38ff25877a"
 REDIRECT_URI = "https://nubepilot-ai-jenadpeumuumeahkmnjmwr.streamlit.app/"
+
+# --- DICCIONARIO DE IDIOMAS (INTEGRACIÓN) ---
+textos = {
+    "Español": {
+        "sub": "Tu Copiloto Estratégico e Inclusivo para Vender Más en TiendaNube",
+        "tab1": "📊 Monitor de Crecimiento & ROI",
+        "carrito": "Carritos Abandonados", "ventas": "Ventas del Mes"
+    },
+    "Português": {
+        "sub": "Seu Copiloto Estratégico e Inclusivo para Vender Mais na TiendaNube",
+        "tab1": "📊 Monitor de Crescimento e ROI",
+        "carrito": "Carrinhos Abandonados", "ventas": "Vendas do Mês"
+    },
+    "English": {
+        "sub": "Your Strategic and Inclusive Copilot to Sell More on TiendaNube",
+        "tab1": "📊 Growth & ROI Monitor",
+        "carrito": "Abandoned Carts", "ventas": "Monthly Sales"
+    },
+    "Náhuatl": {
+        "sub": "Itechpahuic tlanamacaliztli - Tehuantin ticpalehuia",
+        "tab1": "📊 Tlanamacaliztli Monitor",
+        "carrito": "Tlacualiztli", "ventas": "Tlanamacaliztli Metztli"
+    },
+    "Maya": {
+        "sub": "A wéet meyaj ti'al a konik ma'alob ti' TiendaNube",
+        "tab1": "📊 Kanáantik konol",
+        "carrito": "P'áat kóonol", "ventas": "Konol ti' le meso'"
+    }
+}
 
 # --- FUNCIONES DE CONEXIÓN API ---
 def obtener_token_real(code):
@@ -75,7 +69,7 @@ def obtener_token_real(code):
         return None
     return None
 
-# --- ESTILOS CSS PERSONALIZADOS (MANTENIDOS) ---
+# --- ESTILOS CSS PERSONALIZADOS (POTENCIADOS) ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap');
@@ -187,9 +181,7 @@ with st.sidebar:
         lectura_facil_on = st.toggle("Modo Lectura Fácil", help="Aumenta el tamaño de letra y contraste para mejor lectura.")
         contraste_alto = st.toggle("Modo Alto Contraste")
 
-    # CARGA DE TEXTOS DINÁMICOS BASADO EN EL SELECTBOX
-    t = textos_idioma[idioma_interfaz]
-
+    # Mantenemos el glosario
     with st.expander("📘 Glosario"):
         st.write("**ROAS:** Es cuánto dinero ganas por cada peso que pones en publicidad.")
         st.write("**AIO:** Hacer que tu tienda sea 'amiga' de las IAs como ChatGPT.")
@@ -227,34 +219,32 @@ with st.sidebar:
         st.warning("Esperando Conexión... ⚠️")
 
 # --- CUERPO PRINCIPAL ---
+# Seleccionamos el diccionario de idioma actual
+t_act = textos[idioma_interfaz]
+
 main_container = '<div class="lectura-facil">' if lectura_facil_on else '<div>'
 st.markdown(main_container, unsafe_allow_html=True)
 
 st.markdown('<h1 class="main-title">🚀 Impulsa IA</h1>', unsafe_allow_html=True)
-# AHORA EL SUBTÍTULO ES DINÁMICO
-st.subheader(t["sub"])
+st.subheader(t_act["sub"])
 
-# --- AGREGADO: MICROFONO FUNCIONAL ---
-c_voz1, c_voz2 = st.columns([0.8, 0.2])
+# AGREGADO: Integración de Grabación de Voz Real
+c_voz1, c_voz2 = st.columns([0.80, 0.20])
 with c_voz2:
-    # Sustituimos el botón simple por el grabador real
-    audio_comando = mic_recorder(start_prompt="🎤 Voz", stop_prompt="🛑 Parar", key='recorder')
-
-if audio_comando:
-    st.audio(audio_comando['bytes'])
-    st.toast("Comando de voz recibido. Procesando...")
+    audio = mic_recorder(start_prompt="🎤 Iniciar Voz", stop_prompt="🛑 Parar", key='recorder')
+    if audio:
+        st.toast("Procesando comando de voz...")
 
 st.write("---")
 
-# PESTAÑAS CON TEXTO DINÁMICO
-tab_dash, tab_ins, tab_team = st.tabs([t["tab1"], "🧠 Estrategia y AIO", "👥 Equipo"])
+tab_dash, tab_ins, tab_team = st.tabs([t_act["tab1"], "🧠 Estrategia y AIO", "👥 Equipo"])
 
+# --- TAB 1: DASHBOARD GENERAL ---
 with tab_dash:
-    st.markdown(f"### {t['tab1']}")
+    st.markdown(f"### {t_act['tab1']}")
     m_col1, m_col2, m_col3, m_col4 = st.columns(4)
-    # MÉTRICAS CON TEXTO DINÁMICO
-    m_col1.metric(t["carrito"], "12", "Recuperables: $2,400", delta_color="normal")
-    m_col2.metric(t["ventas"], "$12,450 MXN", "↑ 12%")
+    m_col1.metric(t_act["carrito"], "12", "Recuperables: $2,400", delta_color="normal")
+    m_col2.metric(t_act["ventas"], "$12,450 MXN", "↑ 12%")
     m_col3.metric("ROAS (Publicidad)", "4.2x", "Ganas $4.2 por cada $1")
     m_col4.metric("Eficiencia ERP", "98%", "Sincronizado")
 
@@ -263,6 +253,7 @@ with tab_dash:
 
     with col_left:
         st.error("🎯 **Tarea Crítica:** Tienes 12 carritos abandonados. Ejecuta la optimización para enviarles un cupón automático.")
+        
         with st.chat_message("assistant"):
             st.write("🤖 **IA:** He detectado una anomalía: el ROAS de tus campañas bajó mientras que las búsquedas de 'ropa sustentable' subieron. ¿Sincronizamos stock del ERP y optimizamos el SEO para IA?")
         
@@ -283,9 +274,12 @@ with tab_dash:
         if st.button("Analizar"):
             st.info(f"📊 **Análisis (Gemini 1.5 Pro):** Tu producto 'Playera Algodón' tiene un ROAS de 5.1x pero stock crítico en ERP (5 unidades). Sugiero reponer stock antes de escalar Ads.")
 
+# --- TAB 2: ESTRATEGIA Y AIO ---
 with tab_ins:
     st.caption("🛡️ Análisis ético y cumplimiento de estándares de accesibilidad universal WCAG 3.0 (2026).")
+    
     st.markdown("### 🧠 Soluciones Estratégicas")
+    
     c1, c2, c3 = st.columns(3)
     with c1:
         st.markdown(f"""<div class="problem-box">
@@ -307,8 +301,10 @@ with tab_ins:
             </div>""", unsafe_allow_html=True)
 
     st.write("---")
+    
     st.markdown("### 🧬 Big Data Engine: Análisis Predictivo")
     col_big1, col_big2 = st.columns([1.5, 1])
+    
     with col_big1:
         st.markdown("#### 📈 Proyección de Demanda (Próximos 15 días)")
         df_pred = pd.DataFrame({
@@ -317,17 +313,56 @@ with tab_ins:
             "Tendencia Predictiva": np.random.randint(150, 250, 15)
         }).set_index("Día")
         st.line_chart(df_pred)
+        st.caption("Última actualización: hace 2 mins (Datos optimizados para bajo consumo de red).")
+
     with col_big2:
         st.markdown("#### 🎯 Segmentación de Audiencia")
-        st.markdown('<div class="big-data-stat"><h2 style="margin:0; color:#00c6ff;">45,280</h2><p style="margin:0; font-size:0.9rem;">Perfiles Analizados</p></div>', unsafe_allow_html=True)
+        st.markdown("""
+        <div class="big-data-stat">
+            <h2 style="margin:0; color:#00c6ff;">45,280</h2>
+            <p style="margin:0; font-size:0.9rem;">Perfiles Analizados con Ética de Datos</p>
+        </div>
+        """, unsafe_allow_html=True)
+        st.write("")
         st.progress(85, text="Fidelidad de Clientes (LTV)")
         st.progress(62, text="Probabilidad de Recompra")
+        st.progress(18, text="Riesgo de Abandono")
+        
         if st.button("📊 Generar Reporte de Big Data"):
-            st.toast("Traduciendo datos...")
-            st.download_button("Descargar Plan", data="...", file_name="Plan.txt")
+            st.toast("Traduciendo datos complejos a lenguaje ciudadano...")
+            time.sleep(1)
+            st.download_button("Descargar Plan Accesible PDF", data="Contenido inclusivo...", file_name="Plan_Impulsa_Inclusivo.txt")
 
-    st.info("💡 **Insight de Inclusión:** Según AMVO 2026, el acceso móvil en zonas rurales creció un 25%.")
+    st.info("💡 **Insight de Inclusión:** Según AMVO 2026, el acceso móvil en zonas rurales creció un 25%. Tu tienda está optimizada para cargar rápido en dispositivos de gama baja.")
 
+    st.write("---")
+    st.markdown("### 🚛 Logística Inteligente & Envíos (AMVO 2026)")
+    l_col1, l_col2 = st.columns(2)
+    with l_col1:
+        st.info("💡 **Insight Logístico:** Basado en tendencias de AMVO, el 60% de tus ventas este mes vendrán de CDMX y Jalisco. Sugerimos pre-despachar 20 unidades a bodega central.")
+    with l_col2:
+        st.warning("⚠️ **Alerta de Costo:** Los costos de Estafeta han subido 5% en tu zona. La IA recomienda activar 'Envío Gratis' solo en compras > $1,500 MXN para mantener ROI.")
+
+    st.write("---")
+    
+    col_ins1, col_ins2 = st.columns([1, 1])
+    with col_ins1:
+        st.markdown("#### 🚩 Hoja de Ruta SEO/AIO")
+        st.error("🚨 **CRÍTICO:** 3 categorías principales sin etiquetas optimizadas para IA.")
+        st.warning("⚠️ **ALERTA:** Desfase de stock detectado entre ERP y TiendaNube.")
+        st.info("💡 **TIP:** Activar envíos gratis aumentó conversiones un 20% en tu nicho.")
+
+    with col_ins2:
+        st.markdown("#### 📊 Mercado")
+        st.caption("Análisis ajustado a modismos de MX, AR y BR.")
+        data_sentimiento = pd.DataFrame({
+            "Categoría": ["Atención", "Envío", "Stock", "Precio"],
+            "Tu Tienda": [90, 75, 60, 85],
+            "Media Competencia": [80, 82, 85, 78]
+        }).set_index("Categoría")
+        st.area_chart(data_sentimiento)
+
+# --- TAB 3: EQUIPO ---
 with tab_team:
     st.markdown("### 👥 Nuestro Equipo Multidisciplinario")
     equipo = [
@@ -346,10 +381,11 @@ with tab_team:
             with cols[j]:
                 st.markdown(f"""
                 <div class="team-card-large">
-                    <img src="{img_url}" style="width: 220px; height: 220px; border-radius: 50%; object-fit: cover; border: 8px solid #0056ff; margin-bottom: 20px;">
+                    <img src="{img_url}" style="width: 220px; height: 220px; border-radius: 50%; object-fit: cover; border: 8px solid #0056ff; margin-bottom: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.15);">
                     <br><strong style="font-size: 1.6rem; color: #1a1c2e;">{nombre}</strong>
                     <br><span style="color: #0056ff; font-weight: 700; font-size: 1.1rem; text-transform: uppercase;">{cargo}</span>
-                </div>""", unsafe_allow_html=True)
+                </div>
+                """, unsafe_allow_html=True)
 
 st.markdown('</div>', unsafe_allow_html=True) 
 st.write("---")
