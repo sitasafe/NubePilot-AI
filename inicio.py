@@ -98,7 +98,7 @@ st.markdown('<h1 class="main-title">🚀 Impulsa IA</h1>', unsafe_allow_html=Tru
 st.subheader("Tu Copiloto Estratégico para Vender Más en TiendaNube")
 st.write("---")
 
-tab_dash, tab_ins, tab_team = st.tabs(["📊 Dashboard General", "🧠 Estrategia y AIO", "👥 Equipo"])
+tab_dash, tab_ins, tab_team = st.tabs(["📊 Monitor de Crecimiento & ROI", "🧠 Estrategia y AIO", "👥 Equipo"])
 
 # --- TAB 1: DASHBOARD GENERAL ---
 with tab_dash:
@@ -205,4 +205,5 @@ with tab_team:
 
 st.write("---")
 st.caption("Impulsa IA | Equipo 3 | Hackathon UTEL 2026 | TiendaNube")
+
 
