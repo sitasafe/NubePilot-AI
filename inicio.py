@@ -287,6 +287,15 @@ with tab_ins:
             time.sleep(1)
             st.download_button("Descargar Plan de Acción PDF", data="Contenido del reporte...", file_name="Plan_Impulsa_2026.txt")
 
+    # --- NUEVA ADICIÓN: LOGÍSTICA PREDICTIVA (INVESTIGACIÓN EXTRA) ---
+    st.write("---")
+    st.markdown("### 🚛 Logística Inteligente & Envíos (AMVO 2026)")
+    l_col1, l_col2 = st.columns(2)
+    with l_col1:
+        st.info("💡 **Insight Logístico:** Basado en tendencias de AMVO, el 60% de tus ventas este mes vendrán de CDMX y Jalisco. Sugerimos pre-despachar 20 unidades a bodega central.")
+    with l_col2:
+        st.warning("⚠️ **Alerta de Costo:** Los costos de Estafeta han subido 5% en tu zona. La IA recomienda activar 'Envío Gratis' solo en compras > $1,500 MXN para mantener ROI.")
+
     st.write("---")
     
     col_ins1, col_ins2 = st.columns([1, 1])
@@ -334,7 +343,3 @@ with tab_team:
 
 st.write("---")
 st.caption("Impulsa IA | Equipo 3 | Hackathon UTEL 2026 | TiendaNube")
-
-
-
-
