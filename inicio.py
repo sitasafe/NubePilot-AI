@@ -144,9 +144,9 @@ with st.sidebar:
     st.write("---")
     
     # AGREGADO: Glosario de Inclusión (Punto 2 y 3)
-    with st.expander("📘 Glosario"):
+    with st.expander("📘 Glosario para Humanos"):
         st.write("**ROAS:** Es cuánto dinero ganas por cada peso que pones en publicidad.")
-        st.write("**AIO:** Hacer que tu tienda sea " + '"' + amiga + '"' + " de las IAs como ChatGPT.")
+        st.write("**AIO:** Hacer que tu tienda sea " + '"' + "amiga" + '"' + " de las IAs como ChatGPT.")
         st.write("**Insights:** Descubrimientos sobre lo que tus clientes realmente quieren.")
 
     st.image("https://cdn-icons-png.flaticon.com/512/2103/2103633.png", width=50)
