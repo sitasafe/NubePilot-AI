@@ -7,10 +7,11 @@ import requests
 # --- CONFIGURACIÓN DE PÁGINA ---
 st.set_page_config(page_title="Impulsa IA - Hackathon", page_icon="🚀", layout="wide")
 
-# --- CONFIGURACIÓN DE CREDENCIALES TIENDANUBE (ACTUALIZADO CON TUS DATOS REALES) ---
+# --- CREDENCIALES REALES (Basadas en tus capturas) ---
 CLIENT_ID = "27483" 
 CLIENT_SECRET = "d45072c95b889632ad3040bfd1dd951d981e0c38ff25877a" 
-REDIRECT_URI = "https://nubepilot-ai.vercel.app/" 
+# Esta URL debe coincidir con la de tu Panel de Partners en Tiendanube
+REDIRECT_URI = "https://nubepilot-ai-jenadpeumuumeahkmnjmwr.streamlit.app/" 
 
 # --- FUNCIONES DE CONEXIÓN API ---
 def obtener_token_real(code):
@@ -28,10 +29,10 @@ def obtener_token_real(code):
         if response.status_code == 200:
             return data.get("access_token")
         else:
-            st.error(f"Error de la API: {data.get('error_description', data.get('error'))}")
+            st.error(f"Error de Tiendanube: {data.get('error_description', data.get('error'))}")
             return None
     except Exception as e:
-        st.error(f"Error de conexión: {str(e)}")
+        st.error(f"Fallo de conexión: {str(e)}")
         return None
 
 # --- ESTILOS CSS PERSONALIZADOS ---
@@ -116,21 +117,28 @@ with st.sidebar:
         auth_url = f"https://www.tiendanube.com/apps/authorize/token?client_id={CLIENT_ID}&scope=read_orders,write_products"
         st.link_button("1. Autorizar en Tiendanube", auth_url)
         
-        temp_code = st.text_input("2. Pega el 'Code' de la URL:")
+        temp_code = st.text_input("2. Pega el 'Code' o la URL completa:", placeholder="Pega aquí...")
+        
         if st.button("3. Vincular Tienda"):
-            token_valido = obtener_token_real(temp_code)
-            if token_valido:
-                st.session_state['api_token'] = token_valido
-                st.success("¡Conexión Real Establecida! ✅")
+            if temp_code:
+                # Limpieza automática: extrae el código si pegan la URL completa
+                if "code=" in temp_code:
+                    temp_code = temp_code.split("code=")[1].split("&")[0]
+                
+                token_valido = obtener_token_real(temp_code)
+                if token_valido:
+                    st.session_state['api_token'] = token_valido
+                    st.success("¡Conexión Real Establecida! ✅")
+                    st.balloons()
             else:
-                st.error("Error en vinculación. Revisa tus credenciales.")
+                st.warning("Por favor, pega el código obtenido en el paso 1.")
 
     st.divider()
     api_token_val = st.session_state.get('api_token', "")
-    api_token_input = st.text_input("Access Token de API", type="password", value=api_token_val)
+    st.text_input("Access Token Activo", type="password", value=api_token_val, disabled=True)
     id_tienda = st.text_input("ID de Tienda", value="2831942")
     
-    if api_token_input:
+    if api_token_val:
         st.success("Conectado a TiendaNube ✅")
     else:
         st.warning("Esperando Conexión... ⚠️")
@@ -166,89 +174,34 @@ with tab_dash:
                 status.update(label="Generando Metatags AIO (AI Optimization)...", state="running")
                 time.sleep(1)
                 status.update(label="Ajustando pujas de Ads por ROAS...", state="complete", expanded=False)
-            st.balloons()
             st.success("### 🚀 Sistema Optimizado: Stock actualizado y Ads ajustados.")
 
     with col_right:
         st.markdown("### 💬 Consulta IA")
         u_input = st.text_input("Pregunta sobre Ads o Stock:", placeholder="¿Cuál es mi producto más rentable?")
         if st.button("Analizar"):
-            st.info(f"📊 **Análisis:** Tu producto 'Playera Algodón' tiene un ROAS de 5.1x pero stock crítico en ERP (5 unidades). Sugiero reponer stock antes de escalar Ads.")
+            st.info(f"📊 **Análisis:** Tu producto 'Playera Algodón' tiene un ROAS de 5.1x pero stock crítico en ERP (5 unidades).")
 
 # --- TAB 2: ESTRATEGIA Y AIO ---
 with tab_ins:
     st.markdown("### 🧠 Soluciones Estratégicas")
-    
     c1, c2, c3 = st.columns(3)
     with c1:
-        st.markdown(f"""<div class="problem-box">
-            <span class="status-tag">ADS & ROAS</span>
-            <h4>Eficiencia Publicitaria</h4>
-            <p>Ajuste dinámico de inversión según el rendimiento de ventas reales.</p>
-            </div>""", unsafe_allow_html=True)
+        st.markdown('<div class="problem-box"><span class="status-tag">ADS & ROAS</span><h4>Eficiencia Publicitaria</h4><p>Ajuste dinámico de inversión.</p></div>', unsafe_allow_html=True)
     with c2:
-        st.markdown(f"""<div class="problem-box">
-            <span class="status-tag">AIO / SEO</span>
-            <h4>Optimización para IA</h4>
-            <p>Adaptamos tu contenido para ser la primera respuesta en ChatGPT y Gemini.</p>
-            </div>""", unsafe_allow_html=True)
+        st.markdown('<div class="problem-box"><span class="status-tag">AIO / SEO</span><h4>Optimización para IA</h4><p>Resultados en ChatGPT y Gemini.</p></div>', unsafe_allow_html=True)
     with c3:
-        st.markdown(f"""<div class="problem-box">
-            <span class="status-tag">ERP CONNECT</span>
-            <h4>Automatización Operativa</h4>
-            <p>Conexión fluida con sistemas externos para control de inventario total.</p>
-            </div>""", unsafe_allow_html=True)
+        st.markdown('<div class="problem-box"><span class="status-tag">ERP CONNECT</span><h4>Automatización</h4><p>Control de inventario total.</p></div>', unsafe_allow_html=True)
 
     st.write("---")
-    
     st.markdown("### 🧬 Big Data Engine: Análisis Predictivo")
     col_big1, col_big2 = st.columns([1.5, 1])
-    
     with col_big1:
-        st.markdown("#### 📈 Proyección de Demanda (Próximos 15 días)")
-        df_pred = pd.DataFrame({
-            "Día": [f"Día {i}" for i in range(1, 16)],
-            "Ventas Reales": np.random.randint(100, 200, 15),
-            "Tendencia Predictiva": np.random.randint(150, 250, 15)
-        }).set_index("Día")
+        df_pred = pd.DataFrame({"Ventas": np.random.randint(100, 200, 15)}).set_index(np.arange(1, 16))
         st.line_chart(df_pred)
-        st.caption("Gráfico generado tras analizar 2.5 millones de puntos de datos históricos.")
-
     with col_big2:
-        st.markdown("#### 🎯 Segmentación de Audiencia")
-        st.markdown("""
-        <div class="big-data-stat">
-            <h2 style="margin:0; color:#00c6ff;">45,280</h2>
-            <p style="margin:0; font-size:0.9rem;">Perfiles Analizados</p>
-        </div>
-        """, unsafe_allow_html=True)
-        st.write("")
+        st.markdown('<div class="big-data-stat"><h2>45,280</h2><p>Perfiles Analizados</p></div>', unsafe_allow_html=True)
         st.progress(85, text="Fidelidad de Clientes (LTV)")
-        st.progress(62, text="Probabilidad de Recompra")
-        st.progress(18, text="Tasa de Abandono (Predictiva)")
-        
-        if st.button("📊 Generar Reporte de Big Data"):
-            st.toast("Procesando clusters de clientes...")
-            time.sleep(1)
-            st.download_button("Descargar Análisis PDF", data="Contenido del reporte...", file_name="Reporte_BigData_Impulsa.txt")
-
-    st.write("---")
-    
-    col_ins1, col_ins2 = st.columns([1, 1])
-    with col_ins1:
-        st.markdown("#### 🚩 Hoja de Ruta SEO/AIO")
-        st.error("🚨 **CRÍTICO:** 3 categorías principales sin etiquetas optimizadas para IA.")
-        st.warning("⚠️ **ALERTA:** Desfase de stock detectado entre ERP y TiendaNube.")
-        st.info("💡 **TIP:** Activar envíos gratis aumentó conversiones un 20% en tu nicho.")
-
-    with col_ins2:
-        st.markdown("#### 📊 Sentimiento y Mercado")
-        data_sentimiento = pd.DataFrame({
-            "Categoría": ["Atención", "Envío", "Stock", "Precio"],
-            "Tu Tienda": [90, 75, 60, 85],
-            "Media Competencia": [80, 82, 85, 78]
-        }).set_index("Categoría")
-        st.area_chart(data_sentimiento)
 
 # --- TAB 3: EQUIPO ---
 with tab_team:
@@ -267,13 +220,9 @@ with tab_team:
         cols = st.columns(3)
         for j, (nombre, cargo, img_url) in enumerate(equipo[i:i+3]):
             with cols[j]:
-                st.markdown(f"""
-                <div class="team-card-large">
-                    <img src="{img_url}" style="width: 200px; height: 200px; border-radius: 50%; object-fit: cover; border: 6px solid #0056ff; margin-bottom: 15px;">
-                    <br><strong style="font-size: 1.4rem;">{nombre}</strong>
-                    <br><span style="color: #0056ff; font-weight: 600;">{cargo}</span>
-                </div>
-                """, unsafe_allow_html=True)
+                st.markdown(f"""<div class="team-card-large">
+                    <img src="{img_url}" style="width: 180px; height: 180px; border-radius: 50%; object-fit: cover; border: 5px solid #0056ff; margin-bottom: 15px;">
+                    <br><strong>{nombre}</strong><br><span style="color: #0056ff;">{cargo}</span></div>""", unsafe_allow_html=True)
 
 st.write("---")
 st.caption("Impulsa IA | Equipo 3 | Hackathon UTEL 2026 | TiendaNube")
