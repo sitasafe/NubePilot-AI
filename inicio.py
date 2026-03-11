@@ -71,7 +71,7 @@ def obtener_token_real(code):
 
 # --- BARRA LATERAL (Panel de Control) ---
 with st.sidebar:
-    st.image("https://imgur.com/V1m4Dgk", use_container_width=True)
+    st.image("https://imgur.com/V1m4Dgk.jpeg", use_container_width=True)
     st.write("---")
 
     with st.expander("🌐 Accesibilidad e Inclusión", expanded=True):
@@ -408,4 +408,5 @@ with tab_team:
 st.markdown('</div>', unsafe_allow_html=True) 
 st.write("---")
 st.caption("Growth Copilot | Equipo 3 | Hackathon UTEL 2026 | TiendaNube")
+
 
