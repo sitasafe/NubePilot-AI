@@ -335,7 +335,7 @@ with tab_ins:
 
 # --- TAB 3: EQUIPO (CORREGIDO) ---
 with tab_team:
-    st.markdown("### 👥 Nuestro Equipo Multidisciplinario")
+    st.markdown("### 👥 Nuestro Equipo")
     equipo = [
         ("Willan Álvarez.", "Lead Architect", "https://i.imgur.com/CSH9Af7.jpeg"),
         ("Dalia R.", "Product Manager", "https://i.imgur.com/4O2BGL8.jpeg"),
@@ -361,3 +361,4 @@ with tab_team:
 st.markdown('</div>', unsafe_allow_html=True) # Cerrar div de lectura fácil
 st.write("---")
 st.caption("Impulsa IA | Equipo 3 | Hackathon UTEL 2026 | Tecnología Humana para Tod@s")
+
