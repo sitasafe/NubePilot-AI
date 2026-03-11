@@ -7,9 +7,9 @@ import requests
 # --- CONFIGURACIÓN DE PÁGINA ---
 st.set_page_config(page_title="Impulsa IA - Hackathon", page_icon="🚀", layout="wide")
 
-# --- CONFIGURACIÓN DE CREDENCIALES TIENDANUBE ---
+# --- CONFIGURACIÓN DE CREDENCIALES TIENDANUBE (Basado en tus imágenes) ---
 CLIENT_ID = "27483" 
-CLIENT_SECRET = "27483-3XU9X7-Y8Y9Z0-A1B2C3-D4E5F6" # Basado en tu panel
+CLIENT_SECRET = "27483-3XU9X7-Y8Y9Z0-A1B2C3-D4E5F6" 
 REDIRECT_URI = "http://localhost:8501" 
 
 # --- FUNCIONES DE CONEXIÓN API ---
@@ -108,7 +108,6 @@ with st.sidebar:
     
     erp_mode = st.selectbox("Sincronización ERP", ["Holded (Recomendado)", "Odoo", "SAP Business One", "Manual"])
     
-    # INTEGRACIÓN DE CONEXIÓN OFICIAL
     with st.expander("🔑 Conexión Oficial Tiendanube", expanded=True):
         auth_url = f"https://www.tiendanube.com/apps/authorize/token?client_id={CLIENT_ID}&scope=read_orders,write_products"
         st.link_button("1. Autorizar en Tiendanube", auth_url)
@@ -123,7 +122,9 @@ with st.sidebar:
                 st.error("Error en vinculación. Revisa tus credenciales.")
 
     st.divider()
-    api_token_input = st.text_input("Access Token de API", type="password", value=st.session_state.get('api_token', ""))
+    # Mantenemos el input manual por si acaso, pero se llena automáticamente con el proceso de arriba
+    api_token_val = st.session_state.get('api_token', "")
+    api_token_input = st.text_input("Access Token de API", type="password", value=api_token_val)
     id_tienda = st.text_input("ID de Tienda", value="2831942")
     
     if api_token_input:
@@ -257,4 +258,19 @@ with tab_team:
         ("Carlos Andrés A.", "Liderazgo", "https://cdn-icons-png.flaticon.com/512/2354/2354573.png"),
         ("Edwing Garcia", "Ventas", "https://imgur.com/CQJu9xm.jpeg"),
         ("Amarilis Elizabeth", "Gestión", "https://cdn-icons-png.flaticon.com/512/201/201634.png"),
-        ("Cesar Augusto F.", "Estrategia", "https://
+        ("Cesar Augusto F.", "Estrategia", "https://cdn-icons-png.flaticon.com/512/3001/3001764.png")
+    ]
+    for i in range(0, len(equipo), 3):
+        cols = st.columns(3)
+        for j, (nombre, cargo, img_url) in enumerate(equipo[i:i+3]):
+            with cols[j]:
+                st.markdown(f"""
+                <div class="team-card-large">
+                    <img src="{img_url}" style="width: 200px; height: 200px; border-radius: 50%; object-fit: cover; border: 6px solid #0056ff; margin-bottom: 15px;">
+                    <br><strong style="font-size: 1.4rem;">{nombre}</strong>
+                    <br><span style="color: #0056ff; font-weight: 600;">{cargo}</span>
+                </div>
+                """, unsafe_allow_html=True)
+
+st.write("---")
+st.caption("Impulsa IA | Equipo 3 | Hackathon UTEL 2026 | TiendaNube")
