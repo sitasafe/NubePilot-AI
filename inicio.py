@@ -7,7 +7,7 @@ import requests
 # --- CONFIGURACIÓN DE PÁGINA ---
 st.set_page_config(page_title="Impulsa IA - Hackathon", page_icon="🚀", layout="wide")
 
-# --- CONFIGURACIÓN DE CREDENCIALES TIENDANUBE (Basado en tus imágenes) ---
+# --- CONFIGURACIÓN DE CREDENCIALES TIENDANUBE ---
 CLIENT_ID = "27483" 
 CLIENT_SECRET = "27483-3XU9X7-Y8Y9Z0-A1B2C3-D4E5F6" 
 REDIRECT_URI = "http://localhost:8501" 
@@ -109,8 +109,11 @@ with st.sidebar:
     erp_mode = st.selectbox("Sincronización ERP", ["Holded (Recomendado)", "Odoo", "SAP Business One", "Manual"])
     
     with st.expander("🔑 Conexión Oficial Tiendanube", expanded=True):
-        auth_url = f"https://www.tiendanube.com/apps/authorize/token?client_id={CLIENT_ID}&scope=read_orders,write_products"
+        # --- INTEGRACIÓN DE LA CORRECCIÓN ---
+        # Fíjate que no termine en /token
+        auth_url = f"https://www.tiendanube.com/apps/authorize?client_id={CLIENT_ID}&scope=read_orders,write_products,read_customers"
         st.link_button("1. Autorizar en Tiendanube", auth_url)
+        # -------------------------------------
         
         temp_code = st.text_input("2. Pega el 'Code' de la URL:")
         if st.button("3. Vincular Tienda"):
@@ -122,7 +125,6 @@ with st.sidebar:
                 st.error("Error en vinculación. Revisa tus credenciales.")
 
     st.divider()
-    # Mantenemos el input manual por si acaso, pero se llena automáticamente con el proceso de arriba
     api_token_val = st.session_state.get('api_token', "")
     api_token_input = st.text_input("Access Token de API", type="password", value=api_token_val)
     id_tienda = st.text_input("ID de Tienda", value="2831942")
