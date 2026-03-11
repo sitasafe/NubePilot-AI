@@ -165,7 +165,7 @@ with tab_team:
     st.markdown("### 👥 Equipo 3 - Desarrollo y Estrategia")
     
     equipo = [
-        ("Willan Álvarez.", "Lead Architect", "https://cdn-icons-png.flaticon.com/512/6840/6840478.png"),
+        ("Willan Álvarez.", "Lead Architect", "https://imgur.com/CSH9Af7"),
         ("Dalia R.", "Product Manager", "https://cdn-icons-png.flaticon.com/512/6997/6997662.png"),
         ("Montserrat G.", "Strategy", "https://cdn-icons-png.flaticon.com/512/6997/6997674.png"),
         ("Jiram Cabrera", "Organización", "https://cdn-icons-png.flaticon.com/512/4333/4333609.png"),
@@ -189,3 +189,4 @@ with tab_team:
 
 st.write("---")
 st.caption("Impulsa IA | Equipo 3 | Hackathon UTEL 2026 | TiendaNube")
+
