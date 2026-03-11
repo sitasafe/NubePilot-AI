@@ -144,7 +144,7 @@ with st.sidebar:
     st.write("---")
     
     # AGREGADO: Glosario de Inclusión (Punto 2 y 3)
-    with st.expander("📘 Glosario para Humanos"):
+    with st.expander("📘 Glosario"):
         st.write("**ROAS:** Es cuánto dinero ganas por cada peso que pones en publicidad.")
         st.write("**AIO:** Hacer que tu tienda sea " + '"' + "amiga" + '"' + " de las IAs como ChatGPT.")
         st.write("**Insights:** Descubrimientos sobre lo que tus clientes realmente quieren.")
@@ -334,4 +334,5 @@ with tab_team:
 
 st.write("---")
 st.caption("Impulsa IA | Equipo 3 | Hackathon UTEL 2026 | TiendaNube")
+
 
