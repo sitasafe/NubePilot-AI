@@ -112,7 +112,6 @@ with st.sidebar:
     erp_mode = st.selectbox("Sincronización ERP", ["Holded (Recomendado)", "Odoo", "SAP Business One", "Manual"])
     
     with st.expander("🔑 Conexión Oficial Tiendanube", expanded=True):
-        # URL de autorización corregida (sin /token al final para el paso 1)
         auth_url = f"https://www.tiendanube.com/apps/authorize?client_id={CLIENT_ID}&scope=read_orders,write_products,read_customers"
         st.link_button("1. Autorizar en Tiendanube", auth_url)
         
@@ -216,4 +215,64 @@ with tab_ins:
 
     with col_big2:
         st.markdown("#### 🎯 Segmentación de Audiencia")
-        st.
+        st.markdown("""
+        <div class="big-data-stat">
+            <h2 style="margin:0; color:#00c6ff;">45,280</h2>
+            <p style="margin:0; font-size:0.9rem;">Perfiles Analizados</p>
+        </div>
+        """, unsafe_allow_html=True)
+        st.write("")
+        st.progress(85, text="Fidelidad de Clientes (LTV)")
+        st.progress(62, text="Probabilidad de Recompra")
+        st.progress(18, text="Tasa de Abandono (Predictiva)")
+        
+        if st.button("📊 Generar Reporte de Big Data"):
+            st.toast("Procesando clusters de clientes...")
+            time.sleep(1)
+            st.download_button("Descargar Análisis PDF", data="Contenido del reporte...", file_name="Reporte_BigData_Impulsa.txt")
+
+    st.write("---")
+    
+    col_ins1, col_ins2 = st.columns([1, 1])
+    with col_ins1:
+        st.markdown("#### 🚩 Hoja de Ruta SEO/AIO")
+        st.error("🚨 **CRÍTICO:** 3 categorías principales sin etiquetas optimizadas para IA.")
+        st.warning("⚠️ **ALERTA:** Desfase de stock detectado entre ERP y TiendaNube.")
+        st.info("💡 **TIP:** Activar envíos gratis aumentó conversiones un 20% en tu nicho.")
+
+    with col_ins2:
+        st.markdown("#### 📊 Sentimiento y Mercado")
+        data_sentimiento = pd.DataFrame({
+            "Categoría": ["Atención", "Envío", "Stock", "Precio"],
+            "Tu Tienda": [90, 75, 60, 85],
+            "Media Competencia": [80, 82, 85, 78]
+        }).set_index("Categoría")
+        st.area_chart(data_sentimiento)
+
+# --- TAB 3: EQUIPO ---
+with tab_team:
+    st.markdown("### 👥 Nuestro Equipo ")
+    equipo = [
+        ("Willan Álvarez.", "Lead Architect", "https://i.imgur.com/CSH9Af7.jpeg"),
+        ("Dalia R.", "Product Manager", "https://imgur.com/4O2BGL8.jpeg"),
+        ("Montserrat G.", "Strategy", "https://cdn-icons-png.flaticon.com/512/6997/6997674.png"),
+        ("Jiram Cabrera", "Organización", "https://imgur.com/eamMDmE.jpeg"),
+        ("Carlos Andrés A.", "Liderazgo", "https://cdn-icons-png.flaticon.com/512/2354/2354573.png"),
+        ("Edwing Garcia", "Ventas", "https://imgur.com/CQJu9xm.jpeg"),
+        ("Amarilis Elizabeth", "Gestión", "https://cdn-icons-png.flaticon.com/512/201/201634.png"),
+        ("Cesar Augusto F.", "Estrategia", "https://cdn-icons-png.flaticon.com/512/3001/3001764.png")
+    ]
+    for i in range(0, len(equipo), 3):
+        cols = st.columns(3)
+        for j, (nombre, cargo, img_url) in enumerate(equipo[i:i+3]):
+            with cols[j]:
+                st.markdown(f"""
+                <div class="team-card-large">
+                    <img src="{img_url}" style="width: 200px; height: 200px; border-radius: 50%; object-fit: cover; border: 6px solid #0056ff; margin-bottom: 15px;">
+                    <br><strong style="font-size: 1.4rem;">{nombre}</strong>
+                    <br><span style="color: #0056ff; font-weight: 600;">{cargo}</span>
+                </div>
+                """, unsafe_allow_html=True)
+
+st.write("---")
+st.caption("Impulsa IA | Equipo 3 | Hackathon UTEL 2026 | TiendaNube")
