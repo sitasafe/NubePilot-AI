@@ -77,8 +77,8 @@ with st.sidebar:
         st.warning("Estado: Desconectado ⚠️")
 
 # --- CUERPO PRINCIPAL ---
-st.markdown('<h1 class="main-title">🚀 AI Growth</h1>', unsafe_allow_html=True)
-st.subheader("Optimización  en Tiempo Real")
+st.markdown('<h1 class="main-title">🚀 Impulsa IA</h1>', unsafe_allow_html=True)
+st.subheader("Tu Copiloto Estrátegico para Vender Más en TiendaNube")
 st.write("---")
 
 tab_dash, tab_ins, tab_team = st.tabs(["📊 Dashboard General", "🧠 Insights Avanzados", "👥 Equipo"])
@@ -188,5 +188,6 @@ with tab_team:
 
 st.write("---")
 st.caption("AI Growth | Equipo 3 | Hackathon UTEL 2026 | TiendaNube")
+
 
 
