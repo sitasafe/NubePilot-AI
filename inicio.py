@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 
 # --- CONFIGURACIÓN DE PÁGINA ---
-st.set_page_config(page_title="AI Growth Copilot - Hackathon", page_icon="🚀", layout="wide")
+st.set_page_config(page_title="Impulsa IA - Hackathon", page_icon="🚀", layout="wide")
 
 # --- ESTILOS CSS PERSONALIZADOS ---
 st.markdown("""
@@ -50,7 +50,8 @@ st.markdown("""
 
 # --- BARRA LATERAL (Panel de Control) ---
 with st.sidebar:
-    st.image("https://logowik.com/content/uploads/images/tiendanube1485.logowik.com.webp", use_container_width=True)
+    # LOGO ACTUALIZADO (Link directo al JPG del cohete azul)
+    st.image("https://i.imgur.com/Ky1ZXCL.jpeg", use_container_width=True)
     st.write("---")
     
     st.image("https://cdn-icons-png.flaticon.com/512/2103/2103633.png", width=50)
@@ -78,7 +79,7 @@ with st.sidebar:
 
 # --- CUERPO PRINCIPAL ---
 st.markdown('<h1 class="main-title">🚀 Impulsa IA</h1>', unsafe_allow_html=True)
-st.subheader("Tu Copiloto Estrátegico para Vender Más en TiendaNube")
+st.subheader("Tu Copiloto Estratégico para Vender Más en TiendaNube")
 st.write("---")
 
 tab_dash, tab_ins, tab_team = st.tabs(["📊 Dashboard General", "🧠 Insights Avanzados", "👥 Equipo"])
@@ -114,7 +115,7 @@ with tab_dash:
         if st.button("Enviar"):
             st.info(f"📊 **IA:** Analizando tendencias... Recomiendo activar envíos gratis en compras mayores a $999 para reducir el abandono en el checkout.")
 
-# --- TAB 2: INSIGHTS AVANZADOS (Fusión con Review Intelligence) ---
+# --- TAB 2: INSIGHTS AVANZADOS ---
 with tab_ins:
     st.markdown("### 🧠 Review Intelligence")
     st.caption("Nuestra IA analiza el sentimiento del mercado y las reseñas de la competencia para priorizar tu crecimiento.")
@@ -187,7 +188,4 @@ with tab_team:
                 """, unsafe_allow_html=True)
 
 st.write("---")
-st.caption("AI Growth | Equipo 3 | Hackathon UTEL 2026 | TiendaNube")
-
-
-
+st.caption("Impulsa IA | Equipo 3 | Hackathon UTEL 2026 | TiendaNube")
