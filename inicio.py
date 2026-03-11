@@ -38,7 +38,7 @@ def obtener_token_real(code):
         return None
     return None
 
-# --- ESTILOS CSS PERSONALIZADOS (COMPLETOS) ---
+# --- ESTILOS CSS PERSONALIZADOS (REPARADOS) ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap');
@@ -48,6 +48,7 @@ st.markdown("""
         font-family: 'Inter', sans-serif;
     }
     
+    /* Botón */
     div.stButton > button:first-child {
         background: linear-gradient(135deg, #0056ff 0%, #00c6ff 100%) !important;
         color: white !important; 
@@ -56,10 +57,9 @@ st.markdown("""
         padding: 14px 40px !important;
         font-weight: 800 !important; 
         text-transform: uppercase;
-        letter-spacing: 1px;
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important; 
         width: 100% !important; 
         box-shadow: 0px 8px 20px rgba(0, 86, 255, 0.3) !important;
+        transition: all 0.4s ease;
     }
     div.stButton > button:hover {
         transform: translateY(-5px);
@@ -80,40 +80,40 @@ st.markdown("""
         50% { background-position: 100% 50%; }
         100% { background-position: 0% 50%; }
     }
-    
+
+    /* Estilos de Etiquetas que faltaban */
+    .status-tag {
+        background: #e8efff;
+        color: #0056ff;
+        padding: 4px 12px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 800;
+        display: inline-block;
+        margin-bottom: 10px;
+    }
+
+    .big-data-stat {
+        background: white;
+        padding: 20px;
+        border-radius: 20px;
+        text-align: center;
+        box-shadow: 0px 10px 25px rgba(0,0,0,0.05);
+        border: 1px solid #f0f2f6;
+    }
+
     .team-card-large {
         text-align: center; padding: 35px; border-radius: 30px;
-        background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px);
-        border: 1px solid rgba(0, 86, 255, 0.1);
+        background: white; border: 1px solid rgba(0, 86, 255, 0.1);
         box-shadow: 0px 20px 40px rgba(0,0,0,0.05); margin-bottom: 25px;
         transition: all 0.4s ease;
     }
-    .team-card-large:hover {
-        transform: translateY(-15px) scale(1.02);
-        box-shadow: 0px 30px 60px rgba(0, 86, 255, 0.15);
-    }
+    .team-card-large:hover { transform: translateY(-10px); border: 1px solid #0056ff; }
 
     .problem-box {
         background-color: white; padding: 25px; border-radius: 20px;
         border-left: 8px solid #0056ff; box-shadow: 0px 10px 25px rgba(0,0,0,0.03);
         height: 100%; transition: all 0.3s ease;
-    }
-    .problem-box:hover { transform: translateX(10px); }
-
-    .status-tag {
-        background: #e8efff; color: #0056ff; padding: 5px 12px;
-        border-radius: 50px; font-size: 0.75rem; font-weight: 800;
-        text-transform: uppercase; margin-bottom: 10px; display: inline-block;
-    }
-
-    .big-data-stat {
-        background: #f8faff; padding: 20px; border-radius: 20px;
-        text-align: center; border: 1px solid #e0e8f9;
-    }
-    
-    .review-action-card {
-        background: #f8faff; border-radius: 15px; padding: 20px;
-        border-left: 5px solid #6200ea; margin-bottom: 15px;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -136,97 +136,58 @@ with st.sidebar:
                 st.success("¡Conexión Real Establecida! ✅")
 
     api_token_val = st.session_state.get('api_token', "")
-    st.text_input("Access Token Activo", type="password", value=api_token_val)
+    st.text_input("Access Token de API", type="password", value=api_token_val)
 
 # --- CUERPO PRINCIPAL ---
 st.markdown('<h1 class="main-title">🚀 Impulsa IA</h1>', unsafe_allow_html=True)
 st.subheader("Tu Copiloto Estratégico para Vender Más en TiendaNube")
-st.write("---")
 
-tab_dash, tab_rev, tab_ins, tab_team = st.tabs(["📊 Monitor de Crecimiento & ROI", "✨ Review Intelligence", "🧠 Estrategia y AIO", "👥 Equipo"])
+tab_dash, tab_ins, tab_team = st.tabs(["📊 Monitor de Crecimiento & ROI", "🧠 Estrategia y AIO", "👥 Equipo"])
 
 # --- TAB 1: DASHBOARD ---
 with tab_dash:
     st.markdown("### 📊 Performance & ROI Center")
-    m_col1, m_col2, m_col3, m_col4 = st.columns(4)
-    m_col1.metric("Carritos Abandonados", "12", "↑ 2", delta_color="inverse")
-    m_col2.metric("Ventas del Mes", "$12,450 MXN", "↑ 12%")
-    m_col3.metric("ROAS Publicidad", "4.2x", "+0.5")
-    m_col4.metric("Eficiencia ERP", "98%", "Sincronizado")
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric("Carritos Abandonados", "12", "↑ 2", delta_color="inverse")
+    m2.metric("Ventas del Mes", "$12,450 MXN", "↑ 12%")
+    m3.metric("ROAS Publicidad", "4.2x", "+0.5")
+    m4.metric("Eficiencia ERP", "98%", "Sincronizado")
+    
     st.write("---")
     col_left, col_right = st.columns([2, 1])
     with col_left:
         with st.chat_message("assistant"):
-            st.write("🤖 **IA:** He detectado una anomalía: el ROAS bajó pero las búsquedas de 'ropa sustentable' subieron. ¿Optimizamos?")
+            st.write("🤖 **IA:** He detectado que las búsquedas de 'ropa sustentable' subieron. ¿Optimizamos el SEO para IA?")
         if st.button("🎯 Ejecutar Optimización Operativa"):
             with st.status("Procesando...", expanded=True) as status:
                 time.sleep(1)
-                status.update(label="Sincronizando inventario con ERP...", state="running")
+                status.update(label="Sincronizando inventario...", state="running")
                 time.sleep(1)
-                status.update(label="Generando Metatags AIO...", state="running")
-                time.sleep(1)
-                status.update(label="Ajustando pujas de Ads por ROAS...", state="complete")
+                status.update(label="Generando Metatags AIO...", state="complete")
             st.balloons()
-    with col_right:
-        st.info("💡 **Dato IA:** Tu 'Playera Algodón' tiene un ROAS de 5.1x. Escala inversión ahora.")
+            st.success("### 🚀 Sistema Optimizado.")
 
-# --- TAB 2: REVIEW INTELLIGENCE ---
-with tab_rev:
-    st.markdown("### ✨ Review Intelligence: El Decodificador de Opiniones")
-    st.info("Transformamos el caos de los comentarios en una hoja de ruta estratégica para vender más.")
-    
-    col_a, col_b = st.columns(2)
-    with col_a:
-        st.markdown("#### 🛠️ Plan de Acción Inmediato")
-        st.markdown("""
-        <div class="review-action-card">
-            <strong>🔴 URGENTE:</strong> "El 42% menciona 'dificultad de armado'." <br>
-            <small>Tarea: Crea un video tutorial esta semana.</small>
-        </div>
-        <div class="review-action-card">
-            <strong>💡 INSIGHT:</strong> "Dudas recurrentes sobre impermeabilidad." <br>
-            <small>Tarea: Actualiza la descripción hoy mismo.</small>
-        </div>
-        """, unsafe_allow_html=True)
-    with col_b:
-        st.markdown("#### ⚔️ Inteligencia Competitiva")
-        st.markdown("""
-        <div class="review-action-card" style="border-left-color: #00c6ff;">
-            <strong>⚖️ OPORTUNIDAD:</strong> Tus competidores destacan por "cremallera duradera", tú recibes quejas aquí.<br>
-            <small>Acción: Mejora el insumo o comunica mejor tu control de calidad.</small>
-        </div>
-        """, unsafe_allow_html=True)
-
-# --- TAB 3: ESTRATEGIA Y AIO ---
+# --- TAB 2: ESTRATEGIA Y AIO ---
 with tab_ins:
     st.markdown("### 🧠 Soluciones Estratégicas")
     c1, c2, c3 = st.columns(3)
     with c1:
-        st.markdown('<div class="problem-box"><span class="status-tag">ADS & ROAS</span><h4>Eficiencia Publicitaria</h4><p>Ajuste dinámico según ventas reales.</p></div>', unsafe_allow_html=True)
+        st.markdown('<div class="problem-box"><span class="status-tag">ADS & ROAS</span><h4>Eficiencia Publicitaria</h4><p>Inversión dinámica según ventas.</p></div>', unsafe_allow_html=True)
     with c2:
-        st.markdown('<div class="problem-box"><span class="status-tag">AIO / SEO</span><h4>Optimización para IA</h4><p>Sé la primera respuesta en ChatGPT y Gemini.</p></div>', unsafe_allow_html=True)
+        st.markdown('<div class="problem-box"><span class="status-tag">AIO / SEO</span><h4>Optimización para IA</h4><p>Respuesta clave en ChatGPT/Gemini.</p></div>', unsafe_allow_html=True)
     with c3:
-        st.markdown('<div class="problem-box"><span class="status-tag">ERP CONNECT</span><h4>Automatización Operativa</h4><p>Control de inventario total vía ERP.</p></div>', unsafe_allow_html=True)
-    
+        st.markdown('<div class="problem-box"><span class="status-tag">ERP CONNECT</span><h4>Automatización Operativa</h4><p>Control de stock total.</p></div>', unsafe_allow_html=True)
+
     st.write("---")
-    st.markdown("### 🧬 Big Data Engine: Análisis Predictivo")
     col_big1, col_big2 = st.columns([1.5, 1])
     with col_big1:
         st.markdown("#### 📈 Proyección de Demanda")
-        df_pred = pd.DataFrame({
-            "Día": [f"Día {i}" for i in range(1, 16)],
-            "Ventas Reales": np.random.randint(100, 200, 15),
-            "Tendencia Predictiva": np.random.randint(150, 250, 15)
-        }).set_index("Día")
-        st.line_chart(df_pred)
+        st.line_chart(pd.DataFrame(np.random.randint(100, 250, size=(15, 2)), columns=['Real', 'Prediccion']))
     with col_big2:
-        st.markdown("#### 🎯 Segmentación")
-        st.markdown('<div class="big-data-stat"><h2 style="margin:0; color:#00c6ff;">45,280</h2><p style="margin:0; font-size:0.9rem;">Perfiles Analizados</p></div>', unsafe_allow_html=True)
-        st.write("")
+        st.markdown('<div class="big-data-stat"><h2 style="color:#00c6ff;">45,280</h2><p>Perfiles Analizados</p></div>', unsafe_allow_html=True)
         st.progress(85, text="Fidelidad de Clientes")
-        st.progress(62, text="Probabilidad de Recompra")
 
-# --- TAB 4: EQUIPO ---
+# --- TAB 3: EQUIPO (REPARADO) ---
 with tab_team:
     st.markdown("### 👥 Nuestro Equipo ")
     equipo = [
@@ -244,12 +205,11 @@ with tab_team:
         cols = st.columns(3)
         for j, (nombre, cargo, img_url) in enumerate(equipo[i:i+3]):
             with cols[j]:
-                # Estructura limpia para evitar SyntaxError
                 card_html = f"""
                 <div class="team-card-large">
-                    <img src="{img_url}" style="width: 220px; height: 220px; border-radius: 50%; object-fit: cover; border: 8px solid #0056ff; margin-bottom: 20px;">
-                    <br><strong>{nombre}</strong><br>
-                    <span style="color: #0056ff;">{cargo}</span>
+                    <img src="{img_url}" style="width: 200px; height: 200px; border-radius: 50%; object-fit: cover; border: 5px solid #0056ff; margin-bottom: 15px;">
+                    <br><strong style="font-size: 1.4rem;">{nombre}</strong>
+                    <br><span style="color: #0056ff; font-weight: 700;">{cargo}</span>
                 </div>
                 """
                 st.markdown(card_html, unsafe_allow_html=True)
