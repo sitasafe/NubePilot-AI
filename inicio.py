@@ -409,4 +409,5 @@ with tab_team:
 
 st.markdown('</div>', unsafe_allow_html=True) 
 st.write("---")
-st.caption("Impulsa IA | Equipo 3 | Hackathon UTEL 2026 | Tecnología Humana para Tod@s")
+st.caption("Impulsa IA | Equipo 3 | Hackathon UTEL 2026 | TiendaNube")
+
