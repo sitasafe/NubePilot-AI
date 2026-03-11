@@ -102,7 +102,7 @@ tab_dash, tab_ins, tab_team = st.tabs(["📊 Dashboard General", "🧠 Estrategi
 
 # --- TAB 1: DASHBOARD GENERAL ---
 with tab_dash:
-    st.markdown("### 📊 Salud de la Tienda")
+    st.markdown("### 📊 Performance & ROI Center")
     m_col1, m_col2, m_col3, m_col4 = st.columns(4)
     m_col1.metric("Carritos Abandonados", "12", "↑ 2", delta_color="inverse")
     m_col2.metric("Ventas del Mes", "$12,450 MXN", "↑ 12%")
@@ -135,7 +135,7 @@ with tab_dash:
 
 # --- TAB 2: ESTRATEGIA Y AIO ---
 with tab_ins:
-    st.markdown("### 🧠 Soluciones Estratégicas (Pit Stop)")
+    st.markdown("### 🧠 Soluciones Estratégicas")
     
     c1, c2, c3 = st.columns(3)
     with c1:
@@ -178,7 +178,7 @@ with tab_ins:
 
 # --- TAB 3: EQUIPO (MANTENIDO) ---
 with tab_team:
-    st.markdown("### 👥 Equipo 3 - Desarrollo y Estrategia")
+    st.markdown("### 👥 Nuestro Equipo ")
     
     equipo = [
         ("Willan Álvarez.", "Lead Architect", "https://i.imgur.com/CSH9Af7.jpeg"),
@@ -205,3 +205,4 @@ with tab_team:
 
 st.write("---")
 st.caption("Impulsa IA | Equipo 3 | Hackathon UTEL 2026 | TiendaNube")
+
