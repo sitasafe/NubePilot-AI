@@ -33,24 +33,26 @@ st.markdown("""
         background: -webkit-linear-gradient(#0056ff, #00c6ff);
         -webkit-background-clip: text; 
         -webkit-text-fill-color: transparent;
-        font-size: 3rem; 
+        font-size: 3.5rem; 
         font-weight: 800; 
         margin-bottom: 0;
     }
     
-    /* Tarjetas de Equipo */
-    .team-card {
-        text-align: center; padding: 15px; border-radius: 15px;
-        background: white; box-shadow: 0px 2px 10px rgba(0,0,0,0.05); 
-        margin-bottom: 20px; min-height: 180px;
+    /* Tarjetas de Equipo Optimizadas para Fotos Grandes */
+    .team-card-large {
+        text-align: center; 
+        padding: 25px; 
+        border-radius: 20px;
+        background: white; 
+        box-shadow: 0px 10px 20px rgba(0,0,0,0.05); 
+        margin-bottom: 25px;
     }
-    .team-img { width: 50px !important; margin-bottom: 10px; }
 </style>
 """, unsafe_allow_html=True)
 
 # --- BARRA LATERAL (Panel de Control) ---
 with st.sidebar:
-    # LOGO ACTUALIZADO (Link directo al JPG del cohete azul)
+    # LOGO ACTUALIZADO
     st.image("https://i.imgur.com/Ky1ZXCL.jpeg", use_container_width=True)
     st.write("---")
     
@@ -118,10 +120,9 @@ with tab_dash:
 # --- TAB 2: INSIGHTS AVANZADOS ---
 with tab_ins:
     st.markdown("### 🧠 Review Intelligence")
-    st.caption("Nuestra IA analiza el sentimiento del mercado y las reseñas de la competencia para priorizar tu crecimiento.")
+    st.caption("Nuestra IA analiza el sentimiento del mercado y las reseñas de la competencia.")
     
     col_ins1, col_ins2 = st.columns([1, 1])
-
     with col_ins1:
         st.markdown("#### 🚩 Hoja de Ruta Estratégica")
         st.error("🚨 **URGENTE:** El 42% menciona 'dificultad de armado'. Recomendación: Crear video tutorial.")
@@ -137,33 +138,11 @@ with tab_ins:
         }).set_index("Categoría")
         st.bar_chart(data_sentimiento)
 
-    st.divider()
-
-    st.markdown("#### 🛒 Análisis de Productos con más Abandonos")
-    df_abandonos = pd.DataFrame({
-        "Producto": ["Playera Algodón", "Gorra Trucker", "Tenis Sport", "Sudadera Minimal"],
-        "Abandonos": [45, 28, 15, 12],
-        "Valor Perdido (MXN)": [13500, 7000, 18000, 9600],
-        "Impacto": ["Crítico", "Medio", "Alto", "Bajo"]
-    })
-
-    col_table, col_chart = st.columns([2, 1])
-    
-    with col_table:
-        st.dataframe(df_abandonos, use_container_width=True, hide_index=True)
-    
-    with col_chart:
-        st.markdown("**Fuga de Capital Est.**")
-        st.bar_chart(df_abandonos.set_index("Producto")["Valor Perdido (MXN)"])
-
-    st.divider()
-    st.markdown("#### 📈 Proyección de Recuperación con IA")
-    st.line_chart(pd.DataFrame({"Ventas Proyectadas": [10, 25, 20, 50, 65, 90, 115]}))
-
-# --- TAB 3: EQUIPO ---
+# --- TAB 3: EQUIPO (FOTOS GRANDES) ---
 with tab_team:
     st.markdown("### 👥 Equipo 3 - Desarrollo y Estrategia")
     
+    # Lista de integrantes con roles y fotos
     equipo = [
         ("Willan Álvarez.", "Lead Architect", "https://i.imgur.com/CSH9Af7.jpeg"),
         ("Dalia R.", "Product Manager", "https://cdn-icons-png.flaticon.com/512/6997/6997662.png"),
@@ -175,19 +154,26 @@ with tab_team:
         ("Amarilis Elizabeth", "Gestión", "https://cdn-icons-png.flaticon.com/512/201/201634.png")
     ]
     
-    for i in range(0, len(equipo), 4):
-        cols = st.columns(4)
-        for j, (nombre, cargo, icono) in enumerate(equipo[i:i+4]):
+    # Usamos 3 columnas para que las fotos puedan ser más grandes
+    for i in range(0, len(equipo), 3):
+        cols = st.columns(3)
+        for j, (nombre, cargo, img_url) in enumerate(equipo[i:i+3]):
             with cols[j]:
                 st.markdown(f"""
-                <div class="team-card">
-                    <img src="{icono}" class="team-img"><br>
-                    <strong>{nombre}</strong><br>
-                    <small style="color: #666;">{cargo}</small>
+                <div class="team-card-large">
+                    <img src="{img_url}" style="
+                        width: 200px; 
+                        height: 200px; 
+                        border-radius: 50%; 
+                        object-fit: cover; 
+                        border: 6px solid #0056ff; 
+                        margin-bottom: 15px;
+                        box-shadow: 0px 8px 15px rgba(0,0,0,0.1);
+                    ">
+                    <br><strong style="font-size: 1.4rem;">{nombre}</strong>
+                    <br><span style="color: #0056ff; font-weight: 600;">{cargo}</span>
                 </div>
                 """, unsafe_allow_html=True)
 
 st.write("---")
 st.caption("Impulsa IA | Equipo 3 | Hackathon UTEL 2026 | TiendaNube")
-
-
