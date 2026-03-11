@@ -7,10 +7,10 @@ import requests
 # --- CONFIGURACIÓN DE PÁGINA ---
 st.set_page_config(page_title="Impulsa IA - Hackathon", page_icon="🚀", layout="wide")
 
-# --- CONFIGURACIÓN DE CREDENCIALES TIENDANUBE (Basado en tus imágenes) ---
-CLIENT_ID = "27483" 
-CLIENT_SECRET = "27483-3XU9X7-Y8Y9Z0-A1B2C3-D4E5F6" 
-REDIRECT_URI = "http://localhost:8501" 
+# --- CONFIGURACIÓN DE CREDENCIALES TIENDANUBE (Actualizado con tus datos reales) ---
+CLIENT_ID = "27483"
+CLIENT_SECRET = "d45072c95b889632ad3040bfd1dd951d981e0c38ff25877a"
+REDIRECT_URI = "https://nubepilot-ai-jenadpeumuumeahkmnjmwr.streamlit.app/"
 
 # --- FUNCIONES DE CONEXIÓN API ---
 def obtener_token_real(code):
@@ -20,13 +20,16 @@ def obtener_token_real(code):
         "client_id": CLIENT_ID,
         "client_secret": CLIENT_SECRET,
         "grant_type": "authorization_code",
-        "code": code
+        "code": code.strip()
     }
     try:
         response = requests.post(url, json=payload)
         if response.status_code == 200:
             return response.json().get("access_token")
-    except:
+        else:
+            st.error(f"Error de la API: {response.json().get('error_description', 'Desconocido')}")
+    except Exception as e:
+        st.error(f"Error de conexión: {e}")
         return None
     return None
 
@@ -109,7 +112,8 @@ with st.sidebar:
     erp_mode = st.selectbox("Sincronización ERP", ["Holded (Recomendado)", "Odoo", "SAP Business One", "Manual"])
     
     with st.expander("🔑 Conexión Oficial Tiendanube", expanded=True):
-        auth_url = f"https://www.tiendanube.com/apps/authorize/token?client_id={CLIENT_ID}&scope=read_orders,write_products"
+        # URL de autorización corregida (sin /token al final para el paso 1)
+        auth_url = f"https://www.tiendanube.com/apps/authorize?client_id={CLIENT_ID}&scope=read_orders,write_products,read_customers"
         st.link_button("1. Autorizar en Tiendanube", auth_url)
         
         temp_code = st.text_input("2. Pega el 'Code' de la URL:")
@@ -122,7 +126,6 @@ with st.sidebar:
                 st.error("Error en vinculación. Revisa tus credenciales.")
 
     st.divider()
-    # Mantenemos el input manual por si acaso, pero se llena automáticamente con el proceso de arriba
     api_token_val = st.session_state.get('api_token', "")
     api_token_input = st.text_input("Access Token de API", type="password", value=api_token_val)
     id_tienda = st.text_input("ID de Tienda", value="2831942")
@@ -213,64 +216,4 @@ with tab_ins:
 
     with col_big2:
         st.markdown("#### 🎯 Segmentación de Audiencia")
-        st.markdown("""
-        <div class="big-data-stat">
-            <h2 style="margin:0; color:#00c6ff;">45,280</h2>
-            <p style="margin:0; font-size:0.9rem;">Perfiles Analizados</p>
-        </div>
-        """, unsafe_allow_html=True)
-        st.write("")
-        st.progress(85, text="Fidelidad de Clientes (LTV)")
-        st.progress(62, text="Probabilidad de Recompra")
-        st.progress(18, text="Tasa de Abandono (Predictiva)")
-        
-        if st.button("📊 Generar Reporte de Big Data"):
-            st.toast("Procesando clusters de clientes...")
-            time.sleep(1)
-            st.download_button("Descargar Análisis PDF", data="Contenido del reporte...", file_name="Reporte_BigData_Impulsa.txt")
-
-    st.write("---")
-    
-    col_ins1, col_ins2 = st.columns([1, 1])
-    with col_ins1:
-        st.markdown("#### 🚩 Hoja de Ruta SEO/AIO")
-        st.error("🚨 **CRÍTICO:** 3 categorías principales sin etiquetas optimizadas para IA.")
-        st.warning("⚠️ **ALERTA:** Desfase de stock detectado entre ERP y TiendaNube.")
-        st.info("💡 **TIP:** Activar envíos gratis aumentó conversiones un 20% en tu nicho.")
-
-    with col_ins2:
-        st.markdown("#### 📊 Sentimiento y Mercado")
-        data_sentimiento = pd.DataFrame({
-            "Categoría": ["Atención", "Envío", "Stock", "Precio"],
-            "Tu Tienda": [90, 75, 60, 85],
-            "Media Competencia": [80, 82, 85, 78]
-        }).set_index("Categoría")
-        st.area_chart(data_sentimiento)
-
-# --- TAB 3: EQUIPO ---
-with tab_team:
-    st.markdown("### 👥 Nuestro Equipo ")
-    equipo = [
-        ("Willan Álvarez.", "Lead Architect", "https://i.imgur.com/CSH9Af7.jpeg"),
-        ("Dalia R.", "Product Manager", "https://imgur.com/4O2BGL8.jpeg"),
-        ("Montserrat G.", "Strategy", "https://cdn-icons-png.flaticon.com/512/6997/6997674.png"),
-        ("Jiram Cabrera", "Organización", "https://imgur.com/eamMDmE.jpeg"),
-        ("Carlos Andrés A.", "Liderazgo", "https://cdn-icons-png.flaticon.com/512/2354/2354573.png"),
-        ("Edwing Garcia", "Ventas", "https://imgur.com/CQJu9xm.jpeg"),
-        ("Amarilis Elizabeth", "Gestión", "https://cdn-icons-png.flaticon.com/512/201/201634.png"),
-        ("Cesar Augusto F.", "Estrategia", "https://cdn-icons-png.flaticon.com/512/3001/3001764.png")
-    ]
-    for i in range(0, len(equipo), 3):
-        cols = st.columns(3)
-        for j, (nombre, cargo, img_url) in enumerate(equipo[i:i+3]):
-            with cols[j]:
-                st.markdown(f"""
-                <div class="team-card-large">
-                    <img src="{img_url}" style="width: 200px; height: 200px; border-radius: 50%; object-fit: cover; border: 6px solid #0056ff; margin-bottom: 15px;">
-                    <br><strong style="font-size: 1.4rem;">{nombre}</strong>
-                    <br><span style="color: #0056ff; font-weight: 600;">{cargo}</span>
-                </div>
-                """, unsafe_allow_html=True)
-
-st.write("---")
-st.caption("Impulsa IA | Equipo 3 | Hackathon UTEL 2026 | TiendaNube")
+        st.
