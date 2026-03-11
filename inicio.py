@@ -7,10 +7,9 @@ import requests
 # --- CONFIGURACIÓN DE PÁGINA ---
 st.set_page_config(page_title="Impulsa IA - Hackathon", page_icon="🚀", layout="wide")
 
-# --- CREDENCIALES REALES (Basadas en tus capturas) ---
+# --- CREDENCIALES REALES ---
 CLIENT_ID = "27483" 
 CLIENT_SECRET = "d45072c95b889632ad3040bfd1dd951d981e0c38ff25877a" 
-# Esta URL debe coincidir con la de tu Panel de Partners en Tiendanube
 REDIRECT_URI = "https://nubepilot-ai-jenadpeumuumeahkmnjmwr.streamlit.app/" 
 
 # --- FUNCIONES DE CONEXIÓN API ---
@@ -114,14 +113,15 @@ with st.sidebar:
     erp_mode = st.selectbox("Sincronización ERP", ["Holded (Recomendado)", "Odoo", "SAP Business One", "Manual"])
     
     with st.expander("🔑 Conexión Oficial Tiendanube", expanded=True):
-        auth_url = f"https://www.tiendanube.com/apps/authorize/token?client_id={CLIENT_ID}&scope=read_orders,write_products"
+        # CORRECCIÓN DE URL DE AUTORIZACIÓN (Se quitó /token)
+        auth_url = f"https://www.tiendanube.com/apps/authorize?client_id={CLIENT_ID}&scope=read_orders,write_products"
         st.link_button("1. Autorizar en Tiendanube", auth_url)
         
         temp_code = st.text_input("2. Pega el 'Code' o la URL completa:", placeholder="Pega aquí...")
         
         if st.button("3. Vincular Tienda"):
             if temp_code:
-                # Limpieza automática: extrae el código si pegan la URL completa
+                # Limpieza automática si pegan la URL completa
                 if "code=" in temp_code:
                     temp_code = temp_code.split("code=")[1].split("&")[0]
                 
@@ -164,23 +164,21 @@ with tab_dash:
 
     with col_left:
         with st.chat_message("assistant"):
-            st.write("🤖 **IA:** He detectado una anomalía: el ROAS de tus campañas bajó mientras que las búsquedas de 'ropa sustentable' subieron. ¿Sincronizamos stock del ERP y optimizamos el SEO para IA?")
+            st.write("🤖 **IA:** He detectado una anomalía: el ROAS de tus campañas bajó. ¿Sincronizamos stock del ERP?")
         
         if st.button("🎯 Ejecutar Optimización Operativa"):
             with st.status("Procesando...", expanded=True) as status:
                 time.sleep(1)
                 status.update(label="Sincronizando inventario con ERP...", state="running")
                 time.sleep(1)
-                status.update(label="Generando Metatags AIO (AI Optimization)...", state="running")
-                time.sleep(1)
-                status.update(label="Ajustando pujas de Ads por ROAS...", state="complete", expanded=False)
-            st.success("### 🚀 Sistema Optimizado: Stock actualizado y Ads ajustados.")
+                status.update(label="Ajustando pujas de Ads...", state="complete", expanded=False)
+            st.success("### 🚀 Sistema Optimizado")
 
     with col_right:
         st.markdown("### 💬 Consulta IA")
         u_input = st.text_input("Pregunta sobre Ads o Stock:", placeholder="¿Cuál es mi producto más rentable?")
         if st.button("Analizar"):
-            st.info(f"📊 **Análisis:** Tu producto 'Playera Algodón' tiene un ROAS de 5.1x pero stock crítico en ERP (5 unidades).")
+            st.info(f"📊 **Análisis:** El producto 'Playera Algodón' es el más rentable actualmente.")
 
 # --- TAB 2: ESTRATEGIA Y AIO ---
 with tab_ins:
