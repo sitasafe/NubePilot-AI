@@ -69,108 +69,6 @@ def obtener_token_real(code):
         return None
     return None
 
-# --- ESTILOS CSS PERSONALIZADOS (POTENCIADOS) ---
-st.markdown("""
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap');
-    
-    .stApp { 
-        background: radial-gradient(circle at top right, #ffffff, #f1f4f9);
-        font-family: 'Inter', sans-serif;
-    }
-    
-    .lectura-facil {
-        font-size: 1.25rem !important;
-        line-height: 1.8 !important;
-    }
-
-    div.stButton > button:first-child {
-        background: linear-gradient(135deg, #0056ff 0%, #00c6ff 100%) !important;
-        color: white !important; 
-        border-radius: 50px !important; 
-        border: none !important; 
-        padding: 14px 40px !important;
-        font-weight: 800 !important; 
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important; 
-        width: 100% !important; 
-        box-shadow: 0px 8px 20px rgba(0, 86, 255, 0.3) !important;
-    }
-    div.stButton > button:hover {
-        transform: translateY(-5px);
-        box-shadow: 0px 15px 30px rgba(0, 86, 255, 0.5) !important;
-        filter: brightness(1.1);
-    }
-
-    .main-title {
-        background: linear-gradient(90deg, #0056ff, #00c6ff, #6200ea, #0056ff);
-        background-size: 300% auto;
-        -webkit-background-clip: text; 
-        -webkit-text-fill-color: transparent;
-        font-size: 4.5rem !important; 
-        font-weight: 800; 
-        animation: gradient-move 4s ease infinite;
-    }
-    @keyframes gradient-move {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-    }
-    
-    .team-card-large {
-        text-align: center; 
-        padding: 35px; 
-        border-radius: 30px;
-        background: rgba(255, 255, 255, 0.8);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(0, 86, 255, 0.1);
-        box-shadow: 0px 20px 40px rgba(0,0,0,0.05); 
-        margin-bottom: 25px;
-        transition: all 0.4s ease;
-    }
-    .team-card-large:hover {
-        transform: translateY(-15px) scale(1.02);
-        box-shadow: 0px 30px 60px rgba(0, 86, 255, 0.15);
-        border: 1px solid #0056ff;
-    }
-
-    .problem-box {
-        background-color: white;
-        padding: 25px;
-        border-radius: 20px;
-        border-left: 8px solid #0056ff;
-        box-shadow: 0px 10px 25px rgba(0,0,0,0.03);
-        height: 100%;
-        transition: all 0.3s ease;
-    }
-    .problem-box:hover {
-        background: #fdfdff;
-        border-left: 8px solid #00c6ff;
-        transform: translateX(10px);
-    }
-    
-    [data-testid="stMetricValue"] {
-        font-weight: 800 !important;
-        color: #0056ff !important;
-    }
-
-    .stTabs [data-baseweb="tab-list"] { gap: 15px; }
-    .stTabs [data-baseweb="tab"] {
-        background-color: #f1f3f6;
-        border-radius: 15px 15px 0 0;
-        padding: 12px 25px;
-        font-weight: 700;
-        color: #555;
-    }
-    .stTabs [aria-selected="true"] {
-        background: linear-gradient(90deg, #0056ff, #00c6ff) !important;
-        color: white !important;
-        box-shadow: 0px 5px 15px rgba(0, 86, 255, 0.2);
-    }
-</style>
-""", unsafe_allow_html=True)
-
 # --- BARRA LATERAL (Panel de Control) ---
 with st.sidebar:
     st.image("https://i.imgur.com/Ky1ZXCL.jpeg", use_container_width=True)
@@ -217,6 +115,128 @@ with st.sidebar:
         st.success("Conectado a TiendaNube ✅")
     else:
         st.warning("Esperando Conexión... ⚠️")
+
+# --- CORRECCIÓN: LÓGICA DE ESTILOS DINÁMICOS ---
+# Definimos los estilos adicionales basados en los estados de los botones
+extra_styles = ""
+if lectura_facil_on:
+    extra_styles += """
+    html, body, [class*="st-"] { font-size: 1.5rem !important; line-height: 2 !important; }
+    p, li, div { font-weight: 500 !important; }
+    """
+if contraste_alto:
+    extra_styles += """
+    .stApp { background: #000000 !important; color: #FFFFFF !important; }
+    [data-testid="stSidebar"] { background-color: #111111 !important; }
+    h1, h2, h3, h4, p, span, div, label { color: #FFFFFF !important; }
+    .stMetricValue { color: #FFFF00 !important; }
+    .problem-box, .team-card-large { background: #222222 !important; border: 2px solid white !important; }
+    button { background: #FFFFFF !important; color: #000000 !important; border: 2px solid #FFFF00 !important; }
+    """
+
+# --- ESTILOS CSS PERSONALIZADOS (POTENCIADOS) ---
+st.markdown(f"""
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap');
+    
+    .stApp {{ 
+        background: radial-gradient(circle at top right, #ffffff, #f1f4f9);
+        font-family: 'Inter', sans-serif;
+    }}
+    
+    .lectura-facil {{
+        font-size: 1.25rem !important;
+        line-height: 1.8 !important;
+    }}
+
+    div.stButton > button:first-child {{
+        background: linear-gradient(135deg, #0056ff 0%, #00c6ff 100%) !important;
+        color: white !important; 
+        border-radius: 50px !important; 
+        border: none !important; 
+        padding: 14px 40px !important;
+        font-weight: 800 !important; 
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important; 
+        width: 100% !important; 
+        box-shadow: 0px 8px 20px rgba(0, 86, 255, 0.3) !important;
+    }}
+    div.stButton > button:hover {{
+        transform: translateY(-5px);
+        box-shadow: 0px 15px 30px rgba(0, 86, 255, 0.5) !important;
+        filter: brightness(1.1);
+    }}
+
+    .main-title {{
+        background: linear-gradient(90deg, #0056ff, #00c6ff, #6200ea, #0056ff);
+        background-size: 300% auto;
+        -webkit-background-clip: text; 
+        -webkit-text-fill-color: transparent;
+        font-size: 4.5rem !important; 
+        font-weight: 800; 
+        animation: gradient-move 4s ease infinite;
+    }}
+    @keyframes gradient-move {{
+        0% {{ background-position: 0% 50%; }}
+        50% {{ background-position: 100% 50%; }}
+        100% {{ background-position: 0% 50%; }}
+    }}
+    
+    .team-card-large {{
+        text-align: center; 
+        padding: 35px; 
+        border-radius: 30px;
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(0, 86, 255, 0.1);
+        box-shadow: 0px 20px 40px rgba(0,0,0,0.05); 
+        margin-bottom: 25px;
+        transition: all 0.4s ease;
+    }}
+    .team-card-large:hover {{
+        transform: translateY(-15px) scale(1.02);
+        box-shadow: 0px 30px 60px rgba(0, 86, 255, 0.15);
+        border: 1px solid #0056ff;
+    }}
+
+    .problem-box {{
+        background-color: white;
+        padding: 25px;
+        border-radius: 20px;
+        border-left: 8px solid #0056ff;
+        box-shadow: 0px 10px 25px rgba(0,0,0,0.03);
+        height: 100%;
+        transition: all 0.3s ease;
+    }}
+    .problem-box:hover {{
+        background: #fdfdff;
+        border-left: 8px solid #00c6ff;
+        transform: translateX(10px);
+    }}
+    
+    [data-testid="stMetricValue"] {{
+        font-weight: 800 !important;
+        color: #0056ff !important;
+    }}
+
+    .stTabs [data-baseweb="tab-list"] {{ gap: 15px; }}
+    .stTabs [data-baseweb="tab"] {{
+        background-color: #f1f3f6;
+        border-radius: 15px 15px 0 0;
+        padding: 12px 25px;
+        font-weight: 700;
+        color: #555;
+    }}
+    .stTabs [aria-selected="true"] {{
+        background: linear-gradient(90deg, #0056ff, #00c6ff) !important;
+        color: white !important;
+        box-shadow: 0px 5px 15px rgba(0, 86, 255, 0.2);
+    }}
+    /* Inyección de estilos de accesibilidad */
+    {extra_styles}
+</style>
+""", unsafe_allow_html=True)
 
 # --- CUERPO PRINCIPAL ---
 # Seleccionamos el diccionario de idioma actual
