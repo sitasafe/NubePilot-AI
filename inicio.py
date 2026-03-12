@@ -384,7 +384,7 @@ with tab_ins:
 with tab_team:
     st.markdown("### 👥 Nuestro Equipo")
     equipo = [
-        ("Willan Álvarez.", "Lead Architect", "https://i.imgur.com/CSH9Af7.jpeg"),
+        ("Willan Álvarez.", "Lead Architect & AI Developer", "https://i.imgur.com/CSH9Af7.jpeg"),
         ("Dalia R.", "Product Manager", "https://i.imgur.com/4O2BGL8.jpeg"),
         ("Montserrat G.", "Strategy", "https://cdn-icons-png.flaticon.com/512/6997/6997674.png"),
         ("Jiram Cabrera", "Organización", "https://i.imgur.com/eamMDmE.jpeg"),
@@ -408,6 +408,7 @@ with tab_team:
 st.markdown('</div>', unsafe_allow_html=True) 
 st.write("---")
 st.caption("Growth Copilot | Equipo 3 | Hackathon UTEL 2026 | TiendaNube")
+
 
 
 
