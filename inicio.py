@@ -87,7 +87,7 @@ st.markdown(f"""
 
 # --- CABECERA ---
 st.markdown('<h1 class="main-title">🌊 Flowmerce</h1>', unsafe_allow_html=True)
-st.markdown("### **Inteligencia de Capital")
+st.markdown("### Inteligencia de Capital")
 
 st.write("---")
 
@@ -176,4 +176,5 @@ with tab3:
 
 st.write("---")
 st.caption("|Flowmerce | Hackathon UTEL 2026 | Equipo 3 | TiendaNube|")
+
 
