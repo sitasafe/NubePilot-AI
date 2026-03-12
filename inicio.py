@@ -74,7 +74,7 @@ with st.sidebar:
     st.image("https://imgur.com/V1m4Dgk.jpeg", use_container_width=True)
     st.write("---")
 
-    with st.expander("🌐 Accesibilidad e Inclusión", expanded=True):
+    with st.expander("🌐 Accesibilidad", expanded=True):
         idioma_interfaz = st.selectbox("Idioma Interfaz", ["Español", "Português", "English", "Náhuatl", "Maya"])
         lectura_facil_on = st.toggle("Modo Lectura Fácil", help="Aumenta el tamaño de letra y contraste para mejor lectura.")
         contraste_alto = st.toggle("Modo Alto Contraste")
@@ -408,6 +408,7 @@ with tab_team:
 st.markdown('</div>', unsafe_allow_html=True) 
 st.write("---")
 st.caption("Growth Copilot | Equipo 3 | Hackathon UTEL 2026 | TiendaNube")
+
 
 
 
