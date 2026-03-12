@@ -1,156 +1,105 @@
 import streamlit as st
-import time
 import pandas as pd
 import numpy as np
-from streamlit_mic_recorder import mic_recorder
+import time
 
 # --- CONFIGURACIÓN DE PÁGINA ---
-st.set_page_config(page_title="Flowmerce IA - Liquidez Estratégica", page_icon="🌊", layout="wide")
+st.set_page_config(page_title="Flowmerce IA - Motor Vivo", page_icon="🌊", layout="wide")
 
-# --- ESTADO DE LA SESIÓN (Lógica de Negocio Real) ---
-if 'data_inventario' not in st.session_state:
-    st.session_state.data_inventario = pd.DataFrame({
-        "Producto": ["Tenis Runner Pro", "Gorra Urban Blue", "Calcetines High", "Sudadera Lino"],
-        "Stock Actual": [5, 80, 25, 2],
-        "Ventas_Dia": [4.2, 0.1, 1.5, 3.8],
-        "Costo": [1200, 300, 150, 850]
+# --- 1. MOTOR DE DATOS DINÁMICO (Aquí está el truco) ---
+# Usamos session_state para que la "memoria" de la app sea real
+if 'factor_ventas' not in st.session_state:
+    st.session_state.factor_ventas = 1.0
+
+# Datos base que se verán afectados por el usuario
+def generar_datos_vivos(retraso, impulso_ventas):
+    productos = ["Tenis Runner Pro", "Gorra Urban Blue", "Calcetines High", "Sudadera Lino"]
+    # El stock baja si las ventas suben
+    stock_actual = [max(0, int(50 - ( impulso_ventas * 5))), 80, 25, 3]
+    ventas_proyectadas = [4.2 * impulso_ventas, 0.1, 1.5, 3.8 * impulso_ventas]
+    costos = [1200, 300, 150, 850]
+    
+    df = pd.DataFrame({
+        "Producto": productos,
+        "Stock Actual": stock_actual,
+        "Ventas/Día": ventas_proyectadas,
+        "Costo Unitario": costos
     })
+    
+    # Cálculo de días de inventario (Dato dinámico real)
+    df["Días de Autonomía"] = df["Stock Actual"] / df["Ventas/Día"]
+    return df
 
-# --- ESTILOS CSS (Efectos Flowmerce Integrados) ---
-st.markdown(f"""
+# --- 2. ESTILOS CSS ---
+st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap');
-    .stApp {{ background-color: #f4f7fb; font-family: 'Inter', sans-serif; }}
-    
-    .main-title {{
-        background: linear-gradient(90deg, #2D3436, #0052D4, #4364F7);
-        background-size: 300% auto;
-        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        font-size: 3.5rem !important; font-weight: 800;
-        animation: gradient-move 5s ease infinite;
-    }}
-    
-    @keyframes gradient-move {{
-        0% {{ background-position: 0% 50%; }}
-        50% {{ background-position: 100% 50%; }}
-        100% {{ background-position: 0% 50%; }}
-    }}
-
-    .card {{
-        background: white; padding: 20px; border-radius: 20px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.05); border-top: 5px solid #0052D4;
-        transition: transform 0.3s ease; text-align: center;
-    }}
-    .card:hover {{ transform: translateY(-5px); border-top: 5px solid #4364F7; }}
-
-    .metric-value {{ font-size: 2rem; font-weight: 800; color: #0052D4; }}
-
-    .team-card-large {{
-        text-align: center; padding: 15px; border-radius: 20px;
-        background: white; border: 1px solid rgba(0, 82, 212, 0.1);
-        box-shadow: 0px 10px 20px rgba(0,0,0,0.03);
-        transition: all 0.4s ease;
-    }}
+    .main-title { background: linear-gradient(90deg, #0052D4, #4364F7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 3rem; font-weight: 800; text-align: center; }
+    .stMetric { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+    .card-team { text-align: center; border: 1px solid #ddd; padding: 10px; border-radius: 15px; background: #fff; }
 </style>
 """, unsafe_allow_html=True)
 
-# --- SIDEBAR INTERACTIVO ---
+# --- 3. SIDEBAR (Controles que AFECTAN la app) ---
 with st.sidebar:
-    st.image("https://imgur.com/V1m4Dgk.jpeg", use_container_width=True)
-    st.markdown("### ⚡ Control de Datos API")
-    if st.button("🔄 Sincronizar Tiendanube"):
-        with st.spinner("Conectando con el inventario..."):
-            time.sleep(1.5)
-            # Modificación real de datos
-            st.session_state.data_inventario["Stock Actual"] = np.random.randint(0, 100, 4)
-            st.success("¡Inventario actualizado!")
+    st.image("https://imgur.com/V1m4Dgk.jpeg")
+    st.header("🎮 Panel de Control")
+    impulso = st.slider("Simular Impulso de Ventas (Hot Sale)", 1.0, 5.0, 1.0)
+    retraso_log = st.slider("Retraso de Proveedor (Días)", 0, 30, 5)
+    
+    if st.button("🔄 Forzar Sincronización API"):
+        with st.status("Leyendo Webhooks de Tiendanube..."):
+            time.sleep(1)
+            st.toast("Datos actualizados correctamente")
 
-# --- CABECERA ---
-st.markdown('<h1 class="main-title">🌊 Flowmerce</h1>', unsafe_allow_html=True)
-st.markdown("### Inteligencia de Capital: De inventario estancado a flujo de caja.")
+# --- 4. LÓGICA DE NEGOCIO ---
+df_actual = generar_datos_vivos(retraso_log, impulso)
+cap_atrapado = df_actual[df_actual["Stock Actual"] > 50].apply(lambda x: x["Stock Actual"] * x["Costo Unitario"], axis=1).sum()
+quiebres = len(df_actual[df_actual["Días de Autonomía"] < 3])
 
-# --- TABS FUNCIONALES ---
-tab1, tab2, tab3, tab4 = st.tabs(["📊 Monitor de Liquidez", "🤖 Estrategia IA", "🚀 El Pitch", "👥 Equipo"])
+# --- 5. INTERFAZ ---
+st.markdown('<h1 class="main-title">🌊 Flowmerce IA</h1>', unsafe_allow_html=True)
+
+tab1, tab2, tab3 = st.tabs(["📊 Dashboard Operativo", "🤖 Ejecutor IA", "👥 Equipo"])
 
 with tab1:
-    # Cálculos dinámicos basados en el estado actual
-    df = st.session_state.data_inventario
-    atrapado = df[df["Stock Actual"] > 50].apply(lambda x: x["Stock Actual"] * x["Costo"], axis=1).sum()
-    quiebre = len(df[df["Stock Actual"] < 5])
-    
     col1, col2, col3 = st.columns(3)
-    with col1:
-        st.markdown(f'<div class="card"><div style="color:#555;">Capital Atrapado</div><div class="metric-value">${atrapado:,} MXN</div></div>', unsafe_allow_html=True)
-    with col2:
-        st.markdown(f'<div class="card"><div style="color:#e53935;">Riesgo de Quiebre</div><div class="metric-value">{quiebre} SKUs</div></div>', unsafe_allow_html=True)
-    with col3:
-        st.markdown(f'<div class="card"><div style="color:#43a047;">Salud de Flujo</div><div class="metric-value">88%</div></div>', unsafe_allow_html=True)
+    col1.metric("Capital Inmovilizado", f"${cap_atrapado:,} MXN", delta="-5% riesgo")
+    col2.metric("Productos en Quiebre", quiebres, delta="¡Alerta!", delta_color="inverse")
+    col3.metric("ROI Optimizado", f"{85 + impulso}%", delta=f"{impulso/10}%")
 
     st.write("---")
-    st.markdown("#### ⚡ Simulador de Crisis Logística (Impacto en Caja)")
-    retraso = st.slider("Días de retraso del proveedor:", 0, 30, 5)
-    
-    # Gráfico que reacciona al slider
-    dias = pd.date_range(start='2026-03-12', periods=30)
-    flujo_base = np.linspace(60000, 120000, 30) - (retraso * 2000)
-    st.area_chart(pd.DataFrame({"Flujo de Caja Estimado": flujo_base}, index=dias))
+    st.subheader("📉 Proyección de Flujo de Caja (Reactiva)")
+    # El gráfico cambia de forma real según el slider del sidebar
+    chart_data = pd.DataFrame({
+        "Flujo sin Flowmerce": np.linspace(100, 150, 20) - (retraso_log * 2),
+        "Flujo con Flowmerce": np.linspace(100, 200, 20) + (impulso * 5)
+    })
+    st.line_chart(chart_data)
 
 with tab2:
-    st.markdown("### 🤖 Motor de Decisiones Automáticas")
-    
-    # Tabla interactiva con lógica de decisión
-    df_logic = st.session_state.data_inventario.copy()
-    df_logic["Acción Sugerida"] = df_logic["Stock Actual"].apply(
-        lambda x: "🚨 COMPRAR YA" if x < 10 else ("🔥 LIQUIDAR" if x > 60 else "✅ MANTENER")
+    st.subheader("⚡ Acciones Sugeridas por la IA")
+    # Mostramos la tabla que se calcula CADA VEZ que mueves un control
+    df_ver = df_actual.copy()
+    df_ver["Recomendación"] = df_ver["Días de Autonomía"].apply(
+        lambda x: "📦 COMPRAR URGENTE" if x < 5 else ("🔥 LIQUIDAR (Exceso)" if x > 60 else "✅ ESTABLE")
     )
-    st.dataframe(df_logic, use_container_width=True)
+    st.table(df_ver[["Producto", "Stock Actual", "Días de Autonomía", "Recomendación"]])
     
-    if st.button("⚡ Ejecutar Estrategia Flowmerce"):
-        st.balloons()
-        st.success("Órdenes sincronizadas y campañas de liquidación activadas en Tiendanube.")
-
-    st.divider()
-    st.markdown("#### 🎤 Consulta Rápida (IA Voice)")
-    audio = mic_recorder(start_prompt="Preguntar a Flowmerce", stop_prompt="Procesar", key='voice_flow')
-    if audio:
-        st.info("🤖 **Flowmerce IA:** Detecto exceso de stock en 'Gorra Urban'. Recomiendo cupón del 15% para liberar $4,500.")
+    if st.button("🚀 Aplicar Cambios en Tiendanube"):
+        with st.spinner("Enviando comandos..."):
+            time.sleep(2)
+            st.balloons()
+            st.success("Órdenes de compra generadas. Los proveedores han sido notificados.")
 
 with tab3:
-    col_p1, col_p2 = st.columns(2)
-    with col_p1:
-        st.error("### 🚩 El Problema")
-        st.write("Las tiendas quiebran por capital atrapado o falta de stock. La intuición no escala.")
-    with col_p2:
-        st.success("### 💡 La Solución")
-        st.write("Flowmerce: IA que analiza velocidad de venta y reabastece automáticamente.")
-    
-    st.info("**Impacto Estratégico:** Reducción del 40% en inventario inmovilizado y +15% en ventas.")
-    st.markdown("<h4 style='text-align: center; color: #0052D4;'>“No vendemos software. Vendemos decisiones que protegen tu capital.”</h4>", unsafe_allow_html=True)
-
-with tab4:
-    st.markdown("### 👥 Nuestro Equipo")
+    st.subheader("👥 Equipo Flowmerce")
     equipo = [
-        ("Willan Álvarez.", "Lead Architect", "https://i.imgur.com/CSH9Af7.jpeg"),
-        ("Dalia R.", "Product Manager", "https://i.imgur.com/4O2BGL8.jpeg"),
-        ("Montserrat G.", "Strategy", "https://cdn-icons-png.flaticon.com/512/6997/6997674.png"),
-        ("Jiram Cabrera", "Organización", "https://i.imgur.com/eamMDmE.jpeg"),
-        ("Carlos Andrés A.", "Liderazgo", "https://cdn-icons-png.flaticon.com/512/2354/2354573.png"),
-        ("Edwing Garcia", "Ventas", "https://i.imgur.com/CQJu9xm.jpeg"),
-        ("Amarilis Elizabeth", "Gestión", "https://cdn-icons-png.flaticon.com/512/201/201634.png"),
-        ("Cesar Augusto F.", "Estrategia", "https://cdn-icons-png.flaticon.com/512/3001/3001764.png")
+        "Willan Álvarez", "Dalia R.", "Montserrat G.", "Jiram Cabrera",
+        "Carlos Andrés A.", "Edwing Garcia", "Amarilis Elizabeth", "Cesar Augusto F."
     ]
-    
-    for i in range(0, len(equipo), 4):
-        cols = st.columns(4)
-        for j, (nombre, cargo, img_url) in enumerate(equipo[i:i+4]):
-            with cols[j]:
-                st.markdown(f"""
-                <div class="team-card-large">
-                    <img src="{img_url}" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid #0052D4; margin-bottom: 10px;">
-                    <div style="font-weight: 800; color: #1a1c2e; font-size: 0.85rem;">{nombre}</div>
-                    <div style="color: #0052D4; font-size: 0.7rem; font-weight: 700;">{cargo}</div>
-                </div>
-                """, unsafe_allow_html=True)
+    cols = st.columns(4)
+    for i, persona in enumerate(equipo):
+        cols[i % 4].markdown(f'<div class="card-team"><b>{persona}</b><br><small>Equipo 3</small></div>', unsafe_allow_html=True)
 
-st.write("---")
-st.caption("Flowmerce | Hackathon UTEL 2026 | Equipo 3 | TiendaNube")
+st.divider()
+st.caption("Flowmerce v1.1 | Hackathon UTEL 2026 | Sistema de Gestión de Capital en Tiempo Real")
