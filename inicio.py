@@ -87,7 +87,7 @@ st.markdown(f"""
 
 # --- CABECERA ---
 st.markdown('<h1 class="main-title">🌊 Flowmerce</h1>', unsafe_allow_html=True)
-st.markdown("### **Inteligencia de Capital:** De inventario estancado a flujo de efectivo.")
+st.markdown("### **Inteligencia de Capital")
 
 st.write("---")
 
@@ -150,7 +150,7 @@ with tab2:
             st.info("🤖 **Flowmerce IA:** Analizando... Te recomiendo liquidar las 'Gorras Urban' para liberar $4,500 este viernes.")
 
 with tab3:
-    st.markdown("### 👥 El Equipo")
+    st.markdown("### 👥 Nuestro Equipo")
     equipo = [
         ("Willan Álvarez.", "Lead Architect", "https://i.imgur.com/CSH9Af7.jpeg"),
         ("Dalia R.", "Product Manager", "https://i.imgur.com/4O2BGL8.jpeg"),
@@ -175,4 +175,5 @@ with tab3:
                 """, unsafe_allow_html=True)
 
 st.write("---")
-st.caption("Flowmerce | Hackathon UTEL 2026 | Equipo 3")
+st.caption("|Flowmerce | Hackathon UTEL 2026 | Equipo 3 | TiendaNube|")
+
