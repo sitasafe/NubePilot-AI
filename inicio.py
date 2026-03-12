@@ -17,17 +17,17 @@ REDIRECT_URI = "https://nubepilot-ai-jenadpeumuumeahkmnjmwr.streamlit.app/"
 # --- DICCIONARIO DE IDIOMAS (INTEGRACIÓN) ---
 textos = {
     "Español": {
-        "sub": "Tu Copiloto Estratégico e Inclusivo para Vender Más en TiendaNube",
+        "sub": "Tu Copiloto Estratégico para Vender Más en TiendaNube",
         "tab1": "📊 Monitor de Crecimiento & ROI",
         "carrito": "Carritos Abandonados", "ventas": "Ventas del Mes"
     },
     "Português": {
-        "sub": "Seu Copiloto Estratégico e Inclusivo para Vender Mais na TiendaNube",
+        "sub": "Seu Copiloto Estratégico para Vender Mais na TiendaNube",
         "tab1": "📊 Monitor de Crescimento e ROI",
         "carrito": "Carrinhos Abandonados", "ventas": "Vendas do Mês"
     },
     "English": {
-        "sub": "Your Strategic and Inclusive Copilot to Sell More on TiendaNube",
+        "sub": "Your Strategic Copilot to Sell More on TiendaNube",
         "tab1": "📊 Growth & ROI Monitor",
         "carrito": "Abandoned Carts", "ventas": "Monthly Sales"
     },
@@ -408,6 +408,7 @@ with tab_team:
 st.markdown('</div>', unsafe_allow_html=True) 
 st.write("---")
 st.caption("Growth Copilot | Equipo 3 | Hackathon UTEL 2026 | TiendaNube")
+
 
 
 
