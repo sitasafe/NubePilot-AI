@@ -3,140 +3,158 @@ import time
 import pandas as pd
 import numpy as np
 import requests
+# LIBRERÍA ADICIONAL PARA EL MICROFONO
+from streamlit_mic_recorder import mic_recorder
 
 # --- CONFIGURACIÓN DE PÁGINA ---
-st.set_page_config(page_title="NubeFlow IA - Inteligencia de Caja", page_icon="🌊", layout="wide")
+st.set_page_config(page_title="NubeFlow IA - Hackathon", page_icon="🌊", layout="wide")
 
-# --- CREDENCIALES TIENDANUBE ---
+# --- CONFIGURACIÓN DE CREDENCIALES TIENDANUBE ---
 CLIENT_ID = "27483"
 CLIENT_SECRET = "d45072c95b889632ad3040bfd1dd951d981e0c38ff25877a"
+REDIRECT_URI = "https://nubepilot-ai-jenadpeumuumeahkmnjmwr.streamlit.app/"
 
-# --- DICCIONARIO DE IDIOMAS (FOCO: FINANZAS Y CAJA) ---
+# --- DICCIONARIO DE IDIOMAS (INTEGRACIÓN) ---
 textos = {
     "Español": {
-        "sub": "De 5 horas de Excel a 5 minutos de IA: Salva tu flujo de caja",
-        "tab1": "📊 Dashboard de Liquidez",
-        "tab2": "🤖 Decisiones de Compra IA",
-        "met1": "Capital Inmovilizado", "met2": "Riesgo de Quiebra (Caja)", "met3": "Ventas Perdidas (Stockout)"
+        "sub": "De 5 horas de Excel a 5 minutos: Inteligencia de Caja e Inventario",
+        "tab1": "📊 Monitor NubeFlow",
+        "carrito": "Capital en Carritos", "ventas": "Caja Proyectada"
+    },
+    "Português": {
+        "sub": "De 5 horas de Excel para 5 minutos: Inteligência de Caixa e Inventário",
+        "tab1": "📊 Monitor NubeFlow",
+        "carrito": "Capital em Carrinhos", "ventas": "Caixa Projetado"
     },
     "English": {
-        "sub": "From 5 hours of Excel to 5 minutes of AI: Save your cash flow",
-        "tab1": "📊 Liquidity Dashboard",
-        "tab2": "🤖 AI Buying Decisions",
-        "met1": "Stuck Capital", "met2": "Cash Flow Risk", "met3": "Missed Sales (Stockout)"
+        "sub": "From 5 hours of Excel to 5 minutes: Cash Flow & Inventory Intelligence",
+        "tab1": "📊 NubeFlow Monitor",
+        "carrito": "Capital in Carts", "ventas": "Projected Cash"
+    },
+    "Náhuatl": {
+        "sub": "NubeFlow - Tehuantin ticpalehuia mo tlanamacaliz",
+        "tab1": "📊 Tlanamacaliztli Monitor",
+        "carrito": "Tlacualiztli", "ventas": "Tlanamacaliztli Metztli"
+    },
+    "Maya": {
+        "sub": "NubeFlow - A wéet meyaj ti'al a konik ma'alob",
+        "tab1": "📊 Kanáantik konol",
+        "carrito": "P'áat kóonol", "ventas": "Konol ti' le meso'"
     }
 }
 
-# --- ESTILOS NUBEFLOW (Profesional y Financiero) ---
+# --- FUNCIONES DE CONEXIÓN API ---
+def obtener_token_real(code):
+    url = "https://www.tiendanube.com/apps/authorize/token"
+    headers = {"Content-Type": "application/json", "User-Agent": "NubeFlow (socios@tiendanube.com)"}
+    payload = {
+        "client_id": int(CLIENT_ID),
+        "client_secret": CLIENT_SECRET,
+        "grant_type": "authorization_code",
+        "code": code.strip()
+    }
+    try:
+        response = requests.post(url, json=payload, headers=headers)
+        if response.status_code == 200:
+            return response.json().get("access_token")
+    except Exception as e:
+        st.error(f"Error: {e}")
+    return None
+
+# --- BARRA LATERAL ---
+with st.sidebar:
+    st.image("https://imgur.com/V1m4Dgk.jpeg", use_container_width=True)
+    st.write("---")
+
+    with st.expander("🌐 Accesibilidad", expanded=True):
+        idioma_interfaz = st.selectbox("Idioma Interfaz", ["Español", "Português", "English", "Náhuatl", "Maya"])
+        lectura_facil_on = st.toggle("Modo Lectura Fácil")
+        contraste_alto = st.toggle("Modo Alto Contraste")
+
+    with st.expander("🔑 Conexión Tiendanube", expanded=True):
+        st.link_button("1. Autorizar", f"https://www.tiendanube.com/apps/authorize?client_id={CLIENT_ID}&scope=read_orders,write_products")
+        temp_code = st.text_input("2. Pega el Code:")
+        if st.button("3. Vincular"):
+            token_valido = obtener_token_real(temp_code)
+            if token_valido:
+                st.session_state['api_token'] = token_valido
+                st.success("¡Vinculado! ✅")
+
+    st.divider()
+    api_token_val = st.session_state.get('api_token', "")
+    api_token_input = st.text_input("Access Token", type="password", value=api_token_val)
+    if api_token_input: st.success("Conectado ✅")
+
+# --- ESTILOS DINÁMICOS ---
+extra_styles = ""
+if lectura_facil_on:
+    extra_styles += "html, body, [class*='st-'] { font-size: 1.5rem !important; }"
+if contraste_alto:
+    extra_styles += ".stApp { background: #000 !important; color: #FFF !important; }"
+
 st.markdown(f"""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap');
-    .stApp {{ background: #f8f9fc; font-family: 'Inter', sans-serif; }}
+    .stApp {{ background: radial-gradient(circle at top right, #ffffff, #f1f4f9); font-family: 'Inter', sans-serif; }}
     .main-title {{
-        background: linear-gradient(90deg, #0056ff, #00c6ff);
-        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        font-size: 4rem !important; font-weight: 800;
+        background: linear-gradient(90deg, #0056ff, #00c6ff, #6200ea, #0056ff);
+        background-size: 300% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        font-size: 4.5rem !important; font-weight: 800; animation: gradient-move 4s ease infinite;
     }}
-    .metric-card {{
-        background: white; padding: 25px; border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.05); border-bottom: 5px solid #0056ff;
+    .problem-box {{
+        background-color: white; padding: 25px; border-radius: 20px; border-left: 8px solid #0056ff;
+        box-shadow: 0px 10px 25px rgba(0,0,0,0.03); transition: 0.3s;
     }}
-    .insight-box {{
-        background: #eef2ff; padding: 20px; border-radius: 15px;
-        border-left: 10px solid #4f46e5; margin: 10px 0;
+    .team-card-large {{
+        text-align: center; padding: 35px; border-radius: 30px; background: white;
+        border: 1px solid rgba(0, 86, 255, 0.1); transition: 0.4s;
     }}
-    .stButton > button {{
-        background: linear-gradient(135deg, #0056ff 0%, #00c6ff 100%) !important;
-        color: white !important; border-radius: 50px !important; font-weight: 800 !important;
-        height: 3rem; width: 100%; transition: 0.3s;
-    }}
+    {extra_styles}
 </style>
 """, unsafe_allow_html=True)
 
-# --- SIDEBAR ---
-with st.sidebar:
-    st.image("https://i.imgur.com/Ky1ZXCL.jpeg", use_container_width=True)
-    st.write("---")
-    idioma = st.selectbox("🌐 Idioma", ["Español", "English"])
-    st.divider()
-    st.markdown("### ⚙️ Integración")
-    st.success("API TiendaNube: Conectada")
-    st.info("Excel Legacy: Importado")
+# --- CUERPO PRINCIPAL ---
+t_act = textos[idioma_interfaz]
+main_container = '<div class="lectura-facil">' if lectura_facil_on else '<div>'
+st.markdown(main_container, unsafe_allow_html=True)
 
-t_act = textos[idioma]
-
-# --- ENCABEZADO ---
-st.markdown('<h1 class="main-title">🌊 NubeFlow</h1>', unsafe_allow_html=True)
+st.markdown('<h1 class="main-title">🌊 NubeFlow IA</h1>', unsafe_allow_html=True)
 st.subheader(t_act["sub"])
-st.markdown("> **Problem:** *Excel consume 5 horas/semana y arriesga tu liquidez.* \n> **Solution:** *Decisiones automatizadas en 5 minutos basadas en datos reales.*")
+
+# Micrófono
+c_voz1, c_voz2 = st.columns([0.80, 0.20])
+with c_voz2:
+    audio = mic_recorder(start_prompt="🎤 Iniciar Voz", stop_prompt="🛑 Parar", key='recorder')
+    if audio: st.toast("Analizando comando financiero...")
 
 st.write("---")
 
-# --- TABS ---
-tab_dash, tab_buy, tab_team = st.tabs([t_act["tab1"], t_act["tab2"], "👥 Equipo"])
+tab_dash, tab_ins, tab_team = st.tabs([t_act["tab1"], "🧠 Análisis Predictivo de Compra", "👥 Equipo"])
 
+# --- TAB 1: DASHBOARD ---
 with tab_dash:
-    # Métricas de Salud Financiera
-    m1, m2, m3 = st.columns(3)
-    with m1:
-        st.markdown(f'<div class="metric-card">', unsafe_allow_html=True)
-        st.metric(t_act["met1"], "$38,400 MXN", "-12% esta semana")
-        st.write("💸 Dinero atrapado en bodega.")
-        st.markdown('</div>', unsafe_allow_html=True)
-    with m2:
-        st.markdown(f'<div class="metric-card">', unsafe_allow_html=True)
-        st.metric(t_act["met2"], "Bajo", "Saludable")
-        st.write("🛡️ Tienes caja para 45 días.")
-        st.markdown('</div>', unsafe_allow_html=True)
-    with m3:
-        st.markdown(f'<div class="metric-card">', unsafe_allow_html=True)
-        st.metric(t_act["met3"], "$2,100 MXN", "Evitables")
-        st.write("⚠️ Ventas no realizadas por falta de stock.")
-        st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown(f"### {t_act['tab1']}")
+    m_col1, m_col2, m_col3, m_col4 = st.columns(4)
+    m_col1.metric("Capital Inmovilizado", "$45,200", "-15% sugerido", delta_color="normal")
+    m_col2.metric(t_act["ventas"], "$120,450 MXN", "Salud de Caja: Alta")
+    m_col3.metric("Días de Stock", "18 días", "Optimizado")
+    m_col4.metric("Ventas Perdidas", "$2,100", "Por falta de stock")
 
     st.write("---")
-    
-    col_chart, col_list = st.columns([2, 1])
-    with col_chart:
-        st.markdown("### 📈 Predicción de Ventas vs Compra Óptima")
-        d_pred = pd.DataFrame(
-            np.random.randint(50, 100, size=(15, 2)),
-            columns=['Demanda Estimada', 'Stock Recomendado']
-        )
-        st.line_chart(d_pred)
-    
-    with col_list:
-        st.markdown("### ⚡ Acciones Rápidas")
-        st.markdown('<div class="insight-box"><b>Optimizar Stock:</b> Hay 50 unidades de "Producto A" sin movimiento.</div>', unsafe_allow_html=True)
-        if st.button("💰 Crear Liquidación para Flujo de Caja"):
-            with st.status("Analizando API..."): time.sleep(1)
-            st.success("Cupón de 'Flash Sale' creado en Tiendanube para liberar $10,000.")
+    col_l, col_r = st.columns([2, 1])
 
-with tab_buy:
-    st.markdown("### 🤖 Sugerencia de Compra a Proveedores")
-    st.write("Dile adiós al Excel. NubeFlow te dice exactamente qué comprar para no enterrar capital.")
-    
-    # Simulación de tabla de compra inteligente
-    df_compra = pd.DataFrame({
-        "Producto": ["Tenis Runner", "Gorra Urban", "Sudadera Azul", "Calcetines Pro"],
-        "Stock Actual": [2, 45, 5, 120],
-        "Ventas Prox. 30 días (IA)": [25, 10, 30, 80],
-        "Sugerencia NubeFlow": ["Comprar 23", "NO COMPRAR", "Comprar 25", "Vender Exceso"]
-    })
-    
-    st.table(df_compra)
-    
-    st.info("💡 **Insight IA:** Si sigues la sugerencia de compra, liberarás **$12,500 MXN** de capital este mes.")
-    
-    if st.button("📝 Generar Orden de Compra"):
-        st.toast("Generando PDF para proveedores...")
-        time.sleep(1)
-        st.download_button("Descargar Orden (PDF)", "Datos de compra...", file_name="NubeFlow_Orden.pdf")
+    with col_l:
+        st.error("🎯 **Acción de Caja:** Tienes $15,000 MXN en stock que no se ha movido en 60 días. ¿Liberamos este capital?")
+        if st.button("⚡ Ejecutar Estrategia NubeFlow"):
+            with st.status("Analizando stock y caja...", expanded=True) as s:
+                time.sleep(1)
+                s.update(label="Generando campaña de liquidación en Tiendanube...", state="running")
+                time.sleep(1)
+                s.update(label="Ajustando órdenes de compra para mañana...", state="complete")
+            st.balloons()
+            st.success("### 🚀 Capital Liberado: Campaña activa y órdenes optimizadas.")
 
-with tab_team:
-    st.markdown("### 👥 El equipo detrás de NubeFlow")
-    # Mantenemos tu lista de equipo original
-    st.write("Willan, Dalia, Montserrat, Jiram, Carlos, Edwing, Amarilis, Cesar.")
-
-st.write("---")
-st.caption("NubeFlow IA | Hackathon UTEL 2026 | Equipo 3")
+    with col_r:
+        st.markdown("### 💬 Consulta Financiera")
+        u_input = st.text_input("Pregunta a la IA:", placeholder="¿Cuánto capital debo invertir este mes?")
+        if st.button("Analizar"):
