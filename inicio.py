@@ -414,3 +414,4 @@ st.caption("Growth Copilot | Equipo 3 | Hackathon UTEL 2026 | TiendaNube")
 
 
 
+
