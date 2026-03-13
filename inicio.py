@@ -155,23 +155,39 @@ with st.sidebar:
                 st.session_state.token_session = "demo"
                 st.info("Modo Demo ✅")
 
-# --- 7. ESTILOS CSS (INCLUYENDO FONDO IMAGEN) ---
+# --- 7. ESTILOS CSS MEJORADOS PARA LEGIBILIDAD ---
 st.markdown(f"""
 <style>
-    /* FONDO DE PANTALLA DIFUMINADO */
+    /* FONDO OSCURECIDO PARA MEJOR LECTURA */
     .stApp {{
-        background-image: linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.85)), 
-                          url("https://imgur.com/gQ7yynl.jpeg");
+        background: linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)), 
+                    url("https://imgur.com/gQ7yynl.jpeg");
         background-attachment: fixed;
         background-size: cover;
-        background-position: center;
     }}
 
     .main-title {{
         background: linear-gradient(90deg, #0056ff, #00c6ff, #6200ea, #0056ff);
         background-size: 300% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         font-size: 4rem !important; font-weight: 800; animation: gradient-move 4s ease infinite; 
+        text-shadow: 2px 2px 10px rgba(255,255,255,0.5);
     }}
+    
+    /* CONTENEDORES CON FONDO SEMI-BLANCO (GLASSMORPHISM) */
+    div[data-testid="stMetric"], .stTable, .team-card-large, .stTabs {{
+        background-color: rgba(255, 255, 255, 0.85) !important;
+        backdrop-filter: blur(10px);
+        border-radius: 15px !important;
+        padding: 15px !important;
+        border: 1px solid rgba(0, 86, 255, 0.1) !important;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+    }}
+
+    .stTable p, .stTable td, .stTable th {{
+        color: #1E1E1E !important;
+        font-weight: 500 !important;
+    }}
+
     @keyframes gradient-move {{ 0% {{background-position: 0% 50%;}} 50% {{background-position: 100% 50%;}} 100% {{background-position: 0% 50%;}} }}
     
     div.stButton > button, div.stDownloadButton > button {{
@@ -180,24 +196,20 @@ st.markdown(f"""
         border-radius: 12px !important; box-shadow: 0 6px #003399, 0 8px 15px rgba(0,0,0,0.2) !important;
         transition: all 0.1s ease !important; font-weight: bold !important; text-transform: uppercase !important;
     }}
+
+    .team-card-large {{
+        text-align: center; margin-bottom: 20px; min-height: 250px;
+    }}
     
-    .stTable {{ background: white; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }}
+    .sim-box {{ background: linear-gradient(135deg, #0056ff 0%, #6200ea 100%); color: white; padding: 20px; border-radius: 15px; margin-top: 10px; }}
     
+    /* NUBES */
     @keyframes cloud-up {{
         0% {{ transform: translateY(100vh); opacity: 0; }}
         20% {{ opacity: 0.7; }} 80% {{ opacity: 0.7; }}
         100% {{ transform: translateY(-100vh); opacity: 0; }}
     }}
     .cloud-ascend {{ position: fixed; bottom: -100px; font-size: 5rem; z-index: 9999; pointer-events: none; animation: cloud-up 3s ease-in infinite; }}
-    
-    .team-card-large {{
-        text-align: center; padding: 25px; border-radius: 25px;
-        background: rgba(255, 255, 255, 0.7); border: 1px solid rgba(0, 86, 255, 0.2);
-        transition: all 0.4s ease; margin-bottom: 20px; min-height: 250px;
-        backdrop-filter: blur(5px);
-    }}
-    .stMetric {{ background: rgba(255, 255, 255, 0.8); padding: 20px; border-radius: 15px; border-left: 5px solid #0056ff; backdrop-filter: blur(5px); }}
-    .sim-box {{ background: linear-gradient(135deg, #0056ff 0%, #6200ea 100%); color: white; padding: 20px; border-radius: 15px; margin-top: 10px; }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -213,7 +225,7 @@ riesgo_val = (df[df["Autonomia"] < dias_entrega]["V_Diaria"] * df[df["Autonomia"
 st.markdown('<h1 class="main-title">🌊 Flowmerce</h1>', unsafe_allow_html=True)
 
 c_enc1, c_enc2 = st.columns([0.8, 0.2])
-with c_enc1: st.markdown(f"**✨ {t_act['sub']}**")
+with c_enc1: st.markdown(f"<div style='background:rgba(255,255,255,0.6); padding:5px; border-radius:10px; display:inline-block;'><strong>✨ {t_act['sub']}</strong></div>", unsafe_allow_html=True)
 
 # --- LÓGICA DE VOZ MEJORADA ---
 with c_enc2: 
