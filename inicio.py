@@ -57,7 +57,7 @@ textos = {
         "sim_inv": "Investimento para Simular ($)",
         "sim_proj": "Vendas Projetadas",
         "sim_rec": "Recuperação em",
-        "sim_dias": "dias",
+        "sim_dias": "días",
         "btn_app": "🚀 Aplicar na Tiendanube",
         "btn_reporte": "📝 Gerar Relatório e Baixar",
         "sync": "Sincronizando...",
@@ -155,16 +155,19 @@ with st.sidebar:
                 st.session_state.token_session = "demo"
                 st.info("Modo Demo ✅")
 
-# --- 7. LÓGICA DINÁMICA DE CSS (CORREGIDO PARA LEGIBILIDAD) ---
-bg_overlay = "rgba(255, 255, 255, 0.75)" if not alto_contraste else "rgba(0, 0, 0, 0.85)"
-card_bg = "white" # Forzamos blanco sólido para legibilidad
+# --- 7. ESTILOS CON EFECTOS ESPECIALES ---
+bg_overlay = "rgba(255, 255, 255, 0.7)" if not alto_contraste else "rgba(0, 0, 0, 0.9)"
 text_color = "#1E1E1E" if not alto_contraste else "#000000"
-font_size = "1.2rem" if lectura_facil else "1rem"
-title_size = "5rem" if lectura_facil else "4rem"
 
 st.markdown(f"""
 <style>
-    /* FONDO Y TITULO */
+    /* 1. ANIMACIÓN DE GRADIENTE PARA EL TÍTULO */
+    @keyframes gradient-move {{
+        0% {{ background-position: 0% 50%; }}
+        50% {{ background-position: 100% 50%; }}
+        100% {{ background-position: 0% 50%; }}
+    }}
+
     .stApp {{
         background: linear-gradient({bg_overlay}, {bg_overlay}), 
                     url("https://imgur.com/gQ7yynl.jpeg");
@@ -174,53 +177,57 @@ st.markdown(f"""
 
     .main-title {{
         background: linear-gradient(90deg, #0056ff, #00c6ff, #6200ea, #0056ff);
-        background-size: 300% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        font-size: {title_size} !important; font-weight: 800; animation: gradient-move 4s ease infinite; 
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-size: 4rem !important;
+        font-weight: 800;
+        animation: gradient-move 3s linear infinite;
+        margin-bottom: 0px;
     }}
     
-    /* BLOQUE PRINCIPAL DE TABS - FONDO BLANCO SÓLIDO */
-    div[data-testid="stTabs"] {{
-        background-color: {card_bg} !important;
-        padding: 30px !important;
-        border-radius: 15px !important;
-        border: none !important; /* QUITAMOS LÍNEA AZUL */
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
-    }}
-
-    /* ELIMINAR LÍNEA AZUL DEBAJO DE LOS TABS ACTIVOS */
-    button[data-baseweb="tab"] {{
-        border: none !important;
-    }}
-    div[data-baseweb="tab-highlight"] {{
-        background-color: transparent !important;
-    }}
-
-    /* TABLAS Y MÉTRICAS CENTRADAS Y CLARAS */
-    .stTable, div[data-testid="stMetric"] {{
+    /* 2. EFECTO DE ELEVACIÓN EN TABLAS Y TARJETAS */
+    div[data-testid="stMetric"], .stTable, .team-card-large, div[data-testid="stExpander"] {{
         background-color: white !important;
+        border-radius: 15px !important;
         border: none !important;
-        text-align: center !important;
+        padding: 20px !important;
+        transition: all 0.3s ease-in-out !important;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05) !important;
     }}
 
+    div[data-testid="stMetric"]:hover, .stTable:hover, .team-card-large:hover {{
+        transform: translateY(-5px) scale(1.01) !important;
+        box-shadow: 0 12px 30px rgba(0,86,255,0.15) !important;
+    }}
+
+    /* 3. EFECTO EN LOS TABS (CONTENEDOR PRINCIPAL) */
+    div[data-testid="stTabs"] {{
+        background-color: rgba(255, 255, 255, 0.95) !important;
+        padding: 30px !important;
+        border-radius: 20px !important;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1) !important;
+        border: none !important;
+    }}
+
+    /* 4. CENTRADO DE TEXTO EN TABLAS */
     .stTable td, .stTable th {{
         text-align: center !important;
-        padding: 15px !important;
-        color: {text_color} !important;
+        vertical-align: middle !important;
     }}
 
-    /* EQUIPO CENTRADO */
-    .team-card-large {{
-        background-color: white !important;
-        text-align: center !important;
-        border: none !important;
-        padding: 15px;
-        border-radius: 15px;
-    }}
-
+    /* 5. BOTÓN CON PULSO SUTIL */
     div.stButton > button {{
-        background: #0056ff !important;
+        background: linear-gradient(90deg, #0056ff, #00c6ff) !important;
         color: white !important;
         border: none !important;
+        border-radius: 10px !important;
+        transition: 0.3s !important;
+    }}
+    
+    div.stButton > button:hover {{
+        filter: brightness(1.2);
+        box-shadow: 0 5px 15px rgba(0,198,255,0.4) !important;
     }}
 </style>
 """, unsafe_allow_html=True)
@@ -234,11 +241,13 @@ atrapado_val = (df[df["Autonomia"] > 60]["Stock"] * df[df["Autonomia"] > 60]["Co
 riesgo_val = (df[df["Autonomia"] < dias_entrega]["V_Diaria"] * df[df["Autonomia"] < dias_entrega]["Costo"] * 1.5).sum()
 
 # --- 9. CUERPO DE LA APP ---
+# Título con el efecto de gradiente animado
 st.markdown('<h1 class="main-title">🌊 Flowmerce</h1>', unsafe_allow_html=True)
 
 c_enc1, c_enc2 = st.columns([0.8, 0.2])
 with c_enc1: 
-    st.markdown(f"<div style='background:white; padding:10px 20px; border-radius:10px; display:inline-block; color:{text_color}; box-shadow: 0 2px 10px rgba(0,0,0,0.05);'><strong>✨ {t_act['sub']}</strong></div>", unsafe_allow_html=True)
+    # Slogan con fondo limpio
+    st.markdown(f"<div style='background:white; padding:10px 20px; border-radius:10px; display:inline-block; color:{text_color}; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px;'><strong>✨ {t_act['sub']}</strong></div>", unsafe_allow_html=True)
 
 with c_enc2: 
     audio_data = mic_recorder(start_prompt="🎤", stop_prompt="🛑", key='recorder')
@@ -271,8 +280,9 @@ with tabs[2]:
     with st.expander(t_act["sim_tit"], expanded=True):
         sim_inv = st.number_input(t_act["sim_inv"], value=50000)
         c_s1, c_s2 = st.columns(2)
-        with c_s1: st.markdown(f'<div style="background: linear-gradient(135deg, #0056ff 0%, #6200ea 100%); color: white; padding: 20px; border-radius: 15px; text-align: center;"><small>{t_act["sim_proj"]}</small><h3>${sim_inv * (f_demanda * 1.8):,.0f} MXN</h3></div>', unsafe_allow_html=True)
-        with c_s2: st.markdown(f'<div style="background: linear-gradient(135deg, #0056ff 0%, #6200ea 100%); color: white; padding: 20px; border-radius: 15px; text-align: center;"><small>{t_act["sim_rec"]}</small><h3>{30/f_demanda:.1f} {t_act["sim_dias"]}</h3></div>', unsafe_allow_html=True)
+        # Cuadros de simulación con gradiente
+        with c_s1: st.markdown(f'<div style="background: linear-gradient(135deg, #0056ff 0%, #6200ea 100%); color: white; padding: 25px; border-radius: 15px; text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.15);"><small>{t_act["sim_proj"]}</small><h3>${sim_inv * (f_demanda * 1.8):,.0f} MXN</h3></div>', unsafe_allow_html=True)
+        with c_s2: st.markdown(f'<div style="background: linear-gradient(135deg, #00c6ff 0%, #0056ff 100%); color: white; padding: 25px; border-radius: 15px; text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.15);"><small>{t_act["sim_rec"]}</small><h3>{30/f_demanda:.1f} {t_act["sim_dias"]}</h3></div>', unsafe_allow_html=True)
     
     st.write("---")
     def determinar_accion(row):
@@ -295,7 +305,7 @@ with tabs[3]:
     st.markdown(f"### {t_act['equipo_tit']}")
     equipo = [
         ("Willan Álvarez.", "Lead Architect", "https://i.imgur.com/CSH9Af7.jpeg"),
-        ("Dalia R.", "Product Manager", "https://i.imgur.com/4O2BGL8.jpeg"),
+        ("Dalia R.", "Product Manager", "https://i.imgur.com/4O2B8L8.jpeg"),
         ("Montserrat G.", "Strategy", "https://cdn-icons-png.flaticon.com/512/6997/6997674.png"),
         ("Jiram Cabrera", "Organización", "https://i.imgur.com/eamMDmE.jpeg"),
         ("Carlos Andrés A.", "Liderazgo", "https://cdn-icons-png.flaticon.com/512/2354/2354573.png"),
