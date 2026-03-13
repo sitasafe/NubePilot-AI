@@ -148,15 +148,60 @@ with st.sidebar:
                 st.session_state.token_session = "demo"
                 st.info("Modo Demo ✅")
 
-# --- 7. ESTILOS CSS ---
+# --- 7. ESTILOS CSS (MEJORADOS CON EFECTOS 3D Y NUBES) ---
 st.markdown(f"""
 <style>
+    /* Título con Gradiente Animado */
     .main-title {{
         background: linear-gradient(90deg, #0056ff, #00c6ff, #6200ea, #0056ff);
         background-size: 300% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         font-size: 4rem !important; font-weight: 800; animation: gradient-move 4s ease infinite; 
     }}
     @keyframes gradient-move {{ 0% {{background-position: 0% 50%;}} 50% {{background-position: 100% 50%;}} 100% {{background-position: 0% 50%;}} }}
+
+    /* BOTONES 3D DINÁMICOS */
+    div.stButton > button, div.stDownloadButton > button {{
+        background: linear-gradient(145deg, #0056ff, #0045cc) !important;
+        color: white !important;
+        border: none !important;
+        padding: 12px 24px !important;
+        border-radius: 12px !important;
+        box-shadow: 0 6px #003399, 0 8px 15px rgba(0,0,0,0.2) !important;
+        transition: all 0.1s ease !important;
+        font-weight: bold !important;
+        text-transform: uppercase !important;
+    }}
+    div.stButton > button:hover {{
+        transform: translateY(-2px) !important;
+        box-shadow: 0 8px #003399, 0 12px 20px rgba(0,0,0,0.3) !important;
+    }}
+    div.stButton > button:active, div.stDownloadButton > button:active {{
+        transform: translateY(4px) !important;
+        box-shadow: 0 2px #003399 !important;
+    }}
+
+    /* EFECTOS EN TABLAS */
+    .stTable {{
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }}
+    tr:hover {{
+        background-color: rgba(0, 86, 255, 0.05) !important;
+    }}
+
+    /* ANIMACIÓN DE NUBES */
+    @keyframes cloud-up {{
+        0% {{ transform: translateY(100vh); opacity: 0; }}
+        20% {{ opacity: 0.7; }}
+        80% {{ opacity: 0.7; }}
+        100% {{ transform: translateY(-100vh); opacity: 0; }}
+    }}
+    .cloud-ascend {{
+        position: fixed; bottom: -100px; font-size: 5rem; z-index: 9999;
+        pointer-events: none; animation: cloud-up 3s ease-in infinite;
+    }}
+
     .team-card-large {{
         text-align: center; padding: 25px; border-radius: 25px;
         background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(0, 86, 255, 0.2);
@@ -164,12 +209,6 @@ st.markdown(f"""
     }}
     .team-card-large:hover {{ transform: translateY(-10px); border-color: #0056ff; box-shadow: 0px 15px 30px rgba(0, 86, 255, 0.2); }}
     .stMetric {{ background: rgba(0, 86, 255, 0.05); padding: 20px; border-radius: 15px; border-left: 5px solid #0056ff; }}
-    @keyframes cloud-up {{
-        0% {{ transform: translateY(100vh); opacity: 0; }}
-        10% {{ opacity: 0.8; }} 90% {{ opacity: 0.8; }}
-        100% {{ transform: translateY(-100vh); opacity: 0; }}
-    }}
-    .cloud-ascend {{ position: fixed; bottom: 0; font-size: 5rem; z-index: 9999; pointer-events: none; animation: cloud-up 3s linear infinite; }}
     .sim-box {{ background: linear-gradient(135deg, #0056ff 0%, #6200ea 100%); color: white; padding: 20px; border-radius: 15px; margin-top: 10px; }}
 </style>
 """, unsafe_allow_html=True)
@@ -239,19 +278,22 @@ with tabs[2]:
             cloud_placeholder.empty()
     
     with col_b2:
-        # Lógica mejorada del reporte
         csv = df.to_csv(index=False).encode('utf-8')
-        
-        # Botón de descarga de Streamlit (se activa visualmente al generar)
-        st.download_button(
+        # Efecto de nubes activado por el botón de descarga
+        if st.download_button(
             label=t_act["btn_reporte"],
             data=csv,
             file_name=f'Reporte_Flowmerce_{int(time.time())}.csv',
             mime='text/csv',
             use_container_width=True,
-            type="primary",
-            on_click=lambda: st.toast(t_act["rep_exito"]) # Pequeño aviso visual
-        )
+            type="primary"
+        ):
+            # Mostramos nubes al procesar la descarga
+            cloud_wrap = st.empty()
+            cloud_wrap.markdown('<div class="cloud-ascend" style="left:20%;">☁️</div><div class="cloud-ascend" style="left:40%;">☁️</div><div class="cloud-ascend" style="left:70%;">☁️</div>', unsafe_allow_html=True)
+            st.toast(t_act["rep_exito"])
+            time.sleep(2)
+            cloud_wrap.empty()
 
 with tabs[3]:
     st.markdown(f"### {t_act['equipo_tit']}")
