@@ -97,7 +97,7 @@ textos = {
     }
 }
 
-# --- 4. FUNCIONES DE API Y UTILIDADES ---
+# --- 4. FUNCIONES DE API ---
 def obtener_token_real(code):
     url = "https://www.tiendanube.com/apps/authorize/token"
     payload = {"client_id": int(CLIENT_ID), "client_secret": CLIENT_SECRET, "grant_type": "authorization_code", "code": code.strip()}
@@ -106,24 +106,13 @@ def obtener_token_real(code):
         return response.json().get("access_token") if response.status_code == 200 else None
     except: return None
 
-def animar_nubes():
-    cloud_placeholder = st.empty()
-    cloud_placeholder.markdown("""
-        <div class="cloud-effect" style="left: 10%; animation-delay: 0s;">☁️</div>
-        <div class="cloud-effect" style="left: 30%; animation-delay: 0.5s;">☁️</div>
-        <div class="cloud-effect" style="left: 55%; animation-delay: 0.2s;">☁️</div>
-        <div class="cloud-effect" style="left: 80%; animation-delay: 0.8s;">☁️</div>
-        <div class="cloud-effect" style="left: 45%; animation-delay: 1.2s;">☁️</div>
-    """, unsafe_allow_html=True)
-    time.sleep(0.1)
-
 # --- 5. GESTIÓN DE MEMORIA ---
 if 'db_inventario' not in st.session_state:
     st.session_state.db_inventario = pd.DataFrame({
         "Producto": ["Tenis Pro Runner", "Gorra Blue Urban", "Calcetín Sport", "Sudadera Lino"],
         "Stock": [15, 95, 45, 4],
         "Ventas_30d": [45, 10, 30, 42],
-        "Costo": [1200, 350, 150, 890]
+        "Costo": [1200.0, 350.0, 150.0, 890.0]
     })
 if 'token_session' not in st.session_state:
     st.session_state.token_session = None
@@ -166,7 +155,7 @@ with st.sidebar:
                 st.session_state.token_session = "demo"
                 st.info("Modo Demo ✅")
 
-# --- 7. ESTILOS CSS ---
+# --- 7. ESTILOS ---
 bg_overlay = "rgba(255, 255, 255, 0.7)" if not alto_contraste else "rgba(0, 0, 0, 0.9)"
 text_color = "#1E1E1E" if not alto_contraste else "#000000"
 
@@ -177,13 +166,12 @@ st.markdown(f"""
     .cloud-effect {{ position: fixed; font-size: 50px; z-index: 9999; pointer-events: none; animation: clouds-up 4s ease-in forwards; }}
     .stApp {{ background: linear-gradient({bg_overlay}, {bg_overlay}), url("https://imgur.com/gQ7yynl.jpeg"); background-attachment: fixed; background-size: cover; }}
     .main-title {{ background: linear-gradient(90deg, #0056ff, #00c6ff, #6200ea, #0056ff); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 4rem !important; font-weight: 800; animation: gradient-move 3s linear infinite; margin-bottom: 0px; }}
-    div[data-testid="stMetric"], .team-card-large, div[data-testid="stExpander"], .stDataEditor {{ background-color: white !important; border-radius: 15px !important; padding: 20px !important; box-shadow: 0 4px 15px rgba(0,0,0,0.05) !important; }}
-    div[data-testid="stTabs"] {{ background-color: rgba(255, 255, 255, 0.95) !important; padding: 30px !important; border-radius: 20px !important; box-shadow: 0 10px 40px rgba(0,0,0,0.1) !important; }}
-    div.stButton > button {{ background: linear-gradient(90deg, #0056ff, #00c6ff) !important; color: white !important; border-radius: 10px !important; }}
+    div[data-testid="stMetric"], .stTable, .team-card-large, div[data-testid="stExpander"] {{ background-color: white !important; border-radius: 15px !important; padding: 20px !important; box-shadow: 0 4px 15px rgba(0,0,0,0.05) !important; }}
+    div[data-testid="stTabs"] {{ background-color: rgba(255, 255, 255, 0.95) !important; padding: 30px !important; border-radius: 20px !important; }}
 </style>
 """, unsafe_allow_html=True)
 
-# --- 8. LÓGICA DE CÁLCULO DINÁMICA ---
+# --- 8. LÓGICA DE CÁLCULO ---
 t_act = textos[idioma]
 df = st.session_state.db_inventario.copy()
 df["V_Diaria"] = (df["Ventas_30d"] / 30) * f_demanda
@@ -191,23 +179,23 @@ df["Autonomia"] = np.where(df["V_Diaria"] > 0, df["Stock"] / df["V_Diaria"], 999
 atrapado_val = (df[df["Autonomia"] > 60]["Stock"] * df[df["Autonomia"] > 60]["Costo"]).sum()
 riesgo_val = (df[df["Autonomia"] < dias_entrega]["V_Diaria"] * df[df["Autonomia"] < dias_entrega]["Costo"] * 1.5).sum()
 
+def animar_nubes():
+    st.markdown("""<div class="cloud-effect" style="left: 10%;">☁️</div><div class="cloud-effect" style="left: 50%;">☁️</div>""", unsafe_allow_html=True)
+
 # --- 9. CUERPO DE LA APP ---
 st.markdown('<h1 class="main-title">🌊 Flowmerce</h1>', unsafe_allow_html=True)
 
 c_enc1, c_enc2 = st.columns([0.8, 0.2])
 with c_enc1: 
-    st.markdown(f"<div style='background:white; padding:10px 20px; border-radius:10px; display:inline-block; color:{text_color}; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px;'><strong>✨ {t_act['sub']}</strong></div>", unsafe_allow_html=True)
+    st.markdown(f"<div style='background:white; padding:10px 20px; border-radius:10px; display:inline-block; color:{text_color};'><strong>✨ {t_act['sub']}</strong></div>", unsafe_allow_html=True)
 
 with c_enc2: 
     audio_data = mic_recorder(start_prompt="🎤", stop_prompt="🛑", key='recorder')
     if audio_data:
-        st.toast(t_act["escuchando"])
-        time.sleep(1)
-        st.info(f"{t_act['voz_ok']} 'Optimizar inventario'")
+        st.info(f"{t_act['voz_ok']} 'Optimizar'")
 
 tabs = st.tabs([t_act["tab0"], t_act["tab1"], t_act["tab2"], t_act["tab3"]])
 
-# PESTAÑA 0: VISIÓN
 with tabs[0]:
     st.markdown(f"## {t_act['diferencia']}")
     col_v1, col_v2 = st.columns([0.6, 0.4])
@@ -218,7 +206,6 @@ with tabs[0]:
         st.markdown(t_act["modelo_t"])
         st.write(f"{t_act['starter']}\n{t_act['growth']}\n{t_act['scale']}")
 
-# PESTAÑA 1: MONITOR
 with tabs[1]:
     col1, col2, col3 = st.columns(3)
     col1.metric(t_act["atrapado"], f"${float(atrapado_val):,.0f} MXN")
@@ -226,7 +213,6 @@ with tabs[1]:
     col3.metric(t_act["salud"], f"{max(0, 100-int(riesgo_val/1000))}%")
     st.area_chart(df.set_index("Producto")["Stock"])
 
-# PESTAÑA 2: ESTRATEGIA (CON TU NUEVA TABLA INTERACTIVA)
 with tabs[2]:
     st.subheader(t_act["est_tit"])
     
@@ -239,17 +225,18 @@ with tabs[2]:
     
     st.write("---")
     
-    # --- TABLA INTERACTIVA (DATA EDITOR) ---
+    # --- TABLA INTERACTIVA ---
     st.markdown("### 📝 Gestión Dinámica de Inventario")
-    st.caption("Modifica los valores directamente en la tabla para simular cambios de stock o ventas.")
+    st.caption("Modifica los valores directamente en la tabla.")
     
+    # CORRECCIÓN DE ERROR: Usamos NumberColumn con prefijo para evitar el AttributeError
     df_editable = st.data_editor(
         st.session_state.db_inventario,
         column_config={
             "Producto": st.column_config.TextColumn("Producto", disabled=True),
             "Stock": st.column_config.NumberColumn("Stock Actual", min_value=0, step=1),
             "Ventas_30d": st.column_config.NumberColumn("Ventas (30 días)", min_value=0, step=1),
-            "Costo": st.column_config.CurrencyColumn("Costo Unitario", currency="MXN"),
+            "Costo": st.column_config.NumberColumn("Costo Unitario", format="$%.2f"),
         },
         hide_index=True,
         use_container_width=True,
@@ -268,9 +255,8 @@ with tabs[2]:
     
     with col_b2:
         csv = df_editable.to_csv(index=False).encode('utf-8')
-        st.download_button(label=t_act["btn_reporte"], data=csv, file_name='Plan_Accion_Flowmerce.csv', use_container_width=True)
+        st.download_button(label=t_act["btn_reporte"], data=csv, file_name='Plan_Flowmerce.csv', use_container_width=True)
 
-# PESTAÑA 3: EQUIPO
 with tabs[3]:
     st.markdown(f"### {t_act['equipo_tit']}")
     equipo = [
@@ -287,10 +273,10 @@ with tabs[3]:
         cols = st.columns(4)
         for j, (nombre, cargo, img) in enumerate(equipo[i:i+4]):
             with cols[j]:
-                st.markdown(f"""<div class="team-card-large" style="text-align: center;">
-                    <img src="{img}" style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; margin-bottom: 10px;">
-                    <br><strong>{nombre}</strong><br><small style="color:#0056ff;">{cargo}</small>
+                st.markdown(f"""<div class="team-card-large" style="text-align:center;">
+                    <img src="{img}" style="width:100px; height:100px; border-radius:50%; object-fit:cover;">
+                    <br><strong>{nombre}</strong><br><small>{cargo}</small>
                 </div>""", unsafe_allow_html=True)
 
 st.divider()
-st.caption("🌊 Flowmerce | Hackathon UTEL 2026 | Equipo 3 | TiendaNube")
+st.caption("🌊 Flowmerce | Hackathon UTEL 2026 | Equipo 3")
