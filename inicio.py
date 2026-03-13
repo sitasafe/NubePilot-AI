@@ -37,7 +37,9 @@ textos = {
         "sync_ok": "Sincronización Exitosa!",
         "equipo_tit": "👥 Equipo Multidisciplinario (Equipo 3)",
         "rep_proceso": "Procesando Reporte...",
-        "rep_exito": "¡Reporte listo para descargar! ✅"
+        "rep_exito": "¡Reporte listo para descargar! ✅",
+        "escuchando": "🎙️ Analizando comando de voz...",
+        "voz_ok": "✅ Comando recibido: "
     },
     "Português": {
         "sub": "Onde os dados se transformam em vendas",
@@ -62,7 +64,9 @@ textos = {
         "sync_ok": "Sincronização com Sucesso!",
         "equipo_tit": "👥 Equipe Multidisciplinar (Equipe 3)",
         "rep_proceso": "Processando Relatório...",
-        "rep_exito": "Relatório pronto para baixar! ✅"
+        "rep_exito": "Relatório pronto para baixar! ✅",
+        "escuchando": "🎙️ Analisando comando de voz...",
+        "voz_ok": "✅ Comando recebido: "
     },
     "English": {
         "sub": "Where data turns into sales",
@@ -87,7 +91,9 @@ textos = {
         "sync_ok": "Successful Synchronization!",
         "equipo_tit": "👥 Multidisciplinary Team (Team 3)",
         "rep_proceso": "Processing Report...",
-        "rep_exito": "Report ready to download! ✅"
+        "rep_exito": "Report ready to download! ✅",
+        "escuchando": "🎙️ Analyzing voice command...",
+        "voz_ok": "✅ Command received: "
     }
 }
 
@@ -99,18 +105,6 @@ def obtener_token_real(code):
         response = requests.post(url, json=payload, timeout=10)
         return response.json().get("access_token") if response.status_code == 200 else None
     except: return None
-
-def crear_pagina_reporte(token, contenido_html, titulo="Reporte Flowmerce"):
-    if not token or token == "demo":
-        time.sleep(1)
-        return True
-    url = "https://api.tiendanube.com/v1/pages"
-    headers = {"Authentication": f"bearer {token}", "Content-Type": "application/json"}
-    payload = {"page": {"publish": True, "i18n": {"es_AR": {"title": titulo, "content": contenido_html, "seo_handle": f"reporte-{int(time.time())}"}}}}
-    try:
-        response = requests.post(url, json=payload, headers=headers, timeout=5)
-        return response.status_code == 201
-    except: return False
 
 # --- 5. GESTIÓN DE MEMORIA ---
 if 'db_inventario' not in st.session_state:
@@ -125,7 +119,6 @@ if 'token_session' not in st.session_state:
 
 # --- 6. BARRA LATERAL ---
 with st.sidebar:
-    # --- EFECTO DE LOGO FLOTANTE ---
     st.markdown("""
     <style>
         @keyframes float {
@@ -133,11 +126,7 @@ with st.sidebar:
             50% { transform: translateY(-10px); filter: drop-shadow(0 25px 15px rgba(0,86,255,0.1)); }
             100% { transform: translateY(0px); filter: drop-shadow(0 5px 15px rgba(0,86,255,0.2)); }
         }
-        .logo-flow {
-            animation: float 4s ease-in-out infinite;
-            border-radius: 20px;
-            margin-bottom: 20px;
-        }
+        .logo-flow { animation: float 4s ease-in-out infinite; border-radius: 20px; margin-bottom: 20px; }
     </style>
     <div style="text-align: center;">
         <img src="https://imgur.com/YrVO3ZF.jpeg" class="logo-flow" style="width: 100%;">
@@ -175,39 +164,26 @@ st.markdown(f"""
         font-size: 4rem !important; font-weight: 800; animation: gradient-move 4s ease infinite; 
     }}
     @keyframes gradient-move {{ 0% {{background-position: 0% 50%;}} 50% {{background-position: 100% 50%;}} 100% {{background-position: 0% 50%;}} }}
-
-    /* BOTONES 3D */
     div.stButton > button, div.stDownloadButton > button {{
         background: linear-gradient(145deg, #0056ff, #0045cc) !important;
-        color: white !important;
-        border: none !important;
-        padding: 12px 24px !important;
-        border-radius: 12px !important;
-        box-shadow: 0 6px #003399, 0 8px 15px rgba(0,0,0,0.2) !important;
-        transition: all 0.1s ease !important;
-        font-weight: bold !important;
-        text-transform: uppercase !important;
+        color: white !important; border: none !important; padding: 12px 24px !important;
+        border-radius: 12px !important; box-shadow: 0 6px #003399, 0 8px 15px rgba(0,0,0,0.2) !important;
+        transition: all 0.1s ease !important; font-weight: bold !important; text-transform: uppercase !important;
     }}
     div.stButton > button:hover {{ transform: translateY(-2px) !important; box-shadow: 0 8px #003399, 0 12px 20px rgba(0,0,0,0.3) !important; }}
     div.stButton > button:active, div.stDownloadButton > button:active {{ transform: translateY(4px) !important; box-shadow: 0 2px #003399 !important; }}
-
-    /* TABLAS Y OTROS */
     .stTable {{ background: white; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }}
-    tr:hover {{ background-color: rgba(0, 86, 255, 0.05) !important; }}
-
     @keyframes cloud-up {{
         0% {{ transform: translateY(100vh); opacity: 0; }}
         20% {{ opacity: 0.7; }} 80% {{ opacity: 0.7; }}
         100% {{ transform: translateY(-100vh); opacity: 0; }}
     }}
     .cloud-ascend {{ position: fixed; bottom: -100px; font-size: 5rem; z-index: 9999; pointer-events: none; animation: cloud-up 3s ease-in infinite; }}
-
     .team-card-large {{
         text-align: center; padding: 25px; border-radius: 25px;
         background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(0, 86, 255, 0.2);
         transition: all 0.4s ease; margin-bottom: 20px; min-height: 250px;
     }}
-    .team-card-large:hover {{ transform: translateY(-10px); border-color: #0056ff; box-shadow: 0px 15px 30px rgba(0, 86, 255, 0.2); }}
     .stMetric {{ background: rgba(0, 86, 255, 0.05); padding: 20px; border-radius: 15px; border-left: 5px solid #0056ff; }}
     .sim-box {{ background: linear-gradient(135deg, #0056ff 0%, #6200ea 100%); color: white; padding: 20px; border-radius: 15px; margin-top: 10px; }}
 </style>
@@ -226,7 +202,15 @@ st.markdown('<h1 class="main-title">🌊 Flowmerce</h1>', unsafe_allow_html=True
 
 c_enc1, c_enc2 = st.columns([0.8, 0.2])
 with c_enc1: st.markdown(f"**✨ {t_act['sub']}**")
-with c_enc2: mic_recorder(start_prompt="🎤 Voz", stop_prompt="🛑", key='rec')
+
+# --- LÓGICA DE VOZ MEJORADA ---
+with c_enc2: 
+    audio_data = mic_recorder(start_prompt="🎤", stop_prompt="🛑", key='recorder')
+    if audio_data:
+        st.toast(t_act["escuchando"])
+        # Simulamos procesamiento de intención (en una app real aquí conectarías con OpenAI Whisper)
+        time.sleep(1)
+        st.info(f"{t_act['voz_ok']} 'Optimizar inventario'")
 
 tabs = st.tabs([t_act["tab0"], t_act["tab1"], t_act["tab2"], t_act["tab3"]])
 
@@ -238,9 +222,7 @@ with tabs[0]:
         st.info(t_act["dato_cert"])
     with col_v2:
         st.markdown(t_act["modelo_t"])
-        st.write(t_act["starter"])
-        st.write(t_act["growth"])
-        st.write(t_act["scale"])
+        st.write(f"{t_act['starter']}\n{t_act['growth']}\n{t_act['scale']}")
 
 with tabs[1]:
     col1, col2, col3 = st.columns(3)
@@ -254,10 +236,9 @@ with tabs[2]:
     with st.expander(t_act["sim_tit"], expanded=True):
         sim_inv = st.number_input(t_act["sim_inv"], value=50000)
         c_s1, c_s2 = st.columns(2)
-        with c_s1:
-            st.markdown(f'<div class="sim-box"><small>{t_act["sim_proj"]}</small><h3>${sim_inv * (f_demanda * 1.8):,.0f} MXN</h3></div>', unsafe_allow_html=True)
-        with c_s2:
-            st.markdown(f'<div class="sim-box"><small>{t_act["sim_rec"]}</small><h3>{30/f_demanda:.1f} {t_act["sim_dias"]}</h3></div>', unsafe_allow_html=True)
+        with c_s1: st.markdown(f'<div class="sim-box"><small>{t_act["sim_proj"]}</small><h3>${sim_inv * (f_demanda * 1.8):,.0f} MXN</h3></div>', unsafe_allow_html=True)
+        with c_s2: st.markdown(f'<div class="sim-box"><small>{t_act["sim_rec"]}</small><h3>{30/f_demanda:.1f} {t_act["sim_dias"]}</h3></div>', unsafe_allow_html=True)
+    
     st.write("---")
     def determinar_accion(row):
         if row["Autonomia"] < dias_entrega: return "🚨 REABASTECER"
@@ -278,19 +259,8 @@ with tabs[2]:
     
     with col_b2:
         csv = df.to_csv(index=False).encode('utf-8')
-        if st.download_button(
-            label=t_act["btn_reporte"],
-            data=csv,
-            file_name=f'Reporte_Flowmerce_{int(time.time())}.csv',
-            mime='text/csv',
-            use_container_width=True,
-            type="primary"
-        ):
-            cloud_wrap = st.empty()
-            cloud_wrap.markdown('<div class="cloud-ascend" style="left:20%;">☁️</div><div class="cloud-ascend" style="left:70%;">☁️</div>', unsafe_allow_html=True)
+        if st.download_button(label=t_act["btn_reporte"], data=csv, file_name='Reporte_Flowmerce.csv', mime='text/csv', use_container_width=True, type="primary"):
             st.toast(t_act["rep_exito"])
-            time.sleep(2)
-            cloud_wrap.empty()
 
 with tabs[3]:
     st.markdown(f"### {t_act['equipo_tit']}")
