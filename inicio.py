@@ -3,144 +3,80 @@ import pandas as pd
 import numpy as np
 import time
 
-# --- CONFIGURACIÓN DE PÁGINA ---
-st.set_page_config(page_title="Flowmerce IA - Liquidez Estratégica", page_icon="🌊", layout="wide")
+# --- 1. CONFIGURACIÓN Y MEMORIA (SESSION STATE) ---
+st.set_page_config(page_title="Flowmerce IA - Live", page_icon="🌊", layout="wide")
 
-# --- LÓGICA DE NEGOCIO DISRUPTIVA (EL MOTOR DE PREDICCIÓN) ---
-def procesar_datos_tienda(impulso_ventas, retraso_logistico):
-    # Simulamos la data de Tiendanube
-    data = {
-        "Producto": ["Paleta Aurora Glow", "Labial Mate #LM33", "Sérum Hidratante", "Base Perfect Skin"],
-        "Stock": [120, 5, 45, 2],
-        "Ventas_Promedio_Dia": [0.5, 4.2, 1.2, 3.5],
-        "Costo_Unitario": [450, 180, 600, 550],
-        "Lead_Time_Std": [5, 5, 7, 5]
-    }
-    df = pd.DataFrame(data)
-    
-    # 1. Ajuste por el Simulador de Escenarios
-    df["Ventas_Reales"] = df["Ventas_Promedio_Dia"] * impulso_ventas
-    df["Lead_Time_Total"] = df["Lead_Time_Std"] + retraso_logistico
-    
-    # 2. Cálculos de Inteligencia Financiera
-    df["Dias_Autonomia"] = df["Stock"] / df["Ventas_Reales"]
-    df["Capital_Inmovilizado"] = np.where(df["Dias_Autonomia"] > 60, df["Stock"] * df["Costo_Unitario"], 0)
-    
-    # 3. Predicción de Quiebre (Stockout)
-    df["Riesgo_Quiebre"] = df["Dias_Autonomia"] < df["Lead_Time_Total"]
-    return df
+# Inicializamos la "memoria" para que los botones funcionen
+if 'datos' not in st.session_state:
+    st.session_state.datos = pd.DataFrame({
+        "Producto": ["Paleta Aurora", "Labial Mate", "Sérum Hidra", "Base Perfect"],
+        "Stock": [120, 8, 45, 2],
+        "Ventas_Dia": [0.5, 3.2, 1.2, 4.5],
+        "Costo": [450, 180, 600, 550]
+    })
+if 'ejecutado' not in st.session_state:
+    st.session_state.ejecutado = False
 
-# --- ESTILOS CSS PROFESIONALES ---
+# --- 2. ESTILOS CSS ---
 st.markdown("""
 <style>
-    .main-title { background: linear-gradient(90deg, #1A237E, #0052D4, #4364F7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 3.5rem; font-weight: 800; text-align: center; }
-    .stMetric { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 5px solid #0052D4; }
-    .status-card { padding: 20px; border-radius: 15px; margin: 10px 0; border: 1px solid #e0e0e0; }
-    .critical-alert { background: #FFF5F5; border-left: 5px solid #E53935; color: #B71C1C; }
-    .opportunity-alert { background: #F0FBF0; border-left: 5px solid #43A047; color: #1B5E20; }
-    .pitch-box { background: #F8F9FA; padding: 25px; border-radius: 20px; border: 1px dashed #0052D4; }
+    .main-title { background: linear-gradient(90deg, #1A237E, #4364F7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 3rem; font-weight: 800; text-align: center; }
+    .metric-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 5px solid #0052D4; }
+    .stButton>button { width: 100%; border-radius: 10px; height: 3em; font-weight: bold; }
 </style>
 """, unsafe_allow_html=True)
 
-# --- SIDEBAR: SIMULADOR DE ESCENARIOS ---
+# --- 3. SIDEBAR CON CONTROLES REALES ---
 with st.sidebar:
     st.image("https://imgur.com/V1m4Dgk.jpeg")
-    st.header("🎮 Simulador Estratégico")
-    st.info("Ajusta las variables externas para ver cómo Flowmerce protege tu liquidez.")
+    st.header("🎮 Panel de Control")
     
-    f_ventas = st.slider("Impulso de Demanda (ej. Hot Sale)", 0.5, 4.0, 1.0, help="Simula un aumento drástico en ventas")
-    f_logistica = st.slider("Retraso de Proveedores (Días)", 0, 20, 0, help="Simula retrasos en aduanas o logística")
+    # Este slider cambia los cálculos en tiempo real
+    impulso = st.slider("Simular Pico de Ventas", 1.0, 5.0, 1.0)
+    retraso = st.slider("Retraso Logístico (Días)", 0, 20, 5)
     
     st.divider()
-    if st.button("🔄 Sincronizar Tiendanube (LIVE)"):
-        with st.status("Conectando con API de Tiendanube..."):
-            time.sleep(1.5)
-            st.success("Inventario Sincronizado")
+    # BOTÓN FUNCIONAL 1: Sincronización
+    if st.button("🔄 Sincronizar Tiendanube"):
+        with st.spinner("Obteniendo datos reales..."):
+            time.sleep(1)
+            # Cambiamos los datos aleatoriamente para demostrar que funciona
+            st.session_state.datos["Stock"] = np.random.randint(0, 100, 4)
+            st.toast("¡Inventario actualizado desde la API!")
 
-# --- EJECUCIÓN DEL MOTOR ---
-df_res = procesar_datos_tienda(f_ventas, f_logistica)
-dinero_enterrado = df_res["Capital_Inmovilizado"].sum()
-ventas_en_riesgo = df_res[df_res["Riesgo_Quiebre"]].apply(lambda x: x["Ventas_Reales"] * x["Costo_Unitario"] * 1.5, axis=1).sum()
+# --- 4. LÓGICA DE CÁLCULO DINÁMICO ---
+df = st.session_state.datos.copy()
+df["Ventas_Act"] = df["Ventas_Dia"] * impulso
+df["Autonomia"] = df["Stock"] / df["Ventas_Act"]
+# Dinero atrapado: Stock > 50 unidades
+cap_atrapado = df[df["Stock"] > 50].apply(lambda x: x["Stock"] * x["Costo"], axis=1).sum()
+# Ventas perdidas: Si la autonomía es menor al retraso
+riesgo_quiebre = df[df["Autonomia"] < retraso].apply(lambda x: x["Ventas_Act"] * x["Costo"], axis=1).sum()
 
-# --- INTERFAZ PRINCIPAL ---
+# --- 5. INTERFAZ ---
 st.markdown('<h1 class="main-title">🌊 Flowmerce</h1>', unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; font-size: 1.2rem;'><b>Inteligencia Financiera para el Inventario</b></p>", unsafe_allow_html=True)
 
-tab1, tab2, tab3, tab4 = st.tabs(["📊 Diagnóstico de Capital", "🤖 Predicción IA", "🚀 El Pitch", "👥 Equipo"])
+tab1, tab2, tab3 = st.tabs(["📊 Monitor Financiero", "🤖 Estrategia IA", "👥 Equipo"])
 
 with tab1:
-    col1, col2, col3 = st.columns(3)
-    col1.metric("Dinero 'Enterrado'", f"${dinero_enterrado:,.0f} MXN", "Capital Inmovilizado", delta_color="inverse")
-    col2.metric("Ventas en Riesgo", f"${ventas_en_riesgo:,.0f} MXN", "Por quiebre de stock", delta_color="inverse")
-    col3.metric("Eficiencia de Caja", f"{max(0, 100 - (f_logistica*3))}%", "Salud operativa")
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        st.metric("Capital 'Enterrado'", f"${cap_atrapado:,.0f} MXN", "Stock estancado", delta_color="inverse")
+    with c2:
+        st.metric("Ventas en Riesgo", f"${riesgo_quiebre:,.0f} MXN", "Por quiebre de stock", delta_color="inverse")
+    with c3:
+        st.metric("Eficiencia Operativa", f"{int(100 - (retraso*2))}%")
 
     st.write("---")
-    st.subheader("⚠️ Alertas de Acción Inmediata")
-    
-    c1, c2 = st.columns(2)
-    with c1:
-        # Alerta de Stock Estancado (Basado en tu imagen de ejemplo)
-        prod_lento = df_res[df_res["Dias_Autonomia"] > 60].iloc[0]
-        st.markdown(f"""
-        <div class="status-card critical-alert">
-            <h4>🚨 Alerta de Stock Estancado</h4>
-            <p>El producto <b>{prod_lento['Producto']}</b> no se ha movido significativamente. 
-            Tienes <b>{prod_lento['Stock']} unidades</b> bloqueando <b>${prod_lento['Capital_Inmovilizado']:,.0f}</b>.</p>
-            <button style="background:#E53935; color:white; border:none; padding:10px; border-radius:5px;">Activar Venta Flash 25% OFF</button>
-        </div>
-        """, unsafe_allow_html=True)
-        
-    with c2:
-        # Sugerencia de Compra (Basado en la Solución)
-        prod_quiebre = df_res[df_res["Riesgo_Quiebre"]].iloc[0]
-        st.markdown(f"""
-        <div class="status-card opportunity-alert">
-            <h4>💡 Sugerencia de Compra Inteligente</h4>
-            <p><b>{prod_quiebre['Producto']}</b> se agotará en {prod_quiebre['Dias_Autonomia']:.1f} días. 
-            Con el retraso logístico actual, debes pedir hoy mismo <b>{int(prod_quiebre['Ventas_Reales']*15)} unidades</b>.</p>
-            <button style="background:#43A047; color:white; border:none; padding:10px; border-radius:5px;">Generar Orden de Compra</button>
-        </div>
-        """, unsafe_allow_html=True)
+    st.subheader("📉 Proyección de Flujo de Efectivo")
+    # Gráfico reactivo a los sliders
+    datos_grafico = pd.DataFrame({
+        "Flujo Real": np.linspace(50000, 120000, 20) + (impulso * 5000) - (retraso * 2000)
+    })
+    st.area_chart(datos_grafico)
 
 with tab2:
-    st.subheader("🤖 Del 'Registro' a la 'Predicción'")
-    st.write("NubeFlow no solo cuenta cajas, predice el flujo de efectivo.")
+    st.subheader("🤖 Recomendaciones de la IA")
     
-    # Tabla Comparativa de Decisiones
-    df_comparativo = df_res.copy()
-    df_comparativo["Decisión Humana (Intuición)"] = "Esperar a que se agote"
-    df_comparativo["Decisión Flowmerce (Datos)"] = df_comparativo.apply(
-        lambda x: "COMPRAR AHORA" if x["Riesgo_Quiebre"] else ("LIQUIDAR" if x["Dias_Autonomia"] > 60 else "MANTENER"), axis=1
-    )
-    
-    st.dataframe(df_comparativo[["Producto", "Stock", "Dias_Autonomia", "Decisión Flowmerce (Datos)"]], use_container_width=True)
-    
-    st.area_chart(pd.DataFrame({"Flujo Proyectado": np.linspace(50, 150, 30) + (f_ventas*10) - (f_logistica*5)}))
-
-with tab3:
-    st.markdown('<div class="pitch-box">', unsafe_allow_html=True)
-    st.subheader("🎯 Nuestro Diferencial")
-    st.write("""
-    Mientras otros se enfocan en vender más (Front-end), **Flowmerce se enfoca en que no quiebres (Back-end Financiero).**
-    
-    1. **Eliminamos el Error Humano:** Reducimos 5 horas de Excel a 5 minutos de decisiones.
-    2. **Maximizamos Liquidez:** Dinero que no está en stock muerto, es dinero para marketing.
-    3. **Predecimos el Futuro:** No te decimos qué pasó, te decimos qué va a pasar.
-    """)
-    st.info("✨ **Frase de Cierre:** No vendemos software de inventario. Vendemos decisiones inteligentes que protegen el capital de las tiendas.")
-    st.markdown('</div>', unsafe_allow_html=True)
-
-with tab4:
-    st.subheader("👥 Equipo Flowmerce")
-    equipo = [
-        ("Willan Álvarez.", "Lead Architect"), ("Dalia R.", "Product Manager"),
-        ("Montserrat G.", "Strategy"), ("Jiram Cabrera", "Organización"),
-        ("Carlos Andrés A.", "Liderazgo"), ("Edwing Garcia", "Ventas"),
-        ("Amarilis Elizabeth", "Gestión"), ("Cesar Augusto F.", "Estrategia")
-    ]
-    cols = st.columns(4)
-    for i, (nombre, cargo) in enumerate(equipo):
-        cols[i%4].markdown(f"**{nombre}**\n\n{cargo}")
-
-st.divider()
-st.caption("Flowmerce v2.0 | 'De datos estáticos a flujo de efectivo' | Hackathon 2026")
+    # Tabla que reacciona a los botones
+    df_vis
