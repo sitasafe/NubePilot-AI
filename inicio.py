@@ -156,11 +156,11 @@ with st.sidebar:
                 st.info("Modo Demo ✅")
 
 # --- 7. LÓGICA DINÁMICA DE CSS (Contraste y Lectura) ---
-# Definimos variables según los toggles
-bg_overlay = "rgba(255, 255, 255, 0.7)" if not alto_contraste else "rgba(0, 0, 0, 0.9)"
-card_bg = "rgba(255, 255, 255, 0.9)" if not alto_contraste else "#FFFFFF"
-text_color = "#1E1E1E" if not alto_contraste else "#000000"
-font_size = "1.2rem" if lectura_facil else "1rem"
+# Variables reactivas a los toggles
+bg_overlay = "rgba(255, 255, 255, 0.75)" if not alto_contraste else "rgba(0, 0, 0, 0.85)"
+card_bg = "rgba(255, 255, 255, 0.9)" if not alto_contraste else "#1E1E1E"
+text_color = "#1E1E1E" if not alto_contraste else "#FFFFFF"
+font_size = "1.3rem" if lectura_facil else "1rem"
 title_size = "5rem" if lectura_facil else "4rem"
 
 st.markdown(f"""
@@ -182,21 +182,21 @@ st.markdown(f"""
         background: linear-gradient(90deg, #0056ff, #00c6ff, #6200ea, #0056ff);
         background-size: 300% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         font-size: {title_size} !important; font-weight: 800; animation: gradient-move 4s ease infinite; 
-        text-shadow: 2px 2px 10px rgba(255,255,255,0.5);
+        text-shadow: 2px 2px 10px rgba(255,255,255,0.3);
     }}
     
-    /* TARJETAS Y TABLAS */
-    div[data-testid="stMetric"], .stTable, .team-card-large, .stTabs, div[data-testid="stExpander"] {{
+    /* TARJETAS Y TABLAS - SIN LÍNEAS AZULES */
+    div[data-testid="stMetric"], .stTable, .team-card-large, .stTabs, div[data-testid="stExpander"], .stTabs [data-baseweb="tab-panel"] {{
         background-color: {card_bg} !important;
         backdrop-filter: blur(10px);
         border-radius: 15px !important;
-        border: 2px solid #0056ff !important;
+        border: none !important; 
         box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
         color: {text_color} !important;
     }}
 
-    /* AJUSTE DE TEXTO EN TABLAS */
-    .stTable td, .stTable th, .stTable p {{
+    /* AJUSTE DE TEXTO */
+    .stTable td, .stTable th, .stTable p, .stMarkdown, p, li {{
         color: {text_color} !important;
         font-size: {font_size} !important;
     }}
@@ -204,10 +204,13 @@ st.markdown(f"""
     div.stButton > button {{
         background: #0056ff !important;
         color: white !important;
-        font-size: {font_size} !important;
+        border: none !important;
+        font-weight: bold !important;
     }}
 
-    .team-card-large strong {{ color: #0056ff !important; }}
+    .team-card-large strong {{ color: #00c6ff !important; }}
+    
+    @keyframes gradient-move {{ 0% {{background-position: 0% 50%;}} 50% {{background-position: 100% 50%;}} 100% {{background-position: 0% 50%;}} }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -224,7 +227,7 @@ st.markdown('<h1 class="main-title">🌊 Flowmerce</h1>', unsafe_allow_html=True
 
 c_enc1, c_enc2 = st.columns([0.8, 0.2])
 with c_enc1: 
-    st.markdown(f"<div style='background:{card_bg}; padding:10px; border-radius:10px; display:inline-block; color:{text_color}; border:1px solid #0056ff;'><strong>✨ {t_act['sub']}</strong></div>", unsafe_allow_html=True)
+    st.markdown(f"<div style='background:{card_bg}; padding:10px; border-radius:10px; display:inline-block; color:{text_color}; border:none;'><strong>✨ {t_act['sub']}</strong></div>", unsafe_allow_html=True)
 
 with c_enc2: 
     audio_data = mic_recorder(start_prompt="🎤", stop_prompt="🛑", key='recorder')
@@ -293,9 +296,9 @@ with tabs[3]:
         cols = st.columns(4)
         for j, (nombre, cargo, img) in enumerate(equipo[i:i+4]):
             with cols[j]:
-                st.markdown(f"""<div class="team-card-large">
-                    <img src="{img}" style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 3px solid #0056ff; margin-bottom: 10px;">
-                    <br><strong>{nombre}</strong><br><small style="color:#0056ff;">{cargo}</small>
+                st.markdown(f"""<div style="text-align: center; margin-bottom: 20px;">
+                    <img src="{img}" style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: none; margin-bottom: 10px;">
+                    <br><strong style="color:{text_color};">{nombre}</strong><br><small style="color:#0056ff;">{cargo}</small>
                 </div>""", unsafe_allow_html=True)
 
 st.divider()
