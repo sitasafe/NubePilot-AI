@@ -316,7 +316,7 @@ with tabs[3]:
     st.markdown(f"### {t_act['equipo_tit']}")
     equipo = [
         ("Willan Álvarez.", "Lead Architect", "https://i.imgur.com/CSH9Af7.jpeg"),
-        ("Dalia R.", "Product Manager", "https://i.postimg.cc/44p8vX5k/dalia.jpg"), # Foto actualizada
+        ("Dalia R.", "Product Manager", "https://i.imgur.com/4O2BGL8.jpeg"), # Foto actualizada
         ("Montserrat G.", "Strategy", "https://cdn-icons-png.flaticon.com/512/6997/6997674.png"),
         ("Jiram Cabrera", "Organización", "https://i.imgur.com/eamMDmE.jpeg"),
         ("Carlos Andrés A.", "Liderazgo", "https://cdn-icons-png.flaticon.com/512/2354/2354573.png"),
@@ -335,3 +335,4 @@ with tabs[3]:
 
 st.divider()
 st.caption("🌊 Flowmerce | Hackathon UTEL 2026 | Equipo 3")
+
