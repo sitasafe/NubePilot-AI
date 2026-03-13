@@ -12,7 +12,7 @@ st.set_page_config(page_title="Flowmerce - Liquidez Inteligente", page_icon="�
 CLIENT_ID = "27483"
 CLIENT_SECRET = "d45072c95b889632ad3040bfd1dd951d981e0c38ff25877a"
 
-# --- 3. DICCIONARIO MULTILINGÜE COMPLETO ---
+# --- 3. DICCIONARIO MULTILINGÜE ---
 textos = {
     "Español": {
         "sub": "Donde los datos se convierten en ventas",
@@ -155,16 +155,16 @@ with st.sidebar:
                 st.session_state.token_session = "demo"
                 st.info("Modo Demo ✅")
 
-# --- 7. LÓGICA DINÁMICA DE CSS (Contraste y Lectura) ---
-bg_overlay = "rgba(255, 255, 255, 0.7)" if not alto_contraste else "rgba(0, 0, 0, 0.9)"
-card_bg = "rgba(255, 255, 255, 0.9)" if not alto_contraste else "#FFFFFF"
+# --- 7. LÓGICA DINÁMICA DE CSS (CORREGIDO CENTRADO Y BORDES) ---
+bg_overlay = "rgba(255, 255, 255, 0.4)" if not alto_contraste else "rgba(0, 0, 0, 0.85)"
+card_bg = "rgba(255, 255, 255, 0.8)" if not alto_contraste else "#FFFFFF"
 text_color = "#1E1E1E" if not alto_contraste else "#000000"
 font_size = "1.2rem" if lectura_facil else "1rem"
 title_size = "5rem" if lectura_facil else "4rem"
 
 st.markdown(f"""
 <style>
-    /* APLICACIÓN DE ESTILOS GLOBALES */
+    /* ESTILOS GLOBALES */
     html, body, [class*="st-"] {{
         font-size: {font_size} !important;
         { 'font-family: Arial, sans-serif !important;' if lectura_facil else '' }
@@ -181,30 +181,45 @@ st.markdown(f"""
         background: linear-gradient(90deg, #0056ff, #00c6ff, #6200ea, #0056ff);
         background-size: 300% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         font-size: {title_size} !important; font-weight: 800; animation: gradient-move 4s ease infinite; 
-        text-shadow: 2px 2px 10px rgba(255,255,255,0.5);
     }}
     
-    /* TARJETAS Y TABLAS - BORDES ELIMINADOS */
-    div[data-testid="stMetric"], .stTable, .team-card-large, .stTabs, div[data-testid="stExpander"] {{
-        background-color: {card_bg} !important;
-        backdrop-filter: blur(10px);
-        border-radius: 15px !important;
-        border: none !important; /* LÍNEA AZUL QUITADA */
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
-        color: {text_color} !important;
+    /* TARJETAS Y CONTENEDORES (SIN BORDES Y CON PADDING) */
+    div[data-testid="stVerticalBlock"] > div > div[data-testid="stVerticalBlock"] {{
+        padding: 20px !important;
     }}
 
-    /* AJUSTE DE TEXTO EN TABLAS */
-    .stTable td, .stTable th, .stTable p {{
-        color: {text_color} !important;
-        font-size: {font_size} !important;
+    /* Ajuste para que el contenido de los tabs no se pegue */
+    div[data-testid="stTabs"] {{
+        background-color: {card_bg} !important;
+        padding: 2rem !important;
+        border-radius: 15px !important;
+        border: none !important;
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1) !important;
+    }}
+
+    /* ELIMINACIÓN DE LÍNEAS AZULES EN TABLAS Y MÉTRICAS */
+    .stTable, div[data-testid="stMetric"], .team-card-large, div[data-testid="stExpander"] {{
+        background-color: rgba(255, 255, 255, 0.5) !important;
+        border-radius: 15px !important;
+        border: none !important;
+        padding: 15px !important;
+    }}
+
+    /* CENTRADO DE TEXTO DENTRO DE LAS TABLAS */
+    .stTable th {{
+        text-align: center !important;
+        background-color: transparent !important;
+    }}
+    
+    .stTable td {{
+        text-align: center !important;
+        vertical-align: middle !important;
     }}
 
     div.stButton > button {{
         background: #0056ff !important;
         color: white !important;
         border: none !important;
-        font-size: {font_size} !important;
     }}
 
     .team-card-large strong {{ color: #0056ff !important; }}
@@ -224,7 +239,7 @@ st.markdown('<h1 class="main-title">🌊 Flowmerce</h1>', unsafe_allow_html=True
 
 c_enc1, c_enc2 = st.columns([0.8, 0.2])
 with c_enc1: 
-    st.markdown(f"<div style='background:{card_bg}; padding:10px; border-radius:10px; display:inline-block; color:{text_color}; border:none;'><strong>✨ {t_act['sub']}</strong></div>", unsafe_allow_html=True)
+    st.markdown(f"<div style='background:{card_bg}; padding:10px 20px; border-radius:10px; display:inline-block; color:{text_color}; border:none;'><strong>✨ {t_act['sub']}</strong></div>", unsafe_allow_html=True)
 
 with c_enc2: 
     audio_data = mic_recorder(start_prompt="🎤", stop_prompt="🛑", key='recorder')
@@ -257,8 +272,8 @@ with tabs[2]:
     with st.expander(t_act["sim_tit"], expanded=True):
         sim_inv = st.number_input(t_act["sim_inv"], value=50000)
         c_s1, c_s2 = st.columns(2)
-        with c_s1: st.markdown(f'<div style="background: linear-gradient(135deg, #0056ff 0%, #6200ea 100%); color: white; padding: 20px; border-radius: 15px;"><small>{t_act["sim_proj"]}</small><h3>${sim_inv * (f_demanda * 1.8):,.0f} MXN</h3></div>', unsafe_allow_html=True)
-        with c_s2: st.markdown(f'<div style="background: linear-gradient(135deg, #0056ff 0%, #6200ea 100%); color: white; padding: 20px; border-radius: 15px;"><small>{t_act["sim_rec"]}</small><h3>{30/f_demanda:.1f} {t_act["sim_dias"]}</h3></div>', unsafe_allow_html=True)
+        with c_s1: st.markdown(f'<div style="background: linear-gradient(135deg, #0056ff 0%, #6200ea 100%); color: white; padding: 20px; border-radius: 15px; text-align: center;"><small>{t_act["sim_proj"]}</small><h3>${sim_inv * (f_demanda * 1.8):,.0f} MXN</h3></div>', unsafe_allow_html=True)
+        with c_s2: st.markdown(f'<div style="background: linear-gradient(135deg, #0056ff 0%, #6200ea 100%); color: white; padding: 20px; border-radius: 15px; text-align: center;"><small>{t_act["sim_rec"]}</small><h3>{30/f_demanda:.1f} {t_act["sim_dias"]}</h3></div>', unsafe_allow_html=True)
     
     st.write("---")
     def determinar_accion(row):
@@ -266,6 +281,7 @@ with tabs[2]:
         if row["Autonomia"] > 60: return "🔥 LIQUIDAR"
         return "✅ ESTABLE"
     df["Accion"] = df.apply(determinar_accion, axis=1)
+    # Tabla centrada
     st.table(df[["Producto", "Stock", "Accion"]])
     
     col_b1, col_b2 = st.columns(2)
@@ -293,8 +309,7 @@ with tabs[3]:
         cols = st.columns(4)
         for j, (nombre, cargo, img) in enumerate(equipo[i:i+4]):
             with cols[j]:
-                # También se quitó el borde azul de la tarjeta del equipo
-                st.markdown(f"""<div class="team-card-large">
+                st.markdown(f"""<div class="team-card-large" style="text-align: center;">
                     <img src="{img}" style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: none; margin-bottom: 10px;">
                     <br><strong>{nombre}</strong><br><small style="color:#0056ff;">{cargo}</small>
                 </div>""", unsafe_allow_html=True)
