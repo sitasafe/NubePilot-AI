@@ -15,7 +15,7 @@ CLIENT_SECRET = "d45072c95b889632ad3040bfd1dd951d981e0c38ff25877a"
 # --- 3. DICCIONARIO MULTILINGÜE ---
 textos = {
     "Español": {
-        "sub": "Tu Copiloto Estratégico para convertir Inventario en Flujo de Efectivo",
+        "sub": "Donde los datos se convierten en ventas",
         "tab1": "📊 Monitor de Liquidez & ROI", "tab2": "🧠 Estrategia IA", "tab3": "👥 Equipo",
         "atrapado": "Capital Atrapado", "riesgo": "Ventas en Riesgo", "salud": "Salud de Caja"
     },
@@ -193,3 +193,4 @@ with tab3:
 
 st.divider()
 st.caption("🌊 Flowmerce IA | Hackathon UTEL 2026 | Equipo 3")
+
