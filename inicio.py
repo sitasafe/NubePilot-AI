@@ -6,120 +6,132 @@ import time
 # --- CONFIGURACIÓN DE PÁGINA ---
 st.set_page_config(page_title="Flowmerce IA - Liquidez Estratégica", page_icon="🌊", layout="wide")
 
-# --- LÓGICA DE NEGOCIO (EL MOTOR) ---
-def simular_tienda(impacto_ventas, retraso_logistico):
-    # Datos base simulando la API de Tiendanube
-    productos = ["Tenis Runner Pro", "Gorra Urban Blue", "Calcetines High", "Sudadera Lino"]
-    stock_inicial = [5, 80, 25, 3]
-    ventas_historicas = [4.2, 0.5, 1.5, 3.8] # Ventas promedio por día
-    costo_compra = [1200, 300, 150, 850]
+# --- LÓGICA DE NEGOCIO DISRUPTIVA (EL MOTOR DE PREDICCIÓN) ---
+def procesar_datos_tienda(impulso_ventas, retraso_logistico):
+    # Simulamos la data de Tiendanube
+    data = {
+        "Producto": ["Paleta Aurora Glow", "Labial Mate #LM33", "Sérum Hidratante", "Base Perfect Skin"],
+        "Stock": [120, 5, 45, 2],
+        "Ventas_Promedio_Dia": [0.5, 4.2, 1.2, 3.5],
+        "Costo_Unitario": [450, 180, 600, 550],
+        "Lead_Time_Std": [5, 5, 7, 5]
+    }
+    df = pd.DataFrame(data)
     
-    # Aplicamos el impacto del simulador
-    ventas_reales = [v * impacto_ventas for v in ventas_historicas]
-    dias_autonomia = [s / v if v > 0 else 99 for s, v in zip(stock_inicial, ventas_reales)]
+    # 1. Ajuste por el Simulador de Escenarios
+    df["Ventas_Reales"] = df["Ventas_Promedio_Dia"] * impulso_ventas
+    df["Lead_Time_Total"] = df["Lead_Time_Std"] + retraso_logistico
     
-    df = pd.DataFrame({
-        "Producto": productos,
-        "Stock": stock_inicial,
-        "Ventas/Día": ventas_reales,
-        "Días Autonomía": dias_autonomia,
-        "Costo": costo_compra
-    })
+    # 2. Cálculos de Inteligencia Financiera
+    df["Dias_Autonomia"] = df["Stock"] / df["Ventas_Reales"]
+    df["Capital_Inmovilizado"] = np.where(df["Dias_Autonomia"] > 60, df["Stock"] * df["Costo_Unitario"], 0)
+    
+    # 3. Predicción de Quiebre (Stockout)
+    df["Riesgo_Quiebre"] = df["Dias_Autonomia"] < df["Lead_Time_Total"]
     return df
 
-# --- INTERFAZ Y ESTILOS ---
+# --- ESTILOS CSS PROFESIONALES ---
 st.markdown("""
 <style>
-    .main-title { background: linear-gradient(90deg, #0052D4, #4364F7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 3.5rem; font-weight: 800; text-align: center; }
+    .main-title { background: linear-gradient(90deg, #1A237E, #0052D4, #4364F7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 3.5rem; font-weight: 800; text-align: center; }
     .stMetric { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 5px solid #0052D4; }
-    .alert-box { padding: 15px; border-radius: 10px; margin-bottom: 10px; font-weight: 600; }
-    .critical { background: #ffebee; color: #c62828; border: 1px solid #ef5350; }
-    .opportunity { background: #e8f5e9; color: #2e7d32; border: 1px solid #66bb6a; }
+    .status-card { padding: 20px; border-radius: 15px; margin: 10px 0; border: 1px solid #e0e0e0; }
+    .critical-alert { background: #FFF5F5; border-left: 5px solid #E53935; color: #B71C1C; }
+    .opportunity-alert { background: #F0FBF0; border-left: 5px solid #43A047; color: #1B5E20; }
+    .pitch-box { background: #F8F9FA; padding: 25px; border-radius: 20px; border: 1px dashed #0052D4; }
 </style>
 """, unsafe_allow_html=True)
 
-# --- SIDEBAR (LOS CONTROLES) ---
+# --- SIDEBAR: SIMULADOR DE ESCENARIOS ---
 with st.sidebar:
     st.image("https://imgur.com/V1m4Dgk.jpeg")
-    st.header("🎮 Simulador de Negocio")
-    st.write("Ajusta las variables para ver cómo reacciona la IA de Flowmerce.")
-    impulso = st.slider("Impulso de Demanda (Hot Sale)", 0.5, 3.0, 1.0)
-    retraso = st.slider("Retraso Proveedor (Días)", 0, 30, 5)
+    st.header("🎮 Simulador Estratégico")
+    st.info("Ajusta las variables externas para ver cómo Flowmerce protege tu liquidez.")
+    
+    f_ventas = st.slider("Impulso de Demanda (ej. Hot Sale)", 0.5, 4.0, 1.0, help="Simula un aumento drástico en ventas")
+    f_logistica = st.slider("Retraso de Proveedores (Días)", 0, 20, 0, help="Simula retrasos en aduanas o logística")
     
     st.divider()
-    if st.button("🔄 Sincronizar Tiendanube"):
-        with st.status("Analizando historial de ventas..."):
+    if st.button("🔄 Sincronizar Tiendanube (LIVE)"):
+        with st.status("Conectando con API de Tiendanube..."):
             time.sleep(1.5)
-            st.success("¡Datos actualizados!")
+            st.success("Inventario Sincronizado")
 
-# --- CÁLCULOS DINÁMICOS ---
-df_actual = simular_tienda(impulso, retraso)
-capital_atrapado = df_actual[df_actual["Días Autonomía"] > 60].apply(lambda x: x["Stock"] * x["Costo"], axis=1).sum()
-ventas_perdidas = df_actual[df_actual["Días Autonomía"] < retraso].apply(lambda x: (retraso - x["Días Autonomía"]) * x["Ventas/Día"] * x["Costo"] * 1.5, axis=1).sum()
+# --- EJECUCIÓN DEL MOTOR ---
+df_res = procesar_datos_tienda(f_ventas, f_logistica)
+dinero_enterrado = df_res["Capital_Inmovilizado"].sum()
+ventas_en_riesgo = df_res[df_res["Riesgo_Quiebre"]].apply(lambda x: x["Ventas_Reales"] * x["Costo_Unitario"] * 1.5, axis=1).sum()
 
 # --- INTERFAZ PRINCIPAL ---
 st.markdown('<h1 class="main-title">🌊 Flowmerce</h1>', unsafe_allow_html=True)
-st.markdown("<p style='text-align: center;'><b>De inventario estancado a flujo de efectivo inteligente.</b></p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; font-size: 1.2rem;'><b>Inteligencia Financiera para el Inventario</b></p>", unsafe_allow_html=True)
 
-tab1, tab2, tab3, tab4 = st.tabs(["📊 Dashboard de Liquidez", "🤖 Estrategia de IA", "🚀 Pitch & Valor", "👥 Equipo"])
+tab1, tab2, tab3, tab4 = st.tabs(["📊 Diagnóstico de Capital", "🤖 Predicción IA", "🚀 El Pitch", "👥 Equipo"])
 
 with tab1:
     col1, col2, col3 = st.columns(3)
-    col1.metric("Capital Atrapado", f"${capital_atrapado:,.0f} MXN", "Dinero durmiendo", delta_color="inverse")
-    col2.metric("Riesgo Quiebre Stock", f"${ventas_perdidas:,.0f} MXN", "Ventas en riesgo", delta_color="inverse")
-    col3.metric("Eficiencia de Caja", f"{max(0, 100 - (retraso*2))}%", "Salud financiera")
+    col1.metric("Dinero 'Enterrado'", f"${dinero_enterrado:,.0f} MXN", "Capital Inmovilizado", delta_color="inverse")
+    col2.metric("Ventas en Riesgo", f"${ventas_en_riesgo:,.0f} MXN", "Por quiebre de stock", delta_color="inverse")
+    col3.metric("Eficiencia de Caja", f"{max(0, 100 - (f_logistica*3))}%", "Salud operativa")
 
     st.write("---")
-    st.subheader("📈 Proyección de Capital (Próximos 30 días)")
-    # El gráfico cambia de verdad según el slider
-    c1, c2 = st.columns([3, 1])
+    st.subheader("⚠️ Alertas de Acción Inmediata")
+    
+    c1, c2 = st.columns(2)
     with c1:
-        chart_data = pd.DataFrame({
-            "Flujo Proyectado": np.linspace(50000, 150000, 30) - (retraso * 1000) + (impulso * 5000)
-        })
-        st.area_chart(chart_data)
+        # Alerta de Stock Estancado (Basado en tu imagen de ejemplo)
+        prod_lento = df_res[df_res["Dias_Autonomia"] > 60].iloc[0]
+        st.markdown(f"""
+        <div class="status-card critical-alert">
+            <h4>🚨 Alerta de Stock Estancado</h4>
+            <p>El producto <b>{prod_lento['Producto']}</b> no se ha movido significativamente. 
+            Tienes <b>{prod_lento['Stock']} unidades</b> bloqueando <b>${prod_lento['Capital_Inmovilizado']:,.0f}</b>.</p>
+            <button style="background:#E53935; color:white; border:none; padding:10px; border-radius:5px;">Activar Venta Flash 25% OFF</button>
+        </div>
+        """, unsafe_allow_html=True)
+        
     with c2:
-        st.markdown("#### 💡 Alerta de IA")
-        if capital_atrapado > 0:
-            st.markdown(f'<div class="alert-box critical">🚨 Tienes ${capital_atrapado:,.0f} inmovilizados en productos sin rotación.</div>', unsafe_allow_html=True)
-        if ventas_perdidas > 0:
-            st.markdown(f'<div class="alert-box critical">⚠️ Perderás ${ventas_perdidas:,.0f} si no repones stock en 48hs.</div>', unsafe_allow_html=True)
+        # Sugerencia de Compra (Basado en la Solución)
+        prod_quiebre = df_res[df_res["Riesgo_Quiebre"]].iloc[0]
+        st.markdown(f"""
+        <div class="status-card opportunity-alert">
+            <h4>💡 Sugerencia de Compra Inteligente</h4>
+            <p><b>{prod_quiebre['Producto']}</b> se agotará en {prod_quiebre['Dias_Autonomia']:.1f} días. 
+            Con el retraso logístico actual, debes pedir hoy mismo <b>{int(prod_quiebre['Ventas_Reales']*15)} unidades</b>.</p>
+            <button style="background:#43A047; color:white; border:none; padding:10px; border-radius:5px;">Generar Orden de Compra</button>
+        </div>
+        """, unsafe_allow_html=True)
 
 with tab2:
-    st.subheader("⚡ Motor de Órdenes Automáticas")
+    st.subheader("🤖 Del 'Registro' a la 'Predicción'")
+    st.write("NubeFlow no solo cuenta cajas, predice el flujo de efectivo.")
     
-    # Lógica de decisión dinámica
-    def recomendar(fila, r):
-        if fila["Días Autonomía"] < r: return "🚨 COMPRA URGENTE"
-        if fila["Días Autonomía"] > 90: return "🔥 LIQUIDAR (CUPÓN)"
-        return "✅ MANTENER"
-
-    df_view = df_actual.copy()
-    df_view["Decisión Flowmerce"] = df_view.apply(lambda x: recomendar(x, retraso), axis=1)
+    # Tabla Comparativa de Decisiones
+    df_comparativo = df_res.copy()
+    df_comparativo["Decisión Humana (Intuición)"] = "Esperar a que se agote"
+    df_comparativo["Decisión Flowmerce (Datos)"] = df_comparativo.apply(
+        lambda x: "COMPRAR AHORA" if x["Riesgo_Quiebre"] else ("LIQUIDAR" if x["Dias_Autonomia"] > 60 else "MANTENER"), axis=1
+    )
     
-    st.table(df_view[["Producto", "Stock", "Días Autonomía", "Decisión Flowmerce"]])
+    st.dataframe(df_comparativo[["Producto", "Stock", "Dias_Autonomia", "Decisión Flowmerce (Datos)"]], use_container_width=True)
     
-    if st.button("🚀 Ejecutar Decisiones en Tiendanube"):
-        with st.spinner("Sincronizando con proveedores..."):
-            time.sleep(2)
-            st.balloons()
-            st.success("Órdenes de compra enviadas. Campañas de liquidación creadas.")
+    st.area_chart(pd.DataFrame({"Flujo Proyectado": np.linspace(50, 150, 30) + (f_ventas*10) - (f_logistica*5)}))
 
 with tab3:
-    st.markdown("### ¿Por qué Flowmerce es disruptivo?")
-    col_a, col_b = st.columns(2)
-    with col_a:
-        st.write("**❌ El Pasado (Administrativo):**")
-        st.info("Hojas de Excel, decisiones por intuición, stock muerto, capital atrapado.")
-    with col_b:
-        st.write("**✅ El Futuro (Estratégico):**")
-        st.success("Predicción de demanda, liberación de liquidez, decisiones basadas en datos.")
+    st.markdown('<div class="pitch-box">', unsafe_allow_html=True)
+    st.subheader("🎯 Nuestro Diferencial")
+    st.write("""
+    Mientras otros se enfocan en vender más (Front-end), **Flowmerce se enfoca en que no quiebres (Back-end Financiero).**
     
-    st.divider()
-    st.markdown("> **“No vendemos software de inventario. Vendemos decisiones inteligentes que protegen el capital de las tiendas.”**")
+    1. **Eliminamos el Error Humano:** Reducimos 5 horas de Excel a 5 minutos de decisiones.
+    2. **Maximizamos Liquidez:** Dinero que no está en stock muerto, es dinero para marketing.
+    3. **Predecimos el Futuro:** No te decimos qué pasó, te decimos qué va a pasar.
+    """)
+    st.info("✨ **Frase de Cierre:** No vendemos software de inventario. Vendemos decisiones inteligentes que protegen el capital de las tiendas.")
+    st.markdown('</div>', unsafe_allow_html=True)
 
 with tab4:
-    # Mostramos al equipo con un diseño limpio
+    st.subheader("👥 Equipo Flowmerce")
     equipo = [
         ("Willan Álvarez.", "Lead Architect"), ("Dalia R.", "Product Manager"),
         ("Montserrat G.", "Strategy"), ("Jiram Cabrera", "Organización"),
@@ -128,7 +140,7 @@ with tab4:
     ]
     cols = st.columns(4)
     for i, (nombre, cargo) in enumerate(equipo):
-        cols[i%4].info(f"**{nombre}**\n\n{cargo}")
+        cols[i%4].markdown(f"**{nombre}**\n\n{cargo}")
 
 st.divider()
-st.caption("Flowmerce Live Demo | Hackathon UTEL 2026 | Equipo 3")
+st.caption("Flowmerce v2.0 | 'De datos estáticos a flujo de efectivo' | Hackathon 2026")
