@@ -34,23 +34,32 @@ textos = {
 # --- 4. FUNCIONES DE API ---
 def obtener_token_real(code):
     url = "https://www.tiendanube.com/apps/authorize/token"
-    payload = {"client_id": int(CLIENT_ID), "client_secret": CLIENT_SECRET, "grant_type": "authorization_code", "code": code.strip()}
+    payload = {
+        "client_id": int(CLIENT_ID),
+        "client_secret": CLIENT_SECRET,
+        "grant_type": "authorization_code",
+        "code": code.strip()
+    }
     try:
         response = requests.post(url, json=payload, timeout=10)
         return response.json().get("access_token") if response.status_code == 200 else None
-    except: return None
+    except requests.RequestException:
+        return None
 
-# --- 5. GESTIÓN DE MEMORIA ---
+# --- 5. GESTIÓN DE MEMORIA (SESSION STATE) ---
 if 'db_inventario' not in st.session_state:
     st.session_state.db_inventario = pd.DataFrame({
         "Producto": ["Tenis Pro Runner", "Gorra Blue Urban", "Calcetín Sport", "Sudadera Lino"],
-        "Stock": [15, 95, 45, 4], "Ventas_30d": [45, 10, 30, 42], "Costo": [1200, 350, 150, 890]
+        "Stock": [15, 95, 45, 4],
+        "Ventas_30d": [45, 10, 30, 42],
+        "Costo": [1200, 350, 150, 890]
     })
 
 # --- 6. BARRA LATERAL ---
 with st.sidebar:
     st.image("https://imgur.com/YrVO3ZF.jpeg", use_container_width=True)
     st.write("---")
+
     with st.expander("🌐 Accesibilidad e Idioma", expanded=True):
         idioma = st.selectbox("Idioma Interfaz", ["Español", "Português", "English"])
         lectura_facil = st.toggle("Modo Lectura Fácil")
@@ -61,63 +70,55 @@ with st.sidebar:
     dias_entrega = st.slider("Lead Time Proveedor (Días)", 1, 30, 7)
     
     with st.expander("🔑 Conexión Tiendanube", expanded=True):
-        st.link_button("1. Autorizar App", f"https://www.tiendanube.com/apps/authorize?client_id={CLIENT_ID}&scope=read_products,write_products")
+        st.link_button("1. Autorizar App", f"https://www.tiendanube.com/apps/authorize?client_id={CLIENT_ID}&scope=read_orders,write_orders,read_products,write_products")
         temp_code = st.text_input("2. Pega el Code:")
+        
         if st.button("3. Vincular Tienda"):
             token = obtener_token_real(temp_code)
-            if token: st.success("¡Conexión Exitosa! ✅")
+            if token:
+                st.session_state.token_tienda = token
+                st.success("¡Conexión Establecida! ✅")
+            else:
+                st.error("Error en vinculación.")
 
-# --- 7. ESTILOS CSS (RECUPERANDO EFECTOS BLOQUES E IMPULSA IA) ---
+# --- 7. ESTILOS CSS ---
 extra_styles = ""
-if lectura_facil: 
-    extra_styles += "html, body, [class*='st-'] { font-size: 1.5rem !important; line-height: 2 !important; }"
-if alto_contraste: 
-    extra_styles += """
-    .stApp { background: #000000 !important; color: #FFFFFF !important; }
-    .problem-box, .team-card-large { background: #222222 !important; border: 2px solid white !important; }
-    h1, h2, h3, p, span { color: #FFFFFF !important; }
-    """
+if lectura_facil: extra_styles += "html, body, p, div { font-size: 1.4rem !important; line-height: 1.8 !important; }"
+if alto_contraste: extra_styles += ".stApp { background: #000 !important; color: #fff !important; } .team-card-large { border: 2px solid white !important; }"
 
 st.markdown(f"""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap');
-    
-    .stApp {{ font-family: 'Inter', sans-serif; }}
-
+    {extra_styles}
     .main-title {{
         background: linear-gradient(90deg, #0056ff, #00c6ff, #6200ea, #0056ff);
-        background-size: 300% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        font-size: 4.5rem !important; font-weight: 800; animation: gradient-move 4s ease infinite;
+        background-size: 300% auto;
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        font-size: 4rem !important; font-weight: 800; 
+        animation: gradient-move 4s ease infinite; 
+        text-align: left;
+        margin-bottom: 5px;
     }}
     @keyframes gradient-move {{ 0% {{background-position: 0% 50%;}} 50% {{background-position: 100% 50%;}} 100% {{background-position: 0% 50%;}} }}
-
-    /* ESTILO DE BLOQUES RECUPERADO */
-    .problem-box {{
-        background-color: white; padding: 25px; border-radius: 20px; border-left: 8px solid #0056ff;
-        box-shadow: 0px 10px 25px rgba(0,0,0,0.05); height: 100%; transition: all 0.3s ease; color: #1a1c2e;
-    }}
-    .problem-box:hover {{ background: #fdfdff; border-left: 8px solid #00c6ff; transform: translateX(10px); }}
-
-    /* TARJETAS DE EQUIPO GRANDES RECUPERADAS */
+    
     .team-card-large {{
-        text-align: center; padding: 35px; border-radius: 30px; background: rgba(255, 255, 255, 0.8);
-        backdrop-filter: blur(10px); border: 1px solid rgba(0, 86, 255, 0.1);
-        box-shadow: 0px 20px 40px rgba(0,0,0,0.05); margin-bottom: 25px; transition: all 0.4s ease;
+        text-align: center; padding: 25px; border-radius: 25px;
+        background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(0, 86, 255, 0.2);
+        transition: all 0.4s ease; margin-bottom: 20px;
     }}
-    .team-card-large:hover {{ transform: translateY(-15px) scale(1.02); border: 1px solid #0056ff; box-shadow: 0px 30px 60px rgba(0, 86, 255, 0.15); }}
+    .team-card-large:hover {{ transform: translateY(-10px); border-color: #0056ff; box-shadow: 0px 15px 30px rgba(0, 86, 255, 0.2); }}
+    .stMetric {{ background: rgba(0, 86, 255, 0.05); padding: 20px; border-radius: 15px; border-left: 5px solid #0056ff; }}
 
-    /* EFECTO NUBES */
+    /* EFECTO DE NUBES SUBIENDO */
     @keyframes cloud-up {{
         0% {{ transform: translateY(100vh); opacity: 0; }}
-        10% {{ opacity: 0.8; }} 90% {{ opacity: 0.8; }}
+        10% {{ opacity: 0.8; }}
+        90% {{ opacity: 0.8; }}
         100% {{ transform: translateY(-100vh); opacity: 0; }}
     }}
     .cloud-ascend {{
         position: fixed; bottom: 0; font-size: 5rem; z-index: 9999;
         pointer-events: none; animation: cloud-up 3s linear infinite;
     }}
-    
-    {extra_styles}
 </style>
 """, unsafe_allow_html=True)
 
@@ -125,58 +126,74 @@ st.markdown(f"""
 t_act = textos[idioma]
 df = st.session_state.db_inventario.copy()
 df["V_Diaria"] = (df["Ventas_30d"] / 30) * f_demanda
-df["Autonomia"] = np.where(df["V_Diaria"] > 0, df["Stock"] / df["V_Diaria"], 999)
-atrapado_val = df[df["Autonomia"] > 60][["Stock", "Costo"]].product(axis=1).sum()
-riesgo_val = df[df["Autonomia"] < dias_entrega][["V_Diaria", "Costo"]].product(axis=1).sum() * 1.5
+df["Autonomia"] = np.where(df["V_Diaria"] > 0, df["Stock"] / df["V_Diaria"], np.inf)
+
+filtro_atrapado = df["Autonomia"] > 60
+atrapado_val = (df.loc[filtro_atrapado, "Stock"] * df.loc[filtro_atrapado, "Costo"]).sum()
+
+filtro_riesgo = df["Autonomia"] < dias_entrega
+riesgo_val = (df.loc[filtro_riesgo, "V_Diaria"] * df.loc[filtro_riesgo, "Costo"] * 1.5).sum()
 
 # --- 9. CUERPO DE LA APP ---
 st.markdown('<h1 class="main-title">🌊 Flowmerce</h1>', unsafe_allow_html=True)
-c_h1, c_h2 = st.columns([0.8, 0.2])
-with c_h1: st.subheader(f"✨ {t_act['sub']}")
-with c_h2: mic_recorder(start_prompt="🎤 Voz", stop_prompt="🛑", key='rec')
+
+c_enc1, c_enc2 = st.columns([0.8, 0.2])
+with c_enc1:
+    st.markdown(f"**✨ {t_act['sub']}**")
+with c_enc2:
+    mic_recorder(start_prompt="🎤 Voz", stop_prompt="🛑", key='rec')
 
 tab0, tab1, tab2, tab3 = st.tabs([t_act["tab0"], t_act["tab1"], t_act["tab2"], t_act["tab3"]])
 
 with tab0:
-    st.markdown("### 🎯 Nuestra Visión Estratégica")
+    st.markdown("## 🎯 ¿Qué nos diferencia?")
+    col_v1, col_v2 = st.columns([0.6, 0.4])
+    with col_v1:
+        st.write("""
+        Hoy, miles de dueños de marcas pasan **5 horas por semana** frente a un Excel, intentando adivinar el futuro. 
+        Juegan a la ruleta con su inventario: o compran de más y entierran su capital, o compran de menos y pierden ventas.
+        
+        **Tu negocio es un ritmo, no una adivinanza.** Flowmerce transforma datos en decisiones automáticas. 
+        Analizamos la velocidad real de venta para decirte **qué, cuánto y cuándo comprar**.
+        """)
+        st.info("💡 **Dato:** Reducimos una tarde entera de trabajo a solo 5 minutos de certeza.")
+    with col_v2:
+        st.markdown("""
+        ### 💎 Modelo de Negocio (SaaS)
+        - **Starter (Gratis):** Alertas básicas.
+        - **Growth ($20 USD):** Predicción IA.
+        - **Scale (Premium):** Simulación avanzada.
+        """)
+
+    st.divider()
+    st.markdown("### ⚙️ ¿Cómo funciona?")
     c1, c2, c3 = st.columns(3)
-    with c1:
-        st.markdown(f"""<div class="problem-box">
-            <h4 style="color:#0056ff;">📊 El Desafío</h4>
-            <p>Miles de marcas entierran capital en productos que no rotan, asfixiando su crecimiento financiero.</p>
-        </div>""", unsafe_allow_html=True)
-    with c2:
-        st.markdown(f"""<div class="problem-box">
-            <h4 style="color:#0056ff;">🤖 Inteligencia</h4>
-            <p>Usamos IA para predecir el ritmo de venta y sincronizar tu stock con la demanda real del mercado.</p>
-        </div>""", unsafe_allow_html=True)
-    with c3:
-        st.markdown(f"""<div class="problem-box">
-            <h4 style="color:#0056ff;">💎 Modelo SaaS</h4>
-            <p>Desde alertas gratuitas hasta simulaciones avanzadas para escalar tu Tiendanube al siguiente nivel.</p>
-        </div>""", unsafe_allow_html=True)
+    c1.markdown("**1. Conexión Instantánea**\nInstalación desde Marketplace vía API V2.")
+    c2.markdown("**2. Análisis en Background**\nProcesamos órdenes mientras duermes.")
+    c3.markdown("**3. Tablero de Decisiones**\nLista de compras lista para ejecutar.")
 
 with tab1:
     col1, col2, col3 = st.columns(3)
     col1.metric(t_act["atrapado"], f"${float(atrapado_val):,.0f} MXN")
     col2.metric(t_act["riesgo"], f"${float(riesgo_val):,.0f} MXN", delta="¡Alerta!", delta_color="inverse")
-    col3.metric(t_act["salud"], f"{max(0, 100-int(riesgo_val/1000))}%")
+    col3.metric(t_act["salud"], f"{max(0, 100-(dias_entrega*2))}%")
+
     st.write("---")
-    st.subheader("📈 Proyección de Capital")
+    st.subheader("📈 Proyección de Capital Invertido")
     df["Capital_Invertido"] = df["Stock"] * df["Costo"]
     st.area_chart(df.set_index("Producto")["Capital_Invertido"])
 
 with tab2:
-    st.subheader("🤖 Recomendaciones IA")
+    st.subheader("🤖 Recomendaciones de Compra")
     def determinar_accion(row):
         if row["Autonomia"] < dias_entrega: return "🚨 REABASTECER"
         if row["Autonomia"] > 60: return "🔥 LIQUIDAR"
         return "✅ ESTABLE"
 
     df["Acción Sugerida"] = df.apply(determinar_accion, axis=1)
-    st.dataframe(df[["Producto", "Stock", "Autonomia", "Acción Sugerida"]], use_container_width=True)
+    st.table(df[["Producto", "Stock", "Autonomia", "Acción Sugerida"]])
     
-    if st.button("🚀 Sincronizar con Tiendanube (Nubes)"):
+    if st.button("🚀 Aplicar Cambios en Tiendanube"):
         cloud_placeholder = st.empty()
         with st.status("Subiendo datos a la nube...", expanded=True) as s:
             cloud_placeholder.markdown("""
@@ -184,16 +201,16 @@ with tab2:
                 <div class="cloud-ascend" style="left: 40%; animation-duration: 3s;">☁️</div>
                 <div class="cloud-ascend" style="left: 70%; animation-duration: 2s;">☁️</div>
             """, unsafe_allow_html=True)
-            time.sleep(3)
+            time.sleep(2.5)
             s.update(label="¡Sincronización Exitosa! ☁️", state="complete")
         cloud_placeholder.empty()
-        st.balloons()
+        st.success("¡Decisiones aplicadas con éxito!")
 
 with tab3:
     st.markdown("### 👥 Equipo Multidisciplinario (Equipo 3)")
     equipo = [
         ("Willan Álvarez.", "Lead Architect", "https://i.imgur.com/CSH9Af7.jpeg"),
-        ("Dalia R.", "Product Manager", "https://i.imgur.com/4O2B8L8.jpeg"),
+        ("Dalia R.", "Product Manager", "https://i.imgur.com/4O2BGL8.jpeg"),
         ("Montserrat G.", "Strategy", "https://cdn-icons-png.flaticon.com/512/6997/6997674.png"),
         ("Jiram Cabrera", "Organización", "https://i.imgur.com/eamMDmE.jpeg"),
         ("Carlos Andrés A.", "Liderazgo", "https://cdn-icons-png.flaticon.com/512/2354/2354573.png"),
@@ -207,10 +224,12 @@ with tab3:
             with cols[j]:
                 st.markdown(f"""
                 <div class="team-card-large">
-                    <img src="{img}" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 5px solid #0056ff; margin-bottom: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.1);">
-                    <br><strong style="font-size:1.2rem;">{nombre}</strong><br><small style="color:#0056ff; font-weight:bold;">{cargo}</small>
+                    <img src="{img}" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid #0056ff; margin-bottom: 10px;">
+                    <br><strong>{nombre}</strong><br><small style="color:#0056ff;">{cargo}</small>
                 </div>
                 """, unsafe_allow_html=True)
 
 st.divider()
 st.caption("🌊 Flowmerce | Hackathon UTEL 2026 | Equipo 3")
+
+
