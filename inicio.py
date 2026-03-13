@@ -156,7 +156,6 @@ with st.sidebar:
                 st.info("Modo Demo ✅")
 
 # --- 7. LÓGICA DINÁMICA DE CSS (Contraste y Lectura) ---
-# Definimos variables según los toggles
 bg_overlay = "rgba(255, 255, 255, 0.7)" if not alto_contraste else "rgba(0, 0, 0, 0.9)"
 card_bg = "rgba(255, 255, 255, 0.9)" if not alto_contraste else "#FFFFFF"
 text_color = "#1E1E1E" if not alto_contraste else "#000000"
@@ -185,13 +184,13 @@ st.markdown(f"""
         text-shadow: 2px 2px 10px rgba(255,255,255,0.5);
     }}
     
-    /* TARJETAS Y TABLAS */
+    /* TARJETAS Y TABLAS - BORDES ELIMINADOS */
     div[data-testid="stMetric"], .stTable, .team-card-large, .stTabs, div[data-testid="stExpander"] {{
         background-color: {card_bg} !important;
         backdrop-filter: blur(10px);
         border-radius: 15px !important;
-        border: 2px solid #0056ff !important;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
+        border: none !important; /* LÍNEA AZUL QUITADA */
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
         color: {text_color} !important;
     }}
 
@@ -204,6 +203,7 @@ st.markdown(f"""
     div.stButton > button {{
         background: #0056ff !important;
         color: white !important;
+        border: none !important;
         font-size: {font_size} !important;
     }}
 
@@ -224,7 +224,7 @@ st.markdown('<h1 class="main-title">🌊 Flowmerce</h1>', unsafe_allow_html=True
 
 c_enc1, c_enc2 = st.columns([0.8, 0.2])
 with c_enc1: 
-    st.markdown(f"<div style='background:{card_bg}; padding:10px; border-radius:10px; display:inline-block; color:{text_color}; border:1px solid #0056ff;'><strong>✨ {t_act['sub']}</strong></div>", unsafe_allow_html=True)
+    st.markdown(f"<div style='background:{card_bg}; padding:10px; border-radius:10px; display:inline-block; color:{text_color}; border:none;'><strong>✨ {t_act['sub']}</strong></div>", unsafe_allow_html=True)
 
 with c_enc2: 
     audio_data = mic_recorder(start_prompt="🎤", stop_prompt="🛑", key='recorder')
@@ -293,8 +293,9 @@ with tabs[3]:
         cols = st.columns(4)
         for j, (nombre, cargo, img) in enumerate(equipo[i:i+4]):
             with cols[j]:
+                # También se quitó el borde azul de la tarjeta del equipo
                 st.markdown(f"""<div class="team-card-large">
-                    <img src="{img}" style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 3px solid #0056ff; margin-bottom: 10px;">
+                    <img src="{img}" style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: none; margin-bottom: 10px;">
                     <br><strong>{nombre}</strong><br><small style="color:#0056ff;">{cargo}</small>
                 </div>""", unsafe_allow_html=True)
 
