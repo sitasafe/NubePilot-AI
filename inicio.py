@@ -161,20 +161,19 @@ text_color = "#1E1E1E" if not alto_contraste else "#000000"
 
 st.markdown(f"""
 <style>
-    /* 1. ANIMACIÓN DE GRADIENTE PARA EL TÍTULO */
     @keyframes gradient-move {{
         0% {{ background-position: 0% 50%; }}
         50% {{ background-position: 100% 50%; }}
         100% {{ background-position: 0% 50%; }}
     }}
 
-    /* --- EFECTO DE NUBES --- */
     @keyframes clouds-up {{
         0% {{ transform: translateY(100vh); opacity: 0; }}
         20% {{ opacity: 0.8; }}
         80% {{ opacity: 0.6; }}
         100% {{ transform: translateY(-100vh); opacity: 0; }}
     }}
+
     .cloud-effect {{
         position: fixed;
         font-size: 50px;
@@ -182,7 +181,6 @@ st.markdown(f"""
         pointer-events: none;
         animation: clouds-up 4s ease-in forwards;
     }}
-    /* ---------------------- */
 
     .stApp {{
         background: linear-gradient({bg_overlay}, {bg_overlay}), 
@@ -224,22 +222,12 @@ st.markdown(f"""
         border: none !important;
     }}
 
-    .stTable td, .stTable th {{
-        text-align: center !important;
-        vertical-align: middle !important;
-    }}
-
     div.stButton > button {{
         background: linear-gradient(90deg, #0056ff, #00c6ff) !important;
         color: white !important;
         border: none !important;
         border-radius: 10px !important;
         transition: 0.3s !important;
-    }}
-    
-    div.stButton > button:hover {{
-        filter: brightness(1.2);
-        box-shadow: 0 5px 15px rgba(0,198,255,0.4) !important;
     }}
 </style>
 """, unsafe_allow_html=True)
@@ -301,7 +289,6 @@ with tabs[2]:
     df["Accion"] = df.apply(determinar_accion, axis=1)
     st.table(df[["Producto", "Stock", "Accion"]])
     
-    # --- FUNCIÓN DE EFECTO DE NUBES ---
     def animar_nubes():
         cloud_placeholder = st.empty()
         cloud_placeholder.markdown("""
@@ -316,20 +303,20 @@ with tabs[2]:
     col_b1, col_b2 = st.columns(2)
     with col_b1:
         if st.button(t_act["btn_app"], use_container_width=True):
-            animar_nubes() # Solo se agrega esto
+            animar_nubes()
             st.success(t_act["sync_ok"])
     
     with col_b2:
         csv = df.to_csv(index=False).encode('utf-8')
         if st.download_button(label=t_act["btn_reporte"], data=csv, file_name='Reporte_Flowmerce.csv', mime='text/csv', use_container_width=True):
-            animar_nubes() # Solo se agrega esto
+            animar_nubes()
             st.toast(t_act["rep_exito"])
 
 with tabs[3]:
     st.markdown(f"### {t_act['equipo_tit']}")
     equipo = [
         ("Willan Álvarez.", "Lead Architect", "https://i.imgur.com/CSH9Af7.jpeg"),
-        ("Dalia R.", "Product Manager", "https://i.imgur.com/4O2B8L8.jpeg"),
+        ("Dalia R.", "Product Manager", "https://i.postimg.cc/44p8vX5k/dalia.jpg"), # Foto actualizada
         ("Montserrat G.", "Strategy", "https://cdn-icons-png.flaticon.com/512/6997/6997674.png"),
         ("Jiram Cabrera", "Organización", "https://i.imgur.com/eamMDmE.jpeg"),
         ("Carlos Andrés A.", "Liderazgo", "https://cdn-icons-png.flaticon.com/512/2354/2354573.png"),
@@ -342,7 +329,7 @@ with tabs[3]:
         for j, (nombre, cargo, img) in enumerate(equipo[i:i+4]):
             with cols[j]:
                 st.markdown(f"""<div class="team-card-large">
-                    <img src="{img}" style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: none; margin-bottom: 10px;">
+                    <img src="{img}" style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; margin-bottom: 10px;">
                     <br><strong>{nombre}</strong><br><small style="color:#0056ff;">{cargo}</small>
                 </div>""", unsafe_allow_html=True)
 
