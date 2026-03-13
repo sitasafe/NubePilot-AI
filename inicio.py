@@ -57,7 +57,7 @@ textos = {
         "sim_inv": "Investimento para Simular ($)",
         "sim_proj": "Vendas Projetadas",
         "sim_rec": "Recuperação em",
-        "sim_dias": "días",
+        "sim_dias": "dias",
         "btn_app": "🚀 Aplicar na Tiendanube",
         "btn_reporte": "📝 Gerar Relatório e Baixar",
         "sync": "Sincronizando...",
@@ -155,10 +155,11 @@ with st.sidebar:
                 st.session_state.token_session = "demo"
                 st.info("Modo Demo ✅")
 
-# --- 7. ESTILOS CON EFECTOS ESPECIALES ---
+# --- 7. ESTILOS CON EFECTOS ESPECIALES Y ANIMACIÓN DE NUBES ---
 bg_overlay = "rgba(255, 255, 255, 0.7)" if not alto_contraste else "rgba(0, 0, 0, 0.9)"
 text_color = "#1E1E1E" if not alto_contraste else "#000000"
 
+# 
 st.markdown(f"""
 <style>
     /* 1. ANIMACIÓN DE GRADIENTE PARA EL TÍTULO */
@@ -166,6 +167,14 @@ st.markdown(f"""
         0% {{ background-position: 0% 50%; }}
         50% {{ background-position: 100% 50%; }}
         100% {{ background-position: 0% 50%; }}
+    }}
+
+    /* 2. NUEVA ANIMACIÓN DE NUBES ASCENDENTES */
+    @keyframes cloud-up {{
+        0% {{ transform: translateY(100vh) scale(1); opacity: 0; }}
+        10% {{ opacity: 0.8; }}
+        80% {{ opacity: 0.5; }}
+        100% {{ transform: translateY(-100vh) scale(1.5); opacity: 0; }}
     }}
 
     .stApp {{
@@ -186,7 +195,7 @@ st.markdown(f"""
         margin-bottom: 0px;
     }}
     
-    /* 2. EFECTO DE ELEVACIÓN EN TABLAS Y TARJETAS */
+    /* EFECTO DE ELEVACIÓN EN TABLAS Y TARJETAS (MANTENIDO) */
     div[data-testid="stMetric"], .stTable, .team-card-large, div[data-testid="stExpander"] {{
         background-color: white !important;
         border-radius: 15px !important;
@@ -201,7 +210,7 @@ st.markdown(f"""
         box-shadow: 0 12px 30px rgba(0,86,255,0.15) !important;
     }}
 
-    /* 3. EFECTO EN LOS TABS (CONTENEDOR PRINCIPAL) */
+    /* EFECTO EN LOS TABS (MANTENIDO) */
     div[data-testid="stTabs"] {{
         background-color: rgba(255, 255, 255, 0.95) !important;
         padding: 30px !important;
@@ -210,13 +219,13 @@ st.markdown(f"""
         border: none !important;
     }}
 
-    /* 4. CENTRADO DE TEXTO EN TABLAS */
+    /* CENTRADO DE TEXTO EN TABLAS (MANTENIDO) */
     .stTable td, .stTable th {{
         text-align: center !important;
         vertical-align: middle !important;
     }}
 
-    /* 5. BOTÓN CON PULSO SUTIL */
+    /* BOTÓN CON PULSO SUTIL (MANTENIDO) */
     div.stButton > button {{
         background: linear-gradient(90deg, #0056ff, #00c6ff) !important;
         color: white !important;
@@ -229,6 +238,44 @@ st.markdown(f"""
         filter: brightness(1.2);
         box-shadow: 0 5px 15px rgba(0,198,255,0.4) !important;
     }}
+
+    /* ESTILOS PARA LAS NUBES ANIMADAS */
+    .cloud {{
+        position: fixed;
+        bottom: -150px; /* Empezar fuera de la pantalla */
+        background: white;
+        border-radius: 100px;
+        box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        animation: cloud-up 10s infinite linear;
+        opacity: 0;
+        z-index: 1000; /* Asegurar que estén por encima del fondo */
+        pointer-events: none; /* No interferir con los clics */
+    }}
+
+    .cloud:after, .cloud:before {{
+        content: '';
+        position: absolute;
+        background: white;
+        border-radius: 100px;
+    }}
+
+    /* Tamaños y posiciones de las nubes base */
+    .cloud-1 {{ width: 100px; height: 40px; left: 10%; animation-delay: 0s; }}
+    .cloud-1:after {{ width: 50px; height: 50px; top: -25px; left: 15px; }}
+    .cloud-1:before {{ width: 40px; height: 40px; top: -15px; left: 50px; }}
+
+    .cloud-2 {{ width: 150px; height: 60px; left: 30%; animation-delay: 2s; animation-duration: 12s; }}
+    .cloud-2:after {{ width: 70px; height: 70px; top: -35px; left: 25px; }}
+    .cloud-2:before {{ width: 60px; height: 60px; top: -25px; left: 70px; }}
+
+    .cloud-3 {{ width: 80px; height: 30px; left: 60%; animation-delay: 5s; animation-duration: 8s; }}
+    .cloud-3:after {{ width: 40px; height: 40px; top: -20px; left: 10px; }}
+    .cloud-3:before {{ width: 30px; height: 30px; top: -10px; left: 40px; }}
+
+    .cloud-4 {{ width: 120px; height: 50px; left: 80%; animation-delay: 7s; animation-duration: 11s; }}
+    .cloud-4:after {{ width: 60px; height: 60px; top: -30px; left: 20px; }}
+    .cloud-4:before {{ width: 50px; height: 50px; top: -20px; left: 60px; }}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -293,13 +340,47 @@ with tabs[2]:
     st.table(df[["Producto", "Stock", "Accion"]])
     
     col_b1, col_b2 = st.columns(2)
+    # Contenedor vacío para las nubes de Tiendanube
+    cloud_sync_placeholder = st.empty()
+    
     with col_b1:
         if st.button(t_act["btn_app"], use_container_width=True):
-            st.success(t_act["sync_ok"])
+            # Activar nubes
+            cloud_sync_placeholder.markdown("""
+                <div class="cloud cloud-1"></div>
+                <div class="cloud cloud-2"></div>
+                <div class="cloud cloud-3"></div>
+                <div class="cloud cloud-4"></div>
+            """, unsafe_allow_html=True)
+            
+            with st.status(t_act["sync"], expanded=True) as s:
+                # Simular proceso robusto existente
+                time.sleep(3) 
+                s.update(label=t_act["sync_ok"], state="complete")
+                
+            # Desactivar nubes después del proceso
+            cloud_sync_placeholder.empty()
+    
+    # Contenedor vacío para las nubes del reporte
+    cloud_report_placeholder = st.empty()
     
     with col_b2:
         csv = df.to_csv(index=False).encode('utf-8')
-        st.download_button(label=t_act["btn_reporte"], data=csv, file_name='Reporte_Flowmerce.csv', mime='text/csv', use_container_width=True)
+        # La descarga es inmediata en Streamlit, así que activamos nubes y toast al hacer clic
+        if st.download_button(label=t_act["btn_reporte"], data=csv, file_name='Reporte_Flowmerce.csv', mime='text/csv', use_container_width=True):
+            # Activar nubes
+            cloud_report_placeholder.markdown("""
+                <div class="cloud cloud-1"></div>
+                <div class="cloud cloud-2"></div>
+                <div class="cloud cloud-3"></div>
+                <div class="cloud cloud-4"></div>
+            """, unsafe_allow_html=True)
+            
+            st.toast(t_act["rep_exito"])
+            
+            # Dejar las nubes un momento para el efecto visual
+            time.sleep(5) 
+            cloud_report_placeholder.empty()
 
 with tabs[3]:
     st.markdown(f"### {t_act['equipo_tit']}")
