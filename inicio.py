@@ -155,21 +155,16 @@ with st.sidebar:
                 st.session_state.token_session = "demo"
                 st.info("Modo Demo ✅")
 
-# --- 7. LÓGICA DINÁMICA DE CSS (CORREGIDO CENTRADO Y BORDES) ---
-bg_overlay = "rgba(255, 255, 255, 0.4)" if not alto_contraste else "rgba(0, 0, 0, 0.85)"
-card_bg = "rgba(255, 255, 255, 0.8)" if not alto_contraste else "#FFFFFF"
+# --- 7. LÓGICA DINÁMICA DE CSS (CORREGIDO PARA LEGIBILIDAD) ---
+bg_overlay = "rgba(255, 255, 255, 0.75)" if not alto_contraste else "rgba(0, 0, 0, 0.85)"
+card_bg = "white" # Forzamos blanco sólido para legibilidad
 text_color = "#1E1E1E" if not alto_contraste else "#000000"
 font_size = "1.2rem" if lectura_facil else "1rem"
 title_size = "5rem" if lectura_facil else "4rem"
 
 st.markdown(f"""
 <style>
-    /* ESTILOS GLOBALES */
-    html, body, [class*="st-"] {{
-        font-size: {font_size} !important;
-        { 'font-family: Arial, sans-serif !important;' if lectura_facil else '' }
-    }}
-
+    /* FONDO Y TITULO */
     .stApp {{
         background: linear-gradient({bg_overlay}, {bg_overlay}), 
                     url("https://imgur.com/gQ7yynl.jpeg");
@@ -183,37 +178,43 @@ st.markdown(f"""
         font-size: {title_size} !important; font-weight: 800; animation: gradient-move 4s ease infinite; 
     }}
     
-    /* TARJETAS Y CONTENEDORES (SIN BORDES Y CON PADDING) */
-    div[data-testid="stVerticalBlock"] > div > div[data-testid="stVerticalBlock"] {{
-        padding: 20px !important;
-    }}
-
-    /* Ajuste para que el contenido de los tabs no se pegue */
+    /* BLOQUE PRINCIPAL DE TABS - FONDO BLANCO SÓLIDO */
     div[data-testid="stTabs"] {{
         background-color: {card_bg} !important;
-        padding: 2rem !important;
+        padding: 30px !important;
         border-radius: 15px !important;
-        border: none !important;
-        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1) !important;
+        border: none !important; /* QUITAMOS LÍNEA AZUL */
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
     }}
 
-    /* ELIMINACIÓN DE LÍNEAS AZULES EN TABLAS Y MÉTRICAS */
-    .stTable, div[data-testid="stMetric"], .team-card-large, div[data-testid="stExpander"] {{
-        background-color: rgba(255, 255, 255, 0.5) !important;
-        border-radius: 15px !important;
+    /* ELIMINAR LÍNEA AZUL DEBAJO DE LOS TABS ACTIVOS */
+    button[data-baseweb="tab"] {{
         border: none !important;
-        padding: 15px !important;
     }}
-
-    /* CENTRADO DE TEXTO DENTRO DE LAS TABLAS */
-    .stTable th {{
-        text-align: center !important;
+    div[data-baseweb="tab-highlight"] {{
         background-color: transparent !important;
     }}
-    
-    .stTable td {{
+
+    /* TABLAS Y MÉTRICAS CENTRADAS Y CLARAS */
+    .stTable, div[data-testid="stMetric"] {{
+        background-color: white !important;
+        border: none !important;
         text-align: center !important;
-        vertical-align: middle !important;
+    }}
+
+    .stTable td, .stTable th {{
+        text-align: center !important;
+        padding: 15px !important;
+        color: {text_color} !important;
+    }}
+
+    /* EQUIPO CENTRADO */
+    .team-card-large {{
+        background-color: white !important;
+        text-align: center !important;
+        border: none !important;
+        padding: 15px;
+        border-radius: 15px;
     }}
 
     div.stButton > button {{
@@ -221,8 +222,6 @@ st.markdown(f"""
         color: white !important;
         border: none !important;
     }}
-
-    .team-card-large strong {{ color: #0056ff !important; }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -239,7 +238,7 @@ st.markdown('<h1 class="main-title">🌊 Flowmerce</h1>', unsafe_allow_html=True
 
 c_enc1, c_enc2 = st.columns([0.8, 0.2])
 with c_enc1: 
-    st.markdown(f"<div style='background:{card_bg}; padding:10px 20px; border-radius:10px; display:inline-block; color:{text_color}; border:none;'><strong>✨ {t_act['sub']}</strong></div>", unsafe_allow_html=True)
+    st.markdown(f"<div style='background:white; padding:10px 20px; border-radius:10px; display:inline-block; color:{text_color}; box-shadow: 0 2px 10px rgba(0,0,0,0.05);'><strong>✨ {t_act['sub']}</strong></div>", unsafe_allow_html=True)
 
 with c_enc2: 
     audio_data = mic_recorder(start_prompt="🎤", stop_prompt="🛑", key='recorder')
@@ -281,7 +280,6 @@ with tabs[2]:
         if row["Autonomia"] > 60: return "🔥 LIQUIDAR"
         return "✅ ESTABLE"
     df["Accion"] = df.apply(determinar_accion, axis=1)
-    # Tabla centrada
     st.table(df[["Producto", "Stock", "Accion"]])
     
     col_b1, col_b2 = st.columns(2)
@@ -309,7 +307,7 @@ with tabs[3]:
         cols = st.columns(4)
         for j, (nombre, cargo, img) in enumerate(equipo[i:i+4]):
             with cols[j]:
-                st.markdown(f"""<div class="team-card-large" style="text-align: center;">
+                st.markdown(f"""<div class="team-card-large">
                     <img src="{img}" style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: none; margin-bottom: 10px;">
                     <br><strong>{nombre}</strong><br><small style="color:#0056ff;">{cargo}</small>
                 </div>""", unsafe_allow_html=True)
