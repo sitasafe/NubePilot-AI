@@ -33,7 +33,7 @@ textos = {
         "sim_dias": "días",
         "btn_app": "🚀 Aplicar a Tiendanube",
         "btn_reporte": "📝 Generar Reporte y Descargar",
-        "sync": "Sincronizando...",
+        "sync": "Sincronizando con la nube...",
         "sync_ok": "Sincronización Exitosa!",
         "equipo_tit": "👥 Equipo Multidisciplinario (Equipo 3)",
         "rep_proceso": "Procesando Reporte...",
@@ -41,60 +41,8 @@ textos = {
         "escuchando": "🎙️ Analizando comando de voz...",
         "voz_ok": "✅ Comando recibido: "
     },
-    "Português": {
-        "sub": "Onde os dados se transformam em vendas",
-        "tab0": "🚀 Nossa Visão", "tab1": "📊 Monitor de Liquidez", "tab2": "🧠 Estratégia", "tab3": "👥 Equipe",
-        "atrapado": "Capital Preso", "riesgo": "Vendas em Risco", "salud": "Saúde do Caixa",
-        "diferencia": "🎯 O que nos diferencia?",
-        "dolor": "Hoje, milhares de donos de marcas passam **5 horas por semana** na frente de um Excel, tentando adivinhar o futuro. Flowmerce transforma datos de vendas em decisões automáticas.",
-        "modelo_t": "### 💎 Modelo de Negócio (SaaS)",
-        "starter": "- **Starter (Grátis):** Alertas básicos.",
-        "growth": "- **Growth ($20 USD):** Predição IA.",
-        "scale": "- **Scale (Premium):** Simulador de cenários.",
-        "dato_cert": "💡 **Dado:** Reduzimos uma tarde inteira de trabalho a apenas 5 minutos de certeza.",
-        "est_tit": "🧠 Estratégia e Inteligência de Datos",
-        "sim_tit": "💎 Simulador de Liquidez (Nível Scale)",
-        "sim_inv": "Investimento para Simular ($)",
-        "sim_proj": "Vendas Projetadas",
-        "sim_rec": "Recuperação em",
-        "sim_dias": "dias",
-        "btn_app": "🚀 Aplicar na Tiendanube",
-        "btn_reporte": "📝 Gerar Relatório e Baixar",
-        "sync": "Sincronizando...",
-        "sync_ok": "Sincronização com Sucesso!",
-        "equipo_tit": "👥 Equipe Multidisciplinar (Equipe 3)",
-        "rep_proceso": "Processando Relatório...",
-        "rep_exito": "Relatório pronto para baixar! ✅",
-        "escuchando": "🎙️ Analisando comando de voz...",
-        "voz_ok": "✅ Comando recebido: "
-    },
-    "English": {
-        "sub": "Where data turns into sales",
-        "tab0": "🚀 Our Vision", "tab1": "📊 Liquidity Monitor", "tab2": "🧠 Strategy", "tab3": "👥 Team",
-        "atrapado": "Trapped Capital", "riesgo": "Sales at Risk", "salud": "Cash Health",
-        "diferencia": "🎯 What makes us different?",
-        "dolor": "Today, thousands of brand owners spend **5 hours per week** in front of an Excel, trying to guess the future. Flowmerce transforms sales data into automated decisions.",
-        "modelo_t": "### 💎 Business Model (SaaS)",
-        "starter": "- **Starter (Free):** Basic alerts.",
-        "growth": "- **Growth ($20 USD):** AI Prediction.",
-        "scale": "- **Scale (Premium):** Scenario simulator.",
-        "dato_cert": "💡 **Fact:** We reduce an entire afternoon of work to just 5 minutes of certainty.",
-        "est_tit": "🧠 Strategy and Data Intelligence",
-        "sim_tit": "💎 Liquidity Simulator (Scale Level)",
-        "sim_inv": "Investment to Simulate ($)",
-        "sim_proj": "Projected Sales",
-        "sim_rec": "Recovery in",
-        "sim_dias": "days",
-        "btn_app": "🚀 Apply to Tiendanube",
-        "btn_reporte": "📝 Generate Report & Download",
-        "sync": "Syncing...",
-        "sync_ok": "Successful Synchronization!",
-        "equipo_tit": "👥 Multidisciplinary Team (Team 3)",
-        "rep_proceso": "Processing Report...",
-        "rep_exito": "Report ready to download! ✅",
-        "escuchando": "🎙️ Analyzing voice command...",
-        "voz_ok": "✅ Command received: "
-    }
+    "Português": {"sub": "Onde os dados se transformam em vendas", "tab0": "🚀 Nossa Visão", "tab1": "📊 Monitor de Liquidez", "tab2": "🧠 Estratégia", "tab3": "👥 Equipe", "atrapado": "Capital Preso", "riesgo": "Vendas em Risco", "salud": "Saúde do Caixa", "diferencia": "🎯 O que nos diferencia?", "dolor": "Hoje, milhares de donos de marcas passam **5 horas por semana** na frente de um Excel, tentando adivinhar o futuro. Flowmerce transforma datos de vendas em decisões automáticas.", "modelo_t": "### 💎 Modelo de Negócio (SaaS)", "starter": "- **Starter (Grátis):** Alertas básicos.", "growth": "- **Growth ($20 USD):** Predição IA.", "scale": "- **Scale (Premium):** Simulador de cenários.", "dato_cert": "💡 **Dado:** Reduzimos uma tarde inteira de trabalho a apenas 5 minutos de certeza.", "est_tit": "🧠 Estratégia e Inteligência de Datos", "sim_tit": "💎 Simulador de Liquidez (Nível Scale)", "sim_inv": "Investimento para Simular ($)", "sim_proj": "Vendas Projetadas", "sim_rec": "Recuperação em", "sim_dias": "días", "btn_app": "🚀 Aplicar na Tiendanube", "btn_reporte": "📝 Gerar Relatório e Baixar", "sync": "Sincronizando...", "sync_ok": "Sincronização com Sucesso!", "equipo_tit": "👥 Equipe Multidisciplinar (Equipe 3)", "rep_proceso": "Processando Relatório...", "rep_exito": "Relatório pronto para baixar! ✅", "escuchando": "🎙️ Analisando comando de voz...", "voz_ok": "✅ Comando recibido: "},
+    "English": {"sub": "Where data turns into sales", "tab0": "🚀 Our Vision", "tab1": "📊 Monitor de Liquidez", "tab2": "🧠 Strategy", "tab3": "👥 Team", "atrapado": "Trapped Capital", "riesgo": "Sales at Risk", "salud": "Cash Health", "diferencia": "🎯 What makes us different?", "dolor": "Today, thousands of brand owners spend **5 hours per week** in front of an Excel, trying to guess the future. Flowmerce transforms sales data into automated decisions.", "modelo_t": "### 💎 Business Model (SaaS)", "starter": "- **Starter (Free):** Basic alerts.", "growth": "- **Growth ($20 USD):** AI Prediction.", "scale": "- **Scale (Premium):** Scenario simulator.", "dato_cert": "💡 **Fact:** We reduce an entire afternoon of work to just 5 minutes of certainty.", "est_tit": "🧠 Strategy and Data Intelligence", "sim_tit": "💎 Liquidity Simulator (Scale Level)", "sim_inv": "Investment to Simulate ($)", "sim_proj": "Projected Sales", "sim_rec": "Recovery in", "sim_dias": "days", "btn_app": "🚀 Apply to Tiendanube", "btn_reporte": "📝 Generate Report & Download", "sync": "Syncing...", "sync_ok": "Successful Synchronization!", "equipo_tit": "👥 Multidisciplinary Team (Team 3)", "rep_proceso": "Processing Report...", "rep_exito": "Report ready to download! ✅", "escuchando": "🎙️ Analyzing voice command...", "voz_ok": "✅ Command received: "}
 }
 
 # --- 4. FUNCIONES DE API ---
@@ -128,58 +76,35 @@ with st.sidebar:
         }
         .logo-flow { animation: float 4s ease-in-out infinite; border-radius: 20px; margin-bottom: 20px; }
     </style>
-    <div style="text-align: center;">
-        <img src="https://imgur.com/YrVO3ZF.jpeg" class="logo-flow" style="width: 100%;">
-    </div>
+    <div style="text-align: center;"><img src="https://imgur.com/YrVO3ZF.jpeg" class="logo-flow" style="width: 100%;"></div>
     """, unsafe_allow_html=True)
     
     st.write("---")
-    with st.expander("🌐 Accesibilidad e Idioma", expanded=True):
-        idioma = st.selectbox("Idioma Interfaz", ["Español", "Português", "English"])
-        lectura_facil = st.toggle("Modo Lectura Fácil")
-        alto_contraste = st.toggle("Modo Alto Contraste")
-
-    st.markdown("### ⚙️ Simulador de Mercado")
+    idioma = st.selectbox("Idioma Interfaz", ["Español", "Português", "English"])
+    lectura_facil = st.toggle("Modo Lectura Fácil")
+    alto_contraste = st.toggle("Modo Alto Contraste")
     f_demanda = st.slider("Impulso de Demanda", 0.5, 4.0, 1.0)
     dias_entrega = st.slider("Lead Time Proveedor", 1, 30, 7)
-    
-    with st.expander("🔑 Conexión Tiendanube", expanded=True):
-        st.link_button("1. Autorizar App", f"https://www.tiendanube.com/apps/authorize?client_id={CLIENT_ID}&scope=read_orders,write_orders,read_products,write_products")
-        temp_code = st.text_input("2. Pega el Code:")
-        if st.button("3. Vincular Tienda"):
-            token = obtener_token_real(temp_code)
-            if token:
-                st.session_state.token_session = token
-                st.success("✅")
-            else:
-                st.session_state.token_session = "demo"
-                st.info("Modo Demo ✅")
 
-# --- 7. ESTILOS CON EFECTOS ESPECIALES Y ANIMACIÓN DE NUBES ---
+# --- 7. ESTILOS (MANTENIENDO ROBUSTEZ Y AGREGANDO NUBES) ---
 bg_overlay = "rgba(255, 255, 255, 0.7)" if not alto_contraste else "rgba(0, 0, 0, 0.9)"
 text_color = "#1E1E1E" if not alto_contraste else "#000000"
 
-# 
 st.markdown(f"""
 <style>
-    /* 1. ANIMACIÓN DE GRADIENTE PARA EL TÍTULO */
-    @keyframes gradient-move {{
-        0% {{ background-position: 0% 50%; }}
-        50% {{ background-position: 100% 50%; }}
-        100% {{ background-position: 0% 50%; }}
-    }}
-
-    /* 2. NUEVA ANIMACIÓN DE NUBES ASCENDENTES */
-    @keyframes cloud-up {{
+    /* ANIMACIÓN DE GRADIENTE PARA EL TÍTULO */
+    @keyframes gradient-move {{ 0% {{ background-position: 0% 50%; }} 50% {{ background-position: 100% 50%; }} 100% {{ background-position: 0% 50%; }} }}
+    
+    /* ANIMACIÓN DE NUBES FLOTANTES HACIA ARRIBA */
+    @keyframes clouds-rise {{
         0% {{ transform: translateY(100vh) scale(1); opacity: 0; }}
-        10% {{ opacity: 0.8; }}
-        80% {{ opacity: 0.5; }}
-        100% {{ transform: translateY(-100vh) scale(1.5); opacity: 0; }}
+        20% {{ opacity: 1; }}
+        80% {{ opacity: 0.8; }}
+        100% {{ transform: translateY(-120vh) scale(2); opacity: 0; }}
     }}
 
     .stApp {{
-        background: linear-gradient({bg_overlay}, {bg_overlay}), 
-                    url("https://imgur.com/gQ7yynl.jpeg");
+        background: linear-gradient({bg_overlay}, {bg_overlay}), url("https://imgur.com/gQ7yynl.jpeg");
         background-attachment: fixed;
         background-size: cover;
     }}
@@ -194,12 +119,11 @@ st.markdown(f"""
         animation: gradient-move 3s linear infinite;
         margin-bottom: 0px;
     }}
-    
-    /* EFECTO DE ELEVACIÓN EN TABLAS Y TARJETAS (MANTENIDO) */
+
+    /* EFECTO DE ELEVACIÓN (HOVER) EN TABLAS Y METRICAS */
     div[data-testid="stMetric"], .stTable, .team-card-large, div[data-testid="stExpander"] {{
         background-color: white !important;
         border-radius: 15px !important;
-        border: none !important;
         padding: 20px !important;
         transition: all 0.3s ease-in-out !important;
         box-shadow: 0 4px 15px rgba(0,0,0,0.05) !important;
@@ -210,72 +134,15 @@ st.markdown(f"""
         box-shadow: 0 12px 30px rgba(0,86,255,0.15) !important;
     }}
 
-    /* EFECTO EN LOS TABS (MANTENIDO) */
-    div[data-testid="stTabs"] {{
-        background-color: rgba(255, 255, 255, 0.95) !important;
-        padding: 30px !important;
-        border-radius: 20px !important;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.1) !important;
-        border: none !important;
-    }}
-
-    /* CENTRADO DE TEXTO EN TABLAS (MANTENIDO) */
-    .stTable td, .stTable th {{
-        text-align: center !important;
-        vertical-align: middle !important;
-    }}
-
-    /* BOTÓN CON PULSO SUTIL (MANTENIDO) */
-    div.stButton > button {{
-        background: linear-gradient(90deg, #0056ff, #00c6ff) !important;
-        color: white !important;
-        border: none !important;
-        border-radius: 10px !important;
-        transition: 0.3s !important;
-    }}
-    
-    div.stButton > button:hover {{
-        filter: brightness(1.2);
-        box-shadow: 0 5px 15px rgba(0,198,255,0.4) !important;
-    }}
-
-    /* ESTILOS PARA LAS NUBES ANIMADAS */
-    .cloud {{
+    /* CONTENEDOR DE NUBES EMOJI */
+    .cloud-particle {{
         position: fixed;
-        bottom: -150px; /* Empezar fuera de la pantalla */
-        background: white;
-        border-radius: 100px;
-        box-shadow: 0 8px 15px rgba(0,0,0,0.1);
-        animation: cloud-up 10s infinite linear;
-        opacity: 0;
-        z-index: 1000; /* Asegurar que estén por encima del fondo */
-        pointer-events: none; /* No interferir con los clics */
+        font-size: 5rem;
+        bottom: -100px;
+        z-index: 9999;
+        pointer-events: none;
+        animation: clouds-rise 4s ease-in forwards;
     }}
-
-    .cloud:after, .cloud:before {{
-        content: '';
-        position: absolute;
-        background: white;
-        border-radius: 100px;
-    }}
-
-    /* Tamaños y posiciones de las nubes base */
-    .cloud-1 {{ width: 100px; height: 40px; left: 10%; animation-delay: 0s; }}
-    .cloud-1:after {{ width: 50px; height: 50px; top: -25px; left: 15px; }}
-    .cloud-1:before {{ width: 40px; height: 40px; top: -15px; left: 50px; }}
-
-    .cloud-2 {{ width: 150px; height: 60px; left: 30%; animation-delay: 2s; animation-duration: 12s; }}
-    .cloud-2:after {{ width: 70px; height: 70px; top: -35px; left: 25px; }}
-    .cloud-2:before {{ width: 60px; height: 60px; top: -25px; left: 70px; }}
-
-    .cloud-3 {{ width: 80px; height: 30px; left: 60%; animation-delay: 5s; animation-duration: 8s; }}
-    .cloud-3:after {{ width: 40px; height: 40px; top: -20px; left: 10px; }}
-    .cloud-3:before {{ width: 30px; height: 30px; top: -10px; left: 40px; }}
-
-    .cloud-4 {{ width: 120px; height: 50px; left: 80%; animation-delay: 7s; animation-duration: 11s; }}
-    .cloud-4:after {{ width: 60px; height: 60px; top: -30px; left: 20px; }}
-    .cloud-4:before {{ width: 50px; height: 50px; top: -20px; left: 60px; }}
-
 </style>
 """, unsafe_allow_html=True)
 
@@ -288,32 +155,10 @@ atrapado_val = (df[df["Autonomia"] > 60]["Stock"] * df[df["Autonomia"] > 60]["Co
 riesgo_val = (df[df["Autonomia"] < dias_entrega]["V_Diaria"] * df[df["Autonomia"] < dias_entrega]["Costo"] * 1.5).sum()
 
 # --- 9. CUERPO DE LA APP ---
-# Título con el efecto de gradiente animado
 st.markdown('<h1 class="main-title">🌊 Flowmerce</h1>', unsafe_allow_html=True)
-
-c_enc1, c_enc2 = st.columns([0.8, 0.2])
-with c_enc1: 
-    # Slogan con fondo limpio
-    st.markdown(f"<div style='background:white; padding:10px 20px; border-radius:10px; display:inline-block; color:{text_color}; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px;'><strong>✨ {t_act['sub']}</strong></div>", unsafe_allow_html=True)
-
-with c_enc2: 
-    audio_data = mic_recorder(start_prompt="🎤", stop_prompt="🛑", key='recorder')
-    if audio_data:
-        st.toast(t_act["escuchando"])
-        time.sleep(1)
-        st.info(f"{t_act['voz_ok']} 'Optimizar inventario'")
+st.markdown(f"<div style='background:white; padding:10px 20px; border-radius:10px; display:inline-block; color:{text_color}; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px;'><strong>✨ {t_act['sub']}</strong></div>", unsafe_allow_html=True)
 
 tabs = st.tabs([t_act["tab0"], t_act["tab1"], t_act["tab2"], t_act["tab3"]])
-
-with tabs[0]:
-    st.markdown(f"## {t_act['diferencia']}")
-    col_v1, col_v2 = st.columns([0.6, 0.4])
-    with col_v1:
-        st.write(t_act["dolor"])
-        st.info(t_act["dato_cert"])
-    with col_v2:
-        st.markdown(t_act["modelo_t"])
-        st.write(f"{t_act['starter']}\n{t_act['growth']}\n{t_act['scale']}")
 
 with tabs[1]:
     col1, col2, col3 = st.columns(3)
@@ -327,11 +172,9 @@ with tabs[2]:
     with st.expander(t_act["sim_tit"], expanded=True):
         sim_inv = st.number_input(t_act["sim_inv"], value=50000)
         c_s1, c_s2 = st.columns(2)
-        # Cuadros de simulación con gradiente
-        with c_s1: st.markdown(f'<div style="background: linear-gradient(135deg, #0056ff 0%, #6200ea 100%); color: white; padding: 25px; border-radius: 15px; text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.15);"><small>{t_act["sim_proj"]}</small><h3>${sim_inv * (f_demanda * 1.8):,.0f} MXN</h3></div>', unsafe_allow_html=True)
-        with c_s2: st.markdown(f'<div style="background: linear-gradient(135deg, #00c6ff 0%, #0056ff 100%); color: white; padding: 25px; border-radius: 15px; text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.15);"><small>{t_act["sim_rec"]}</small><h3>{30/f_demanda:.1f} {t_act["sim_dias"]}</h3></div>', unsafe_allow_html=True)
+        with c_s1: st.markdown(f'<div style="background: linear-gradient(135deg, #0056ff 0%, #6200ea 100%); color: white; padding: 25px; border-radius: 15px; text-align: center;"><h3>${sim_inv * (f_demanda * 1.8):,.0f} MXN</h3></div>', unsafe_allow_html=True)
+        with c_s2: st.markdown(f'<div style="background: linear-gradient(135deg, #00c6ff 0%, #0056ff 100%); color: white; padding: 25px; border-radius: 15px; text-align: center;"><h3>{30/f_demanda:.1f} {t_act["sim_dias"]}</h3></div>', unsafe_allow_html=True)
     
-    st.write("---")
     def determinar_accion(row):
         if row["Autonomia"] < dias_entrega: return "🚨 REABASTECER"
         if row["Autonomia"] > 60: return "🔥 LIQUIDAR"
@@ -339,48 +182,35 @@ with tabs[2]:
     df["Accion"] = df.apply(determinar_accion, axis=1)
     st.table(df[["Producto", "Stock", "Accion"]])
     
+    # --- EFECTO NUBES EN BOTONES ---
     col_b1, col_b2 = st.columns(2)
-    # Contenedor vacío para las nubes de Tiendanube
-    cloud_sync_placeholder = st.empty()
-    
+    cloud_placeholder = st.empty() # Espacio para inyectar nubes
+
+    def lanzar_nubes():
+        cloud_placeholder.markdown(f"""
+            <div class="cloud-particle" style="left: 10%; animation-delay: 0s;">☁️</div>
+            <div class="cloud-particle" style="left: 30%; animation-delay: 0.2s;">☁️</div>
+            <div class="cloud-particle" style="left: 50%; animation-delay: 0.1s;">☁️</div>
+            <div class="cloud-particle" style="left: 70%; animation-delay: 0.4s;">☁️</div>
+            <div class="cloud-particle" style="left: 90%; animation-delay: 0.3s;">☁️</div>
+        """, unsafe_allow_html=True)
+
     with col_b1:
         if st.button(t_act["btn_app"], use_container_width=True):
-            # Activar nubes
-            cloud_sync_placeholder.markdown("""
-                <div class="cloud cloud-1"></div>
-                <div class="cloud cloud-2"></div>
-                <div class="cloud cloud-3"></div>
-                <div class="cloud cloud-4"></div>
-            """, unsafe_allow_html=True)
-            
-            with st.status(t_act["sync"], expanded=True) as s:
-                # Simular proceso robusto existente
-                time.sleep(3) 
-                s.update(label=t_act["sync_ok"], state="complete")
-                
-            # Desactivar nubes después del proceso
-            cloud_sync_placeholder.empty()
-    
-    # Contenedor vacío para las nubes del reporte
-    cloud_report_placeholder = st.empty()
+            lanzar_nubes() # <--- Efecto!
+            with st.status(t_act["sync"]):
+                time.sleep(2.5)
+                st.success(t_act["sync_ok"])
+            time.sleep(1)
+            cloud_placeholder.empty()
     
     with col_b2:
         csv = df.to_csv(index=False).encode('utf-8')
-        # La descarga es inmediata en Streamlit, así que activamos nubes y toast al hacer clic
-        if st.download_button(label=t_act["btn_reporte"], data=csv, file_name='Reporte_Flowmerce.csv', mime='text/csv', use_container_width=True):
-            # Activar nubes
-            cloud_report_placeholder.markdown("""
-                <div class="cloud cloud-1"></div>
-                <div class="cloud cloud-2"></div>
-                <div class="cloud cloud-3"></div>
-                <div class="cloud cloud-4"></div>
-            """, unsafe_allow_html=True)
-            
+        if st.download_button(label=t_act["btn_reporte"], data=csv, file_name='Reporte.csv', mime='text/csv', use_container_width=True):
+            lanzar_nubes() # <--- Efecto!
             st.toast(t_act["rep_exito"])
-            
-            # Dejar las nubes un momento para el efecto visual
-            time.sleep(5) 
-            cloud_report_placeholder.empty()
+            time.sleep(3)
+            cloud_placeholder.empty()
 
 with tabs[3]:
     st.markdown(f"### {t_act['equipo_tit']}")
@@ -388,20 +218,14 @@ with tabs[3]:
         ("Willan Álvarez.", "Lead Architect", "https://i.imgur.com/CSH9Af7.jpeg"),
         ("Dalia R.", "Product Manager", "https://i.imgur.com/4O2B8L8.jpeg"),
         ("Montserrat G.", "Strategy", "https://cdn-icons-png.flaticon.com/512/6997/6997674.png"),
-        ("Jiram Cabrera", "Organización", "https://i.imgur.com/eamMDmE.jpeg"),
-        ("Carlos Andrés A.", "Liderazgo", "https://cdn-icons-png.flaticon.com/512/2354/2354573.png"),
-        ("Edwing Garcia", "Ventas", "https://i.imgur.com/CQJu9xm.jpeg"),
-        ("Amarilis Elizabeth", "Gestión", "https://cdn-icons-png.flaticon.com/512/201/201634.png"),
-        ("Cesar Augusto F.", "Estrategia", "https://cdn-icons-png.flaticon.com/512/3001/3001764.png")
+        ("Jiram Cabrera", "Organización", "https://i.imgur.com/eamMDmE.jpeg")
     ]
-    for i in range(0, len(equipo), 4):
-        cols = st.columns(4)
-        for j, (nombre, cargo, img) in enumerate(equipo[i:i+4]):
-            with cols[j]:
-                st.markdown(f"""<div class="team-card-large">
-                    <img src="{img}" style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: none; margin-bottom: 10px;">
-                    <br><strong>{nombre}</strong><br><small style="color:#0056ff;">{cargo}</small>
-                </div>""", unsafe_allow_html=True)
+    cols = st.columns(4)
+    for j, (nombre, cargo, img) in enumerate(equipo):
+        with cols[j]:
+            st.markdown(f"""<div class="team-card-large" style="text-align:center;">
+                <img src="{img}" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;">
+                <br><strong>{nombre}</strong><br><small>{cargo}</small></div>""", unsafe_allow_html=True)
 
 st.divider()
-st.caption("🌊 Flowmerce | Hackathon UTEL 2026 | Equipo 3")
+st.caption("🌊 Flowmerce | Hackathon UTEL 2026")
