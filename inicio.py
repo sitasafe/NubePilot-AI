@@ -108,15 +108,20 @@ st.markdown(f"""
     .team-card-large:hover {{ transform: translateY(-10px); border-color: #0056ff; box-shadow: 0px 15px 30px rgba(0, 86, 255, 0.2); }}
     .stMetric {{ background: rgba(0, 86, 255, 0.05); padding: 20px; border-radius: 15px; border-left: 5px solid #0056ff; }}
 
-    /* EFECTO DE NUBES FLOTANDO */
-    @keyframes move-clouds {{
-        from {{ transform: translateX(-100%); }}
-        to {{ transform: translateX(100vw); }}
+    /* NUEVO EFECTO: NUBES SUBIENDO HACIA ARRIBA */
+    @keyframes cloud-up {{
+        0% {{ transform: translateY(100vh); opacity: 0; }}
+        10% {{ opacity: 0.8; }}
+        90% {{ opacity: 0.8; }}
+        100% {{ transform: translateY(-100vh); opacity: 0; }}
     }}
-    .cloud-particle {{
-        position: fixed; top: 0; left: 0; font-size: 4rem;
-        animation: move-clouds 3s linear infinite;
-        z-index: 9999; pointer-events: none; opacity: 0.8;
+    .cloud-ascend {{
+        position: fixed;
+        bottom: 0;
+        font-size: 4rem;
+        z-index: 9999;
+        pointer-events: none;
+        animation: cloud-up 3s linear infinite;
     }}
 </style>
 """, unsafe_allow_html=True)
@@ -166,17 +171,22 @@ with tab2:
     st.table(df[["Producto", "Stock", "Autonomia", "Acción Sugerida"]])
     
     if st.button("🚀 Aplicar Cambios en Tiendanube"):
-        # CAMBIO: NUBES EN LUGAR DE GLOBOS
-        with st.status("Sincronizando con la nube...", expanded=True) as s:
-            time.sleep(1.5)
-            # Insertamos las nubes animadas vía HTML/CSS
-            st.markdown("""
-                <div class="cloud-particle" style="top: 20%; animation-duration: 2s;">☁️</div>
-                <div class="cloud-particle" style="top: 50%; animation-duration: 3s;">☁️</div>
-                <div class="cloud-particle" style="top: 80%; animation-duration: 2.5s;">☁️</div>
-                <div class="cloud-particle" style="top: 10%; animation-duration: 4s;">☁️</div>
+        # Contenedor para el efecto visual
+        cloud_container = st.empty()
+        with st.status("Subiendo datos a la nube...", expanded=True) as s:
+            # Generamos las nubes que suben
+            cloud_container.markdown("""
+                <div class="cloud-ascend" style="left: 15%; animation-duration: 2.5s;">☁️</div>
+                <div class="cloud-ascend" style="left: 35%; animation-duration: 3.5s;">☁️</div>
+                <div class="cloud-ascend" style="left: 55%; animation-duration: 3s;">☁️</div>
+                <div class="cloud-ascend" style="left: 75%; animation-duration: 2s;">☁️</div>
+                <div class="cloud-ascend" style="left: 90%; animation-duration: 4s;">☁️</div>
             """, unsafe_allow_html=True)
+            
+            time.sleep(2.5)
             s.update(label="¡Sincronización Exitosa! ☁️", state="complete")
+        
+        cloud_container.empty() # Limpiar nubes después de la animación
         st.success("¡Datos actualizados en Tiendanube!")
 
 with tab3:
