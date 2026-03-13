@@ -3,11 +3,10 @@ import pandas as pd
 import numpy as np
 import time
 
-# --- 1. CONFIGURACIÓN DE LA PÁGINA ---
+# --- 1. CONFIGURACIÓN ---
 st.set_page_config(page_title="Flowmerce IA", page_icon="🌊", layout="wide")
 
-# --- 2. GESTIÓN DE MEMORIA (SESSION STATE) ---
-# Esto es vital para que los botones "hagan algo" y no solo refresquen
+# --- 2. MEMORIA DE LA APP ---
 if 'inventario' not in st.session_state:
     st.session_state.inventario = pd.DataFrame({
         "Producto": ["Tenis Runner", "Gorra Urban", "Calcetín Sport", "Sudadera Lino"],
@@ -16,46 +15,79 @@ if 'inventario' not in st.session_state:
         "Costo": [1200, 300, 150, 850]
     })
 
-if 'mensaje_ia' not in st.session_state:
-    st.session_state.mensaje_ia = "Haz clic en 'Sincronizar' para analizar tu tienda."
-
-# --- 3. ESTILOS VISUALES ---
+# --- 3. ESTILOS ---
 st.markdown("""
 <style>
     .main-title { background: linear-gradient(90deg, #1A237E, #4364F7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 3rem; font-weight: 800; text-align: center; }
-    .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 5px solid #0052D4; text-align: center; margin-bottom: 20px; }
+    .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 5px solid #0052D4; text-align: center; }
     .metric-val { font-size: 1.8rem; font-weight: bold; color: #0052D4; }
-    .stButton>button { width: 100%; height: 3em; background-color: #0052D4; color: white; border-radius: 10px; }
 </style>
 """, unsafe_allow_html=True)
 
-# --- 4. SIDEBAR (CONTROLES DINÁMICOS) ---
+# --- 4. SIDEBAR ---
 with st.sidebar:
     st.image("https://imgur.com/V1m4Dgk.jpeg")
-    st.header("⚙️ Configuración Logística")
-    
-    # Sliders que recalculan todo automáticamente
-    demanda = st.slider("Simular Demanda (X)", 0.5, 4.0, 1.0)
+    st.header("⚙️ Simulador Logístico")
+    demanda = st.slider("Impulso de Demanda (IA)", 0.5, 4.0, 1.0)
     retraso_prov = st.slider("Días de Entrega Proveedor", 1, 20, 5)
     
-    st.divider()
-    
-    # BOTÓN 1: Sincronizar (Cambia los datos de la memoria)
     if st.button("🔄 Sincronizar Tiendanube"):
-        with st.spinner("Conectando con la API..."):
-            time.sleep(1.5)
-            # Modificamos el stock aleatoriamente para probar la funcionalidad
+        with st.spinner("Conectando..."):
+            time.sleep(1)
             st.session_state.inventario["Stock"] = np.random.randint(1, 100, 4)
-            st.session_state.mensaje_ia = "✅ Análisis completado: Se detectaron cambios en 4 SKUs."
-            st.toast("¡Datos actualizados!")
+            st.toast("¡Sincronizado!")
 
-# --- 5. LÓGICA DE NEGOCIO (CALCULOS EN VIVO) ---
+# --- 5. LÓGICA DE CÁLCULO (CORREGIDA) ---
 df = st.session_state.inventario.copy()
-df["Ventas_Proyectadas"] = df["Ventas_Promedio"] * demanda
-df["Dias_Autonomia"] = df["Stock"] / df["Ventas_Proyectadas"]
+df["Ventas_P"] = df["Ventas_Promedio"] * demanda
+df["Autonomia"] = df["Stock"] / df["Ventas_P"]
 
-# Capital Atrapado (Dinero en productos con exceso)
+# Calculamos métricas financieras
 dinero_enterrado = df[df["Stock"] > 50].apply(lambda x: x["Stock"] * x["Costo"], axis=1).sum()
 
-# Ventas en Riesgo (Si el stock se acaba antes de que llegue el pedido)
-ventas_riesgo = df[df["Dias_Autonomia"] < retraso_prov].apply(lambda
+# LÍNEA CORREGIDA: Sin saltos de línea extraños para evitar el SyntaxError
+ventas_riesgo = df[df["Autonomia"] < retraso_prov].apply(lambda x: x["Ventas_P"] * x["Costo"], axis=1).sum()
+
+# --- 6. INTERFAZ ---
+st.markdown('<h1 class="main-title">🌊 Flowmerce</h1>', unsafe_allow_html=True)
+
+t1, t2, t3, t4 = st.tabs(["📊 Diagnóstico", "🤖 Predicción", "💡 Valor", "👥 Equipo"])
+
+with t1:
+    col1, col2, col3 = st.columns(3)
+    col1.markdown(f'<div class="card">Dinero "Enterrado"<br><span class="metric-val">${dinero_enterrado:,.0f}</span></div>', unsafe_allow_html=True)
+    col2.markdown(f'<div class="card">Ventas en Riesgo<br><span class="metric-val" style="color:#E53935;">${ventas_riesgo:,.0f}</span></div>', unsafe_allow_html=True)
+    col3.markdown(f'<div class="card">Salud Financiera<br><span class="metric-val" style="color:#43A047;">{max(0, 100-(retraso_prov*2))}%</span></div>', unsafe_allow_html=True)
+
+    st.write("---")
+    st.subheader("📉 Proyección de Flujo de Efectivo")
+    chart_data = pd.DataFrame({
+        "Flujo Optimizado": np.linspace(40, 140, 20) + (demanda * 10),
+        "Pérdida por Stockout": np.linspace(40, 140, 20) - (retraso_prov * 3)
+    })
+    st.area_chart(chart_data)
+
+with t2:
+    st.subheader("🤖 Recomendaciones de Compra Automáticas")
+    def recomendar(dias):
+        if dias < retraso_prov: return "🚨 COMPRAR YA"
+        if dias > 90: return "🔥 LIQUIDAR"
+        return "✅ ESTABLE"
+
+    df["Acción"] = df["Autonomia"].apply(recomendar)
+    st.table(df[["Producto", "Stock", "Autonomia", "Acción"]])
+    
+    if st.button("🚀 Ejecutar Pedidos"):
+        st.balloons()
+        st.success("Órdenes enviadas a Tiendanube.")
+
+with t3:
+    st.markdown("### 🎯 Diferenciador Flowmerce")
+    st.write("- **Excel:** Solo te dice cuánto tienes.\n- **Flowmerce:** Te dice cuánto dinero vas a ganar o perder.")
+    st.info("“No vendemos software de inventario. Vendemos decisiones inteligentes.”")
+
+with t4:
+    equipo = ["Willan A.", "Dalia R.", "Montserrat G.", "Jiram C.", "Carlos A.", "Edwing G.", "Amarilis E.", "Cesar F."]
+    cols = st.columns(4)
+    for i, p in enumerate(equipo):
+        cols[i%4].info(f"**{p}**\n\nEquipo 3")
