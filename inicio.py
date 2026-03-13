@@ -155,16 +155,17 @@ with st.sidebar:
                 st.session_state.token_session = "demo"
                 st.info("Modo Demo ✅")
 
-# --- 7. LÓGICA DINÁMICA DE CSS ---
-# Ajustamos overlay para que se vean mejor las caras del fondo (menos opacidad)
-bg_overlay = "rgba(255, 255, 255, 0.4)" if not alto_contraste else "rgba(0, 0, 0, 0.85)"
-card_bg = "rgba(255, 255, 255, 0.8)" if not alto_contraste else "#FFFFFF"
+# --- 7. LÓGICA DINÁMICA DE CSS (Contraste y Lectura) ---
+# Definimos variables según los toggles
+bg_overlay = "rgba(255, 255, 255, 0.7)" if not alto_contraste else "rgba(0, 0, 0, 0.9)"
+card_bg = "rgba(255, 255, 255, 0.9)" if not alto_contraste else "#FFFFFF"
 text_color = "#1E1E1E" if not alto_contraste else "#000000"
 font_size = "1.2rem" if lectura_facil else "1rem"
 title_size = "5rem" if lectura_facil else "4rem"
 
 st.markdown(f"""
 <style>
+    /* APLICACIÓN DE ESTILOS GLOBALES */
     html, body, [class*="st-"] {{
         font-size: {font_size} !important;
         { 'font-family: Arial, sans-serif !important;' if lectura_facil else '' }
@@ -181,28 +182,29 @@ st.markdown(f"""
         background: linear-gradient(90deg, #0056ff, #00c6ff, #6200ea, #0056ff);
         background-size: 300% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         font-size: {title_size} !important; font-weight: 800; animation: gradient-move 4s ease infinite; 
+        text-shadow: 2px 2px 10px rgba(255,255,255,0.5);
     }}
     
-    /* ELIMINACIÓN DE BORDES AZULES EN TARJETAS Y TABLAS */
+    /* TARJETAS Y TABLAS */
     div[data-testid="stMetric"], .stTable, .team-card-large, .stTabs, div[data-testid="stExpander"] {{
         background-color: {card_bg} !important;
-        backdrop-filter: blur(8px);
+        backdrop-filter: blur(10px);
         border-radius: 15px !important;
-        border: none !important; /* QUITAMOS EL BORDE AZUL */
-        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15) !important;
+        border: 2px solid #0056ff !important;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
         color: {text_color} !important;
     }}
 
+    /* AJUSTE DE TEXTO EN TABLAS */
     .stTable td, .stTable th, .stTable p {{
         color: {text_color} !important;
-        border: none !important;
+        font-size: {font_size} !important;
     }}
 
     div.stButton > button {{
         background: #0056ff !important;
         color: white !important;
-        border-radius: 10px !important;
-        border: none !important;
+        font-size: {font_size} !important;
     }}
 
     .team-card-large strong {{ color: #0056ff !important; }}
@@ -220,4 +222,81 @@ riesgo_val = (df[df["Autonomia"] < dias_entrega]["V_Diaria"] * df[df["Autonomia"
 # --- 9. CUERPO DE LA APP ---
 st.markdown('<h1 class="main-title">🌊 Flowmerce</h1>', unsafe_allow_html=True)
 
-c_enc1, c_enc
+c_enc1, c_enc2 = st.columns([0.8, 0.2])
+with c_enc1: 
+    st.markdown(f"<div style='background:{card_bg}; padding:10px; border-radius:10px; display:inline-block; color:{text_color}; border:1px solid #0056ff;'><strong>✨ {t_act['sub']}</strong></div>", unsafe_allow_html=True)
+
+with c_enc2: 
+    audio_data = mic_recorder(start_prompt="🎤", stop_prompt="🛑", key='recorder')
+    if audio_data:
+        st.toast(t_act["escuchando"])
+        time.sleep(1)
+        st.info(f"{t_act['voz_ok']} 'Optimizar inventario'")
+
+tabs = st.tabs([t_act["tab0"], t_act["tab1"], t_act["tab2"], t_act["tab3"]])
+
+with tabs[0]:
+    st.markdown(f"## {t_act['diferencia']}")
+    col_v1, col_v2 = st.columns([0.6, 0.4])
+    with col_v1:
+        st.write(t_act["dolor"])
+        st.info(t_act["dato_cert"])
+    with col_v2:
+        st.markdown(t_act["modelo_t"])
+        st.write(f"{t_act['starter']}\n{t_act['growth']}\n{t_act['scale']}")
+
+with tabs[1]:
+    col1, col2, col3 = st.columns(3)
+    col1.metric(t_act["atrapado"], f"${float(atrapado_val):,.0f} MXN")
+    col2.metric(t_act["riesgo"], f"${float(riesgo_val):,.0f} MXN", delta="!", delta_color="inverse")
+    col3.metric(t_act["salud"], f"{max(0, 100-int(riesgo_val/1000))}%")
+    st.area_chart(df.set_index("Producto")["Stock"])
+
+with tabs[2]:
+    st.subheader(t_act["est_tit"])
+    with st.expander(t_act["sim_tit"], expanded=True):
+        sim_inv = st.number_input(t_act["sim_inv"], value=50000)
+        c_s1, c_s2 = st.columns(2)
+        with c_s1: st.markdown(f'<div style="background: linear-gradient(135deg, #0056ff 0%, #6200ea 100%); color: white; padding: 20px; border-radius: 15px;"><small>{t_act["sim_proj"]}</small><h3>${sim_inv * (f_demanda * 1.8):,.0f} MXN</h3></div>', unsafe_allow_html=True)
+        with c_s2: st.markdown(f'<div style="background: linear-gradient(135deg, #0056ff 0%, #6200ea 100%); color: white; padding: 20px; border-radius: 15px;"><small>{t_act["sim_rec"]}</small><h3>{30/f_demanda:.1f} {t_act["sim_dias"]}</h3></div>', unsafe_allow_html=True)
+    
+    st.write("---")
+    def determinar_accion(row):
+        if row["Autonomia"] < dias_entrega: return "🚨 REABASTECER"
+        if row["Autonomia"] > 60: return "🔥 LIQUIDAR"
+        return "✅ ESTABLE"
+    df["Accion"] = df.apply(determinar_accion, axis=1)
+    st.table(df[["Producto", "Stock", "Accion"]])
+    
+    col_b1, col_b2 = st.columns(2)
+    with col_b1:
+        if st.button(t_act["btn_app"], use_container_width=True):
+            st.success(t_act["sync_ok"])
+    
+    with col_b2:
+        csv = df.to_csv(index=False).encode('utf-8')
+        st.download_button(label=t_act["btn_reporte"], data=csv, file_name='Reporte_Flowmerce.csv', mime='text/csv', use_container_width=True)
+
+with tabs[3]:
+    st.markdown(f"### {t_act['equipo_tit']}")
+    equipo = [
+        ("Willan Álvarez.", "Lead Architect", "https://i.imgur.com/CSH9Af7.jpeg"),
+        ("Dalia R.", "Product Manager", "https://i.imgur.com/4O2BGL8.jpeg"),
+        ("Montserrat G.", "Strategy", "https://cdn-icons-png.flaticon.com/512/6997/6997674.png"),
+        ("Jiram Cabrera", "Organización", "https://i.imgur.com/eamMDmE.jpeg"),
+        ("Carlos Andrés A.", "Liderazgo", "https://cdn-icons-png.flaticon.com/512/2354/2354573.png"),
+        ("Edwing Garcia", "Ventas", "https://i.imgur.com/CQJu9xm.jpeg"),
+        ("Amarilis Elizabeth", "Gestión", "https://cdn-icons-png.flaticon.com/512/201/201634.png"),
+        ("Cesar Augusto F.", "Estrategia", "https://cdn-icons-png.flaticon.com/512/3001/3001764.png")
+    ]
+    for i in range(0, len(equipo), 4):
+        cols = st.columns(4)
+        for j, (nombre, cargo, img) in enumerate(equipo[i:i+4]):
+            with cols[j]:
+                st.markdown(f"""<div class="team-card-large">
+                    <img src="{img}" style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 3px solid #0056ff; margin-bottom: 10px;">
+                    <br><strong>{nombre}</strong><br><small style="color:#0056ff;">{cargo}</small>
+                </div>""", unsafe_allow_html=True)
+
+st.divider()
+st.caption("🌊 Flowmerce | Hackathon UTEL 2026 | Equipo 3")
