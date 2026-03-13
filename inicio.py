@@ -32,6 +32,7 @@ textos = {
         "sim_rec": "Recuperación en",
         "sim_dias": "días",
         "btn_app": "🚀 Aplicar a Tiendanube",
+        "btn_reporte": "📝 Crear Reporte en Tienda",
         "sync": "Sincronizando...",
         "sync_ok": "Sincronización Exitosa!",
         "equipo_tit": "👥 Equipo Multidisciplinario (Equipo 3)"
@@ -54,6 +55,7 @@ textos = {
         "sim_rec": "Recuperação em",
         "sim_dias": "dias",
         "btn_app": "🚀 Aplicar na Tiendanube",
+        "btn_reporte": "📝 Criar Relatório na Loja",
         "sync": "Sincronizando...",
         "sync_ok": "Sincronização com Sucesso!",
         "equipo_tit": "👥 Equipe Multidisciplinar (Equipe 3)"
@@ -76,6 +78,7 @@ textos = {
         "sim_rec": "Recovery in",
         "sim_dias": "days",
         "btn_app": "🚀 Apply to Tiendanube",
+        "btn_reporte": "📝 Create Report in Store",
         "sync": "Syncing...",
         "sync_ok": "Successful Synchronization!",
         "equipo_tit": "👥 Multidisciplinary Team (Team 3)"
@@ -91,6 +94,29 @@ def obtener_token_real(code):
         return response.json().get("access_token") if response.status_code == 200 else None
     except: return None
 
+def crear_pagina_reporte(token, contenido_html, titulo="Reporte de Liquidez Flowmerce"):
+    url = "https://api.tiendanube.com/v1/pages"
+    headers = {
+        "Authentication": f"bearer {token}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "page": {
+            "publish": True,
+            "i18n": {
+                "es_AR": { 
+                    "title": titulo,
+                    "content": contenido_html,
+                    "seo_handle": f"reporte-flowmerce-{int(time.time())}"
+                }
+            }
+        }
+    }
+    try:
+        response = requests.post(url, json=payload, headers=headers)
+        return response.status_code == 201
+    except: return False
+
 # --- 5. GESTIÓN DE MEMORIA ---
 if 'db_inventario' not in st.session_state:
     st.session_state.db_inventario = pd.DataFrame({
@@ -99,6 +125,8 @@ if 'db_inventario' not in st.session_state:
         "Ventas_30d": [45, 10, 30, 42],
         "Costo": [1200, 350, 150, 890]
     })
+if 'token' not in st.session_state:
+    st.session_state.token = None
 
 # --- 6. BARRA LATERAL ---
 with st.sidebar:
@@ -117,8 +145,10 @@ with st.sidebar:
         st.link_button("1. Autorizar App", f"https://www.tiendanube.com/apps/authorize?client_id={CLIENT_ID}&scope=read_orders,write_orders,read_products,write_products")
         temp_code = st.text_input("2. Pega el Code:")
         if st.button("3. Vincular Tienda"):
-            token = obtener_token_real(temp_code)
-            if token: st.success("✅")
+            token_recibido = obtener_token_real(temp_code)
+            if token_recibido: 
+                st.session_state.token = token_recibido
+                st.success("✅")
 
 # --- 7. ESTILOS CSS ---
 st.markdown(f"""
@@ -198,13 +228,25 @@ with tabs[2]:
         return "✅ ESTABLE"
     df["Accion"] = df.apply(determinar_accion, axis=1)
     st.table(df[["Producto", "Stock", "Accion"]])
-    if st.button(t_act["btn_app"]):
-        cloud_placeholder = st.empty()
-        with st.status(t_act["sync"], expanded=True) as s:
-            cloud_placeholder.markdown('<div class="cloud-ascend" style="left:15%;">☁️</div><div class="cloud-ascend" style="left:50%;">☁️</div>', unsafe_allow_html=True)
-            time.sleep(2)
-            s.update(label=t_act["sync_ok"], state="complete")
-        cloud_placeholder.empty()
+    
+    col_btn1, col_btn2 = st.columns(2)
+    with col_btn1:
+        if st.button(t_act["btn_app"]):
+            cloud_placeholder = st.empty()
+            with st.status(t_act["sync"], expanded=True) as s:
+                cloud_placeholder.markdown('<div class="cloud-ascend" style="left:15%;">☁️</div><div class="cloud-ascend" style="left:50%;">☁️</div>', unsafe_allow_html=True)
+                time.sleep(2)
+                s.update(label=t_act["sync_ok"], state="complete")
+            cloud_placeholder.empty()
+            
+    with col_btn2:
+        if st.button(t_act["btn_reporte"]):
+            if st.session_state.token:
+                html_reporte = f"<h1>Reporte Flowmerce</h1><p>Capital Atrapado: ${atrapado_val}</p><p>Ventas en Riesgo: ${riesgo_val}</p>"
+                if crear_pagina_reporte(st.session_state.token, html_reporte):
+                    st.success("¡Página creada en tu tienda! ✅")
+                else: st.error("Error al crear página")
+            else: st.warning("Primero vincula tu tienda")
 
 with tabs[3]:
     st.markdown(f"### {t_act['equipo_tit']}")
