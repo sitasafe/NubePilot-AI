@@ -32,31 +32,37 @@ textos = {
         "sim_rec": "Recuperación en",
         "sim_dias": "días",
         "btn_app": "🚀 Aplicar a Tiendanube",
+        "btn_reporte": "📝 Generar Reporte y Descargar",
         "sync": "Sincronizando...",
         "sync_ok": "Sincronización Exitosa!",
-        "equipo_tit": "👥 Equipo Multidisciplinario (Equipo 3)"
+        "equipo_tit": "👥 Equipo Multidisciplinario (Equipo 3)",
+        "rep_proceso": "Procesando Reporte...",
+        "rep_exito": "¡Reporte listo para descargar! ✅"
     },
     "Português": {
         "sub": "Onde os dados se transformam em vendas",
         "tab0": "🚀 Nossa Visão", "tab1": "📊 Monitor de Liquidez", "tab2": "🧠 Estratégia", "tab3": "👥 Equipe",
         "atrapado": "Capital Preso", "riesgo": "Vendas em Risco", "salud": "Saúde do Caixa",
         "diferencia": "🎯 O que nos diferencia?",
-        "dolor": "Hoje, milhares de donos de marcas passam **5 horas por semana** na frente de um Excel, tentando adivinhar o futuro. Flowmerce transforma dados de vendas em decisões automáticas.",
+        "dolor": "Hoje, milhares de donos de marcas passam **5 horas por semana** na frente de um Excel, tentando adivinhar o futuro. Flowmerce transforma datos de vendas em decisões automáticas.",
         "modelo_t": "### 💎 Modelo de Negócio (SaaS)",
         "starter": "- **Starter (Grátis):** Alertas básicos.",
         "growth": "- **Growth ($20 USD):** Predição IA.",
         "scale": "- **Scale (Premium):** Simulador de cenários.",
         "dato_cert": "💡 **Dado:** Reduzimos uma tarde inteira de trabalho a apenas 5 minutos de certeza.",
-        "est_tit": "🧠 Estratégia e Inteligência de Dados",
+        "est_tit": "🧠 Estratégia e Inteligência de Datos",
         "sim_tit": "💎 Simulador de Liquidez (Nível Scale)",
         "sim_inv": "Investimento para Simular ($)",
         "sim_proj": "Vendas Projetadas",
         "sim_rec": "Recuperação em",
         "sim_dias": "dias",
         "btn_app": "🚀 Aplicar na Tiendanube",
+        "btn_reporte": "📝 Gerar Relatório e Baixar",
         "sync": "Sincronizando...",
         "sync_ok": "Sincronização com Sucesso!",
-        "equipo_tit": "👥 Equipe Multidisciplinar (Equipe 3)"
+        "equipo_tit": "👥 Equipe Multidisciplinar (Equipe 3)",
+        "rep_proceso": "Processando Relatório...",
+        "rep_exito": "Relatório pronto para baixar! ✅"
     },
     "English": {
         "sub": "Where data turns into sales",
@@ -76,9 +82,12 @@ textos = {
         "sim_rec": "Recovery in",
         "sim_dias": "days",
         "btn_app": "🚀 Apply to Tiendanube",
+        "btn_reporte": "📝 Generate Report & Download",
         "sync": "Syncing...",
         "sync_ok": "Successful Synchronization!",
-        "equipo_tit": "👥 Multidisciplinary Team (Team 3)"
+        "equipo_tit": "👥 Multidisciplinary Team (Team 3)",
+        "rep_proceso": "Processing Report...",
+        "rep_exito": "Report ready to download! ✅"
     }
 }
 
@@ -91,6 +100,18 @@ def obtener_token_real(code):
         return response.json().get("access_token") if response.status_code == 200 else None
     except: return None
 
+def crear_pagina_reporte(token, contenido_html, titulo="Reporte Flowmerce"):
+    if not token or token == "demo":
+        time.sleep(1)
+        return True
+    url = "https://api.tiendanube.com/v1/pages"
+    headers = {"Authentication": f"bearer {token}", "Content-Type": "application/json"}
+    payload = {"page": {"publish": True, "i18n": {"es_AR": {"title": titulo, "content": contenido_html, "seo_handle": f"reporte-{int(time.time())}"}}}}
+    try:
+        response = requests.post(url, json=payload, headers=headers, timeout=5)
+        return response.status_code == 201
+    except: return False
+
 # --- 5. GESTIÓN DE MEMORIA ---
 if 'db_inventario' not in st.session_state:
     st.session_state.db_inventario = pd.DataFrame({
@@ -99,6 +120,8 @@ if 'db_inventario' not in st.session_state:
         "Ventas_30d": [45, 10, 30, 42],
         "Costo": [1200, 350, 150, 890]
     })
+if 'token_session' not in st.session_state:
+    st.session_state.token_session = None
 
 # --- 6. BARRA LATERAL ---
 with st.sidebar:
@@ -118,7 +141,12 @@ with st.sidebar:
         temp_code = st.text_input("2. Pega el Code:")
         if st.button("3. Vincular Tienda"):
             token = obtener_token_real(temp_code)
-            if token: st.success("✅")
+            if token:
+                st.session_state.token_session = token
+                st.success("✅")
+            else:
+                st.session_state.token_session = "demo"
+                st.info("Modo Demo ✅")
 
 # --- 7. ESTILOS CSS ---
 st.markdown(f"""
@@ -198,13 +226,32 @@ with tabs[2]:
         return "✅ ESTABLE"
     df["Accion"] = df.apply(determinar_accion, axis=1)
     st.table(df[["Producto", "Stock", "Accion"]])
-    if st.button(t_act["btn_app"]):
-        cloud_placeholder = st.empty()
-        with st.status(t_act["sync"], expanded=True) as s:
-            cloud_placeholder.markdown('<div class="cloud-ascend" style="left:15%;">☁️</div><div class="cloud-ascend" style="left:50%;">☁️</div>', unsafe_allow_html=True)
-            time.sleep(2)
-            s.update(label=t_act["sync_ok"], state="complete")
-        cloud_placeholder.empty()
+    
+    # --- SECCIÓN DE BOTONES ---
+    col_b1, col_b2 = st.columns(2)
+    with col_b1:
+        if st.button(t_act["btn_app"], use_container_width=True):
+            cloud_placeholder = st.empty()
+            with st.status(t_act["sync"], expanded=True) as s:
+                cloud_placeholder.markdown('<div class="cloud-ascend" style="left:15%;">☁️</div><div class="cloud-ascend" style="left:50%;">☁️</div>', unsafe_allow_html=True)
+                time.sleep(2)
+                s.update(label=t_act["sync_ok"], state="complete")
+            cloud_placeholder.empty()
+    
+    with col_b2:
+        # Lógica mejorada del reporte
+        csv = df.to_csv(index=False).encode('utf-8')
+        
+        # Botón de descarga de Streamlit (se activa visualmente al generar)
+        st.download_button(
+            label=t_act["btn_reporte"],
+            data=csv,
+            file_name=f'Reporte_Flowmerce_{int(time.time())}.csv',
+            mime='text/csv',
+            use_container_width=True,
+            type="primary",
+            on_click=lambda: st.toast(t_act["rep_exito"]) # Pequeño aviso visual
+        )
 
 with tabs[3]:
     st.markdown(f"### {t_act['equipo_tit']}")
@@ -229,4 +276,3 @@ with tabs[3]:
 
 st.divider()
 st.caption("🌊 Flowmerce | Hackathon UTEL 2026 | Equipo 3")
-
