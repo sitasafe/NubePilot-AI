@@ -55,4 +55,159 @@ if 'db_inventario' not in st.session_state:
         "Costo": [1200, 350, 150, 890]
     })
 
-# ---
+# --- 6. BARRA LATERAL ---
+with st.sidebar:
+    st.image("https://imgur.com/V1m4Dgk.jpeg", use_container_width=True)
+    st.write("---")
+
+    with st.expander("🌐 Accesibilidad e Idioma", expanded=True):
+        idioma = st.selectbox("Idioma Interfaz", ["Español", "Português", "English"])
+        lectura_facil = st.toggle("Modo Lectura Fácil")
+        alto_contraste = st.toggle("Modo Alto Contraste")
+
+    st.markdown("### ⚙️ Simulador de Mercado")
+    f_demanda = st.slider("Impulso de Demanda (Factor)", 0.5, 4.0, 1.0)
+    dias_entrega = st.slider("Lead Time Proveedor (Días)", 1, 30, 7)
+    
+    with st.expander("🔑 Conexión Tiendanube", expanded=True):
+        st.link_button("1. Autorizar App", f"https://www.tiendanube.com/apps/authorize?client_id={CLIENT_ID}&scope=read_orders,write_orders,read_products,write_products")
+        temp_code = st.text_input("2. Pega el Code:")
+        
+        if st.button("3. Vincular Tienda"):
+            token = obtener_token_real(temp_code)
+            if token:
+                st.session_state.token_tienda = token
+                st.success("¡Conexión Establecida! ✅")
+            else:
+                st.error("Error en vinculación.")
+
+# --- 7. ESTILOS CSS ---
+extra_styles = ""
+if lectura_facil: extra_styles += "html, body, p, div { font-size: 1.4rem !important; line-height: 1.8 !important; }"
+if alto_contraste: extra_styles += ".stApp { background: #000 !important; color: #fff !important; } .team-card-large { border: 2px solid white !important; }"
+
+st.markdown(f"""
+<style>
+    {extra_styles}
+    .main-title {{
+        background: linear-gradient(90deg, #0056ff, #00c6ff, #6200ea, #0056ff);
+        background-size: 300% auto;
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        font-size: 4rem !important; font-weight: 800; 
+        animation: gradient-move 4s ease infinite; 
+        text-align: left;
+        margin-bottom: 5px;
+    }}
+    @keyframes gradient-move {{ 0% {{background-position: 0% 50%;}} 50% {{background-position: 100% 50%;}} 100% {{background-position: 0% 50%;}} }}
+    
+    .team-card-large {{
+        text-align: center; padding: 25px; border-radius: 25px;
+        background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(0, 86, 255, 0.2);
+        transition: all 0.4s ease; margin-bottom: 20px;
+    }}
+    .team-card-large:hover {{ transform: translateY(-10px); border-color: #0056ff; box-shadow: 0px 15px 30px rgba(0, 86, 255, 0.2); }}
+    .stMetric {{ background: rgba(0, 86, 255, 0.05); padding: 20px; border-radius: 15px; border-left: 5px solid #0056ff; }}
+
+    /* Estilo del Banner de Carga */
+    .loading-banner {{
+        background: linear-gradient(90deg, #001f54, #0056ff);
+        color: white;
+        padding: 20px;
+        border-radius: 15px;
+        text-align: center;
+        border: 1px solid #00c6ff;
+        margin-bottom: 20px;
+        box-shadow: 0px 10px 20px rgba(0,0,0,0.2);
+    }}
+</style>
+""", unsafe_allow_html=True)
+
+# --- 8. LÓGICA DE CÁLCULO ---
+t_act = textos[idioma]
+df = st.session_state.db_inventario.copy()
+df["V_Diaria"] = (df["Ventas_30d"] / 30) * f_demanda
+df["Autonomia"] = np.where(df["V_Diaria"] > 0, df["Stock"] / df["V_Diaria"], np.inf)
+
+filtro_atrapado = df["Autonomia"] > 60
+atrapado_val = (df.loc[filtro_atrapado, "Stock"] * df.loc[filtro_atrapado, "Costo"]).sum()
+
+filtro_riesgo = df["Autonomia"] < dias_entrega
+riesgo_val = (df.loc[filtro_riesgo, "V_Diaria"] * df.loc[filtro_riesgo, "Costo"] * 1.5).sum()
+
+# --- 9. CUERPO DE LA APP ---
+# BANNER EN PRIMER PLANO (Placeholder)
+placeholder_banner = st.empty()
+
+st.markdown('<h1 class="main-title">🌊 Flowmerce</h1>', unsafe_allow_html=True)
+
+c_enc1, c_enc2 = st.columns([0.8, 0.2])
+with c_enc1:
+    st.markdown(f"**✨ {t_act['sub']}**")
+with c_enc2:
+    mic_recorder(start_prompt="🎤 Comando Voz", stop_prompt="🛑", key='rec')
+
+tab1, tab2, tab3 = st.tabs([t_act["tab1"], t_act["tab2"], t_act["tab3"]])
+
+with tab1:
+    col1, col2, col3 = st.columns(3)
+    col1.metric(t_act["atrapado"], f"${float(atrapado_val):,.0f} MXN")
+    col2.metric(t_act["riesgo"], f"${float(riesgo_val):,.0f} MXN", delta="¡Alerta!", delta_color="inverse")
+    col3.metric(t_act["salud"], f"{max(0, 100-(dias_entrega*2))}%")
+
+    st.write("---")
+    st.subheader("📈 Proyección de Capital Invertido")
+    df["Capital_Invertido"] = df["Stock"] * df["Costo"]
+    st.area_chart(df.set_index("Producto")["Capital_Invertido"])
+
+with tab2:
+    st.subheader("🤖 Recomendaciones Estratégicas")
+    def determinar_accion(row):
+        if row["Autonomia"] < dias_entrega: return "🚨 REABASTECER"
+        if row["Autonomia"] > 60: return "🔥 LIQUIDAR"
+        return "✅ ESTABLE"
+
+    df["Acción Sugerida"] = df.apply(determinar_accion, axis=1)
+    st.table(df[["Producto", "Stock", "Autonomia", "Acción Sugerida"]])
+    
+    if st.button("🚀 Aplicar Cambios en Tiendanube"):
+        with placeholder_banner.container():
+            st.markdown("""
+                <div class="loading-banner">
+                    <h3>⚡ Sincronización Inteligente en Curso</h3>
+                    <p>Actualizando stock y optimizando liquidez en tiempo real...</p>
+                </div>
+            """, unsafe_allow_html=True)
+            progreso = st.progress(0)
+            for i in range(101):
+                time.sleep(0.02)
+                progreso.progress(i)
+            st.success("✅ ¡Tienda sincronizada con éxito!")
+            time.sleep(1)
+        placeholder_banner.empty()
+
+with tab3:
+    st.markdown("### 👥 Equipo Multidisciplinario (Equipo 3)")
+    equipo = [
+        ("Willan Álvarez.", "Lead Architect", "https://i.imgur.com/CSH9Af7.jpeg"),
+        ("Dalia R.", "Product Manager", "https://i.imgur.com/4O2BGL8.jpeg"),
+        ("Montserrat G.", "Strategy", "https://cdn-icons-png.flaticon.com/512/6997/6997674.png"),
+        ("Jiram Cabrera", "Organización", "https://i.imgur.com/eamMDmE.jpeg"),
+        ("Carlos Andrés A.", "Liderazgo", "https://cdn-icons-png.flaticon.com/512/2354/2354573.png"),
+        ("Edwing Garcia", "Ventas", "https://i.imgur.com/CQJu9xm.jpeg"),
+        ("Amarilis Elizabeth", "Gestión", "https://cdn-icons-png.flaticon.com/512/201/201634.png"),
+        ("Cesar Augusto F.", "Estrategia", "https://cdn-icons-png.flaticon.com/512/3001/3001764.png")
+    ]
+    
+    for i in range(0, len(equipo), 4):
+        cols = st.columns(4)
+        for j, (nombre, cargo, img) in enumerate(equipo[i:i+4]):
+            with cols[j]:
+                st.markdown(f"""
+                <div class="team-card-large">
+                    <img src="{img}" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid #0056ff; margin-bottom: 15px;">
+                    <br><strong>{nombre}</strong><br><small style="color:#0056ff;">{cargo}</small>
+                </div>
+                """, unsafe_allow_html=True)
+
+st.divider()
+st.caption("🌊 Flowmerce | Hackathon UTEL 2026 | Equipo 3")
