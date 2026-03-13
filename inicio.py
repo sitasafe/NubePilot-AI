@@ -97,7 +97,7 @@ textos = {
     }
 }
 
-# --- 4. FUNCIONES DE API ---
+# --- 4. FUNCIONES DE API Y UTILIDADES ---
 def obtener_token_real(code):
     url = "https://www.tiendanube.com/apps/authorize/token"
     payload = {"client_id": int(CLIENT_ID), "client_secret": CLIENT_SECRET, "grant_type": "authorization_code", "code": code.strip()}
@@ -105,6 +105,17 @@ def obtener_token_real(code):
         response = requests.post(url, json=payload, timeout=10)
         return response.json().get("access_token") if response.status_code == 200 else None
     except: return None
+
+def animar_nubes():
+    cloud_placeholder = st.empty()
+    cloud_placeholder.markdown("""
+        <div class="cloud-effect" style="left: 10%; animation-delay: 0s;">☁️</div>
+        <div class="cloud-effect" style="left: 30%; animation-delay: 0.5s;">☁️</div>
+        <div class="cloud-effect" style="left: 55%; animation-delay: 0.2s;">☁️</div>
+        <div class="cloud-effect" style="left: 80%; animation-delay: 0.8s;">☁️</div>
+        <div class="cloud-effect" style="left: 45%; animation-delay: 1.2s;">☁️</div>
+    """, unsafe_allow_html=True)
+    time.sleep(0.1)
 
 # --- 5. GESTIÓN DE MEMORIA ---
 if 'db_inventario' not in st.session_state:
@@ -155,84 +166,24 @@ with st.sidebar:
                 st.session_state.token_session = "demo"
                 st.info("Modo Demo ✅")
 
-# --- 7. ESTILOS CON EFECTOS ESPECIALES ---
+# --- 7. ESTILOS CSS ---
 bg_overlay = "rgba(255, 255, 255, 0.7)" if not alto_contraste else "rgba(0, 0, 0, 0.9)"
 text_color = "#1E1E1E" if not alto_contraste else "#000000"
 
 st.markdown(f"""
 <style>
-    @keyframes gradient-move {{
-        0% {{ background-position: 0% 50%; }}
-        50% {{ background-position: 100% 50%; }}
-        100% {{ background-position: 0% 50%; }}
-    }}
-
-    @keyframes clouds-up {{
-        0% {{ transform: translateY(100vh); opacity: 0; }}
-        20% {{ opacity: 0.8; }}
-        80% {{ opacity: 0.6; }}
-        100% {{ transform: translateY(-100vh); opacity: 0; }}
-    }}
-
-    .cloud-effect {{
-        position: fixed;
-        font-size: 50px;
-        z-index: 9999;
-        pointer-events: none;
-        animation: clouds-up 4s ease-in forwards;
-    }}
-
-    .stApp {{
-        background: linear-gradient({bg_overlay}, {bg_overlay}), 
-                    url("https://imgur.com/gQ7yynl.jpeg");
-        background-attachment: fixed;
-        background-size: cover;
-    }}
-
-    .main-title {{
-        background: linear-gradient(90deg, #0056ff, #00c6ff, #6200ea, #0056ff);
-        background-size: 200% auto;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        font-size: 4rem !important;
-        font-weight: 800;
-        animation: gradient-move 3s linear infinite;
-        margin-bottom: 0px;
-    }}
-    
-    div[data-testid="stMetric"], .stTable, .team-card-large, div[data-testid="stExpander"] {{
-        background-color: white !important;
-        border-radius: 15px !important;
-        border: none !important;
-        padding: 20px !important;
-        transition: all 0.3s ease-in-out !important;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.05) !important;
-    }}
-
-    div[data-testid="stMetric"]:hover, .stTable:hover, .team-card-large:hover {{
-        transform: translateY(-5px) scale(1.01) !important;
-        box-shadow: 0 12px 30px rgba(0,86,255,0.15) !important;
-    }}
-
-    div[data-testid="stTabs"] {{
-        background-color: rgba(255, 255, 255, 0.95) !important;
-        padding: 30px !important;
-        border-radius: 20px !important;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.1) !important;
-        border: none !important;
-    }}
-
-    div.stButton > button {{
-        background: linear-gradient(90deg, #0056ff, #00c6ff) !important;
-        color: white !important;
-        border: none !important;
-        border-radius: 10px !important;
-        transition: 0.3s !important;
-    }}
+    @keyframes gradient-move {{ 0% {{ background-position: 0% 50%; }} 50% {{ background-position: 100% 50%; }} 100% {{ background-position: 0% 50%; }} }}
+    @keyframes clouds-up {{ 0% {{ transform: translateY(100vh); opacity: 0; }} 20% {{ opacity: 0.8; }} 80% {{ opacity: 0.6; }} 100% {{ transform: translateY(-100vh); opacity: 0; }} }}
+    .cloud-effect {{ position: fixed; font-size: 50px; z-index: 9999; pointer-events: none; animation: clouds-up 4s ease-in forwards; }}
+    .stApp {{ background: linear-gradient({bg_overlay}, {bg_overlay}), url("https://imgur.com/gQ7yynl.jpeg"); background-attachment: fixed; background-size: cover; }}
+    .main-title {{ background: linear-gradient(90deg, #0056ff, #00c6ff, #6200ea, #0056ff); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 4rem !important; font-weight: 800; animation: gradient-move 3s linear infinite; margin-bottom: 0px; }}
+    div[data-testid="stMetric"], .team-card-large, div[data-testid="stExpander"], .stDataEditor {{ background-color: white !important; border-radius: 15px !important; padding: 20px !important; box-shadow: 0 4px 15px rgba(0,0,0,0.05) !important; }}
+    div[data-testid="stTabs"] {{ background-color: rgba(255, 255, 255, 0.95) !important; padding: 30px !important; border-radius: 20px !important; box-shadow: 0 10px 40px rgba(0,0,0,0.1) !important; }}
+    div.stButton > button {{ background: linear-gradient(90deg, #0056ff, #00c6ff) !important; color: white !important; border-radius: 10px !important; }}
 </style>
 """, unsafe_allow_html=True)
 
-# --- 8. LÓGICA DE CÁLCULO ---
+# --- 8. LÓGICA DE CÁLCULO DINÁMICA ---
 t_act = textos[idioma]
 df = st.session_state.db_inventario.copy()
 df["V_Diaria"] = (df["Ventas_30d"] / 30) * f_demanda
@@ -256,6 +207,7 @@ with c_enc2:
 
 tabs = st.tabs([t_act["tab0"], t_act["tab1"], t_act["tab2"], t_act["tab3"]])
 
+# PESTAÑA 0: VISIÓN
 with tabs[0]:
     st.markdown(f"## {t_act['diferencia']}")
     col_v1, col_v2 = st.columns([0.6, 0.4])
@@ -266,6 +218,7 @@ with tabs[0]:
         st.markdown(t_act["modelo_t"])
         st.write(f"{t_act['starter']}\n{t_act['growth']}\n{t_act['scale']}")
 
+# PESTAÑA 1: MONITOR
 with tabs[1]:
     col1, col2, col3 = st.columns(3)
     col1.metric(t_act["atrapado"], f"${float(atrapado_val):,.0f} MXN")
@@ -273,50 +226,56 @@ with tabs[1]:
     col3.metric(t_act["salud"], f"{max(0, 100-int(riesgo_val/1000))}%")
     st.area_chart(df.set_index("Producto")["Stock"])
 
+# PESTAÑA 2: ESTRATEGIA (CON TU NUEVA TABLA INTERACTIVA)
 with tabs[2]:
     st.subheader(t_act["est_tit"])
-    with st.expander(t_act["sim_tit"], expanded=True):
+    
+    # --- SIMULADOR DE ESCENARIOS ---
+    with st.expander(t_act["sim_tit"], expanded=False):
         sim_inv = st.number_input(t_act["sim_inv"], value=50000)
         c_s1, c_s2 = st.columns(2)
-        with c_s1: st.markdown(f'<div style="background: linear-gradient(135deg, #0056ff 0%, #6200ea 100%); color: white; padding: 25px; border-radius: 15px; text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.15);"><small>{t_act["sim_proj"]}</small><h3>${sim_inv * (f_demanda * 1.8):,.0f} MXN</h3></div>', unsafe_allow_html=True)
-        with c_s2: st.markdown(f'<div style="background: linear-gradient(135deg, #00c6ff 0%, #0056ff 100%); color: white; padding: 25px; border-radius: 15px; text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.15);"><small>{t_act["sim_rec"]}</small><h3>{30/f_demanda:.1f} {t_act["sim_dias"]}</h3></div>', unsafe_allow_html=True)
+        with c_s1: st.markdown(f'<div style="background: linear-gradient(135deg, #0056ff 0%, #6200ea 100%); color: white; padding: 25px; border-radius: 15px; text-align: center;"><small>{t_act["sim_proj"]}</small><h3>${sim_inv * (f_demanda * 1.8):,.0f} MXN</h3></div>', unsafe_allow_html=True)
+        with c_s2: st.markdown(f'<div style="background: linear-gradient(135deg, #00c6ff 0%, #0056ff 100%); color: white; padding: 25px; border-radius: 15px; text-align: center;"><small>{t_act["sim_rec"]}</small><h3>{30/f_demanda:.1f} {t_act["sim_dias"]}</h3></div>', unsafe_allow_html=True)
     
     st.write("---")
-    def determinar_accion(row):
-        if row["Autonomia"] < dias_entrega: return "🚨 REABASTECER"
-        if row["Autonomia"] > 60: return "🔥 LIQUIDAR"
-        return "✅ ESTABLE"
-    df["Accion"] = df.apply(determinar_accion, axis=1)
-    st.table(df[["Producto", "Stock", "Accion"]])
     
-    def animar_nubes():
-        cloud_placeholder = st.empty()
-        cloud_placeholder.markdown("""
-            <div class="cloud-effect" style="left: 10%; animation-delay: 0s;">☁️</div>
-            <div class="cloud-effect" style="left: 30%; animation-delay: 0.5s;">☁️</div>
-            <div class="cloud-effect" style="left: 55%; animation-delay: 0.2s;">☁️</div>
-            <div class="cloud-effect" style="left: 80%; animation-delay: 0.8s;">☁️</div>
-            <div class="cloud-effect" style="left: 45%; animation-delay: 1.2s;">☁️</div>
-        """, unsafe_allow_html=True)
-        time.sleep(0.1)
+    # --- TABLA INTERACTIVA (DATA EDITOR) ---
+    st.markdown("### 📝 Gestión Dinámica de Inventario")
+    st.caption("Modifica los valores directamente en la tabla para simular cambios de stock o ventas.")
+    
+    df_editable = st.data_editor(
+        st.session_state.db_inventario,
+        column_config={
+            "Producto": st.column_config.TextColumn("Producto", disabled=True),
+            "Stock": st.column_config.NumberColumn("Stock Actual", min_value=0, step=1),
+            "Ventas_30d": st.column_config.NumberColumn("Ventas (30 días)", min_value=0, step=1),
+            "Costo": st.column_config.CurrencyColumn("Costo Unitario", currency="MXN"),
+        },
+        hide_index=True,
+        use_container_width=True,
+        key="editor_inventario"
+    )
+
+    if not df_editable.equals(st.session_state.db_inventario):
+        st.session_state.db_inventario = df_editable
+        st.rerun()
 
     col_b1, col_b2 = st.columns(2)
     with col_b1:
         if st.button(t_act["btn_app"], use_container_width=True):
             animar_nubes()
-            st.success(t_act["sync_ok"])
+            st.success("📦 Pedidos de reabastecimiento enviados a Tiendanube")
     
     with col_b2:
-        csv = df.to_csv(index=False).encode('utf-8')
-        if st.download_button(label=t_act["btn_reporte"], data=csv, file_name='Reporte_Flowmerce.csv', mime='text/csv', use_container_width=True):
-            animar_nubes()
-            st.toast(t_act["rep_exito"])
+        csv = df_editable.to_csv(index=False).encode('utf-8')
+        st.download_button(label=t_act["btn_reporte"], data=csv, file_name='Plan_Accion_Flowmerce.csv', use_container_width=True)
 
+# PESTAÑA 3: EQUIPO
 with tabs[3]:
     st.markdown(f"### {t_act['equipo_tit']}")
     equipo = [
         ("Willan Álvarez.", "Lead Architect", "https://i.imgur.com/CSH9Af7.jpeg"),
-        ("Dalia R.", "Product Manager", "https://i.imgur.com/4O2BGL8.jpeg"), # Foto actualizada
+        ("Dalia R.", "Product Manager", "https://i.imgur.com/4O2BGL8.jpeg"),
         ("Montserrat G.", "Strategy", "https://cdn-icons-png.flaticon.com/512/6997/6997674.png"),
         ("Jiram Cabrera", "Organización", "https://i.imgur.com/eamMDmE.jpeg"),
         ("Carlos Andrés A.", "Liderazgo", "https://cdn-icons-png.flaticon.com/512/2354/2354573.png"),
@@ -328,12 +287,10 @@ with tabs[3]:
         cols = st.columns(4)
         for j, (nombre, cargo, img) in enumerate(equipo[i:i+4]):
             with cols[j]:
-                st.markdown(f"""<div class="team-card-large">
+                st.markdown(f"""<div class="team-card-large" style="text-align: center;">
                     <img src="{img}" style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; margin-bottom: 10px;">
                     <br><strong>{nombre}</strong><br><small style="color:#0056ff;">{cargo}</small>
                 </div>""", unsafe_allow_html=True)
 
 st.divider()
-st.caption("🌊 Flowmerce | Hackathon UTEL 2026 | Equipo 3 |TiendaNube")
-
-
+st.caption("🌊 Flowmerce | Hackathon UTEL 2026 | Equipo 3 | TiendaNube")
