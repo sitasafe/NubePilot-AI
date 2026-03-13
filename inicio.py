@@ -31,7 +31,7 @@ textos = {
     }
 }
 
-# --- 4. FUNCIONES DE API (Manejo de errores mejorado) ---
+# --- 4. FUNCIONES DE API ---
 def obtener_token_real(code):
     url = "https://www.tiendanube.com/apps/authorize/token"
     payload = {
@@ -73,7 +73,6 @@ with st.sidebar:
         st.link_button("1. Autorizar App", f"https://www.tiendanube.com/apps/authorize?client_id={CLIENT_ID}&scope=read_orders,write_orders,read_products,write_products")
         temp_code = st.text_input("2. Pega el Code:")
         
-        # Corrección: Persistencia de Token
         if st.button("3. Vincular Tienda"):
             token = obtener_token_real(temp_code)
             if token:
@@ -87,7 +86,7 @@ with st.sidebar:
     st.toggle("Plan del día a WhatsApp", value=True)
     st.toggle("Alertas SMS (Zonas sin datos)", value=False)
 
-# --- 7. ESTILOS CSS (Efectos Visuales Originales) ---
+# --- 7. ESTILOS CSS (ALINEADO A LA IZQUIERDA / ESQUINA) ---
 extra_styles = ""
 if lectura_facil: extra_styles += "html, body, p, div { font-size: 1.4rem !important; line-height: 1.8 !important; }"
 if alto_contraste: extra_styles += ".stApp { background: #000 !important; color: #fff !important; } .team-card-large { border: 2px solid white !important; }"
@@ -95,13 +94,18 @@ if alto_contraste: extra_styles += ".stApp { background: #000 !important; color:
 st.markdown(f"""
 <style>
     {extra_styles}
+    /* Título alineado a la izquierda */
     .main-title {{
         background: linear-gradient(90deg, #0056ff, #00c6ff, #6200ea, #0056ff);
         background-size: 300% auto;
         -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        font-size: 4.5rem !important; font-weight: 800; animation: gradient-move 4s ease infinite; text-align: center;
+        font-size: 4rem !important; font-weight: 800; 
+        animation: gradient-move 4s ease infinite; 
+        text-align: left; /* AQUÍ CAMBIAMOS A LA ESQUINA */
+        margin-bottom: 0px;
     }}
     @keyframes gradient-move {{ 0% {{background-position: 0% 50%;}} 50% {{background-position: 100% 50%;}} 100% {{background-position: 0% 50%;}} }}
+    
     .team-card-large {{
         text-align: center; padding: 25px; border-radius: 25px;
         background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(0, 86, 255, 0.2);
@@ -112,15 +116,12 @@ st.markdown(f"""
 </style>
 """, unsafe_allow_html=True)
 
-# --- 8. LÓGICA DE CÁLCULO (Correcciones de Estabilidad Aplicadas) ---
+# --- 8. LÓGICA DE CÁLCULO ---
 t_act = textos[idioma]
 df = st.session_state.db_inventario.copy()
 df["V_Diaria"] = (df["Ventas_30d"] / 30) * f_demanda
-
-# Corrección: Prevención de División por Cero
 df["Autonomia"] = np.where(df["V_Diaria"] > 0, df["Stock"] / df["V_Diaria"], np.inf)
 
-# Corrección: Cálculo Vectorizado para evitar errores de Pandas
 filtro_atrapado = df["Autonomia"] > 60
 atrapado_val = (df.loc[filtro_atrapado, "Stock"] * df.loc[filtro_atrapado, "Costo"]).sum()
 
@@ -128,14 +129,14 @@ filtro_riesgo = df["Autonomia"] < dias_entrega
 riesgo_val = (df.loc[filtro_riesgo, "V_Diaria"] * df.loc[filtro_riesgo, "Costo"] * 1.5).sum()
 
 # --- 9. CUERPO DE LA APP ---
+# Encabezado alineado a la izquierda
 st.markdown('<h1 class="main-title">🌊 Flowmerce IA</h1>', unsafe_allow_html=True)
-st.subheader(f"✨ {t_act['sub']}")
 
-# Voz
-c_voz1, c_voz2 = st.columns([0.7, 0.3])
+c_voz1, c_voz2 = st.columns([0.8, 0.2])
+with c_voz1:
+    st.markdown(f"**✨ {t_act['sub']}**")
 with c_voz2:
-    audio = mic_recorder(start_prompt="🎤 Comando Voz", stop_prompt="🛑 Parar", key='rec')
-    if audio: st.toast("Procesando comando...")
+    audio = mic_recorder(start_prompt="🎤 Voz", stop_prompt="🛑", key='rec')
 
 tab1, tab2, tab3 = st.tabs([t_act["tab1"], t_act["tab2"], t_act["tab3"]])
 
@@ -146,8 +147,7 @@ with tab1:
     col3.metric(t_act["salud"], f"{max(0, 100-(dias_entrega*2))}%")
 
     st.write("---")
-    st.subheader("📈 Proyección de Flujo de Efectivo")
-    # Gráfico mejorado: Capital total
+    st.subheader("📈 Análisis de Capital por Producto")
     df["Capital_Invertido"] = df["Stock"] * df["Costo"]
     st.area_chart(df.set_index("Producto")["Capital_Invertido"])
 
@@ -161,14 +161,13 @@ with tab2:
     df["Acción Sugerida"] = df.apply(determinar_accion, axis=1)
     st.table(df[["Producto", "Stock", "Autonomia", "Acción Sugerida"]])
     
-    if st.button("🚀 Ejecutar Órdenes en Tiendanube"):
-        with st.status("Sincronizando..."): time.sleep(2)
+    if st.button("🚀 Sincronizar con Tiendanube"):
+        with st.status("Procesando..."): time.sleep(1.5)
         st.balloons()
-        st.success("Acciones enviadas a la tienda.")
 
 with tab3:
     st.markdown("### 👥 Equipo Multidisciplinario (Equipo 3)")
-    # INTEGRANTES COMPLETOS RESTAURADOS
+    # INTEGRANTES COMPLETOS (LOS 8)
     equipo = [
         ("Willan Álvarez.", "Lead Architect", "https://i.imgur.com/CSH9Af7.jpeg"),
         ("Dalia R.", "Product Manager", "https://i.imgur.com/4O2BGL8.jpeg"),
@@ -180,16 +179,17 @@ with tab3:
         ("Cesar Augusto F.", "Estrategia", "https://cdn-icons-png.flaticon.com/512/3001/3001764.png")
     ]
     
+    # Grid de 4 columnas para que quepan bien los 8
     for i in range(0, len(equipo), 4):
         cols = st.columns(4)
         for j, (nombre, cargo, img) in enumerate(equipo[i:i+4]):
             with cols[j]:
                 st.markdown(f"""
                 <div class="team-card-large">
-                    <img src="{img}" style="width: 130px; height: 130px; border-radius: 50%; object-fit: cover; border: 4px solid #0056ff; margin-bottom: 15px;">
+                    <img src="{img}" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid #0056ff; margin-bottom: 15px;">
                     <br><strong>{nombre}</strong><br><small style="color:#0056ff;">{cargo}</small>
                 </div>
                 """, unsafe_allow_html=True)
 
 st.divider()
-st.caption("🌊 Flowmerce IA | Hackathon UTEL 2026 | Equipo 3 | Tiendanube Partner")
+st.caption("🌊 Flowmerce IA | Hackathon UTEL 2026 | Equipo 3")
