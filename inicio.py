@@ -32,12 +32,12 @@ textos = {
         "sim_rec": "Recuperación en",
         "sim_dias": "días",
         "btn_app": "🚀 Aplicar a Tiendanube",
-        "btn_reporte": "📝 Crear Reporte en Tienda", # Añadido
+        "btn_reporte": "📝 Generar Reporte y Descargar",
         "sync": "Sincronizando...",
         "sync_ok": "Sincronización Exitosa!",
         "equipo_tit": "👥 Equipo Multidisciplinario (Equipo 3)",
-        "rep_proceso": "Generando página de reporte vía API...", # Añadido
-        "rep_exito": "¡Página creada exitosamente en la tienda! ✅" # Añadido
+        "rep_proceso": "Procesando Reporte...",
+        "rep_exito": "¡Reporte listo para descargar! ✅"
     },
     "Português": {
         "sub": "Onde os dados se transformam em vendas",
@@ -57,12 +57,12 @@ textos = {
         "sim_rec": "Recuperação em",
         "sim_dias": "dias",
         "btn_app": "🚀 Aplicar na Tiendanube",
-        "btn_reporte": "📝 Criar Relatório na Loja",
+        "btn_reporte": "📝 Gerar Relatório e Baixar",
         "sync": "Sincronizando...",
         "sync_ok": "Sincronização com Sucesso!",
         "equipo_tit": "👥 Equipe Multidisciplinar (Equipe 3)",
-        "rep_proceso": "Gerando página de relatório...",
-        "rep_exito": "Página criada com sucesso! ✅"
+        "rep_proceso": "Processando Relatório...",
+        "rep_exito": "Relatório pronto para baixar! ✅"
     },
     "English": {
         "sub": "Where data turns into sales",
@@ -82,12 +82,12 @@ textos = {
         "sim_rec": "Recovery in",
         "sim_dias": "days",
         "btn_app": "🚀 Apply to Tiendanube",
-        "btn_reporte": "📝 Create Report in Store",
+        "btn_reporte": "📝 Generate Report & Download",
         "sync": "Syncing...",
         "sync_ok": "Successful Synchronization!",
         "equipo_tit": "👥 Multidisciplinary Team (Team 3)",
-        "rep_proceso": "Generating report page...",
-        "rep_exito": "Page created successfully! ✅"
+        "rep_proceso": "Processing Report...",
+        "rep_exito": "Report ready to download! ✅"
     }
 }
 
@@ -100,20 +100,13 @@ def obtener_token_real(code):
         return response.json().get("access_token") if response.status_code == 200 else None
     except: return None
 
-# Función para el botón de reporte (Modo real + Modo demo)
 def crear_pagina_reporte(token, contenido_html, titulo="Reporte Flowmerce"):
-    if not token or token == "demo": # Soporte para simulación en la Hackathon
-        time.sleep(2)
+    if not token or token == "demo":
+        time.sleep(1)
         return True
-    
     url = "https://api.tiendanube.com/v1/pages"
     headers = {"Authentication": f"bearer {token}", "Content-Type": "application/json"}
-    payload = {
-        "page": {
-            "publish": True,
-            "i18n": {"es_AR": {"title": titulo, "content": contenido_html, "seo_handle": f"reporte-{int(time.time())}"}}
-        }
-    }
+    payload = {"page": {"publish": True, "i18n": {"es_AR": {"title": titulo, "content": contenido_html, "seo_handle": f"reporte-{int(time.time())}"}}}}
     try:
         response = requests.post(url, json=payload, headers=headers, timeout=5)
         return response.status_code == 201
@@ -127,7 +120,7 @@ if 'db_inventario' not in st.session_state:
         "Ventas_30d": [45, 10, 30, 42],
         "Costo": [1200, 350, 150, 890]
     })
-if 'token_session' not in st.session_state: # Usamos nombre distinto para no chocar
+if 'token_session' not in st.session_state:
     st.session_state.token_session = None
 
 # --- 6. BARRA LATERAL ---
@@ -152,7 +145,7 @@ with st.sidebar:
                 st.session_state.token_session = token
                 st.success("✅")
             else:
-                st.session_state.token_session = "demo" # Activa modo demo si falla el code real
+                st.session_state.token_session = "demo"
                 st.info("Modo Demo ✅")
 
 # --- 7. ESTILOS CSS ---
@@ -246,21 +239,19 @@ with tabs[2]:
             cloud_placeholder.empty()
     
     with col_b2:
-        # BOTÓN NUEVO: CREAR REPORTE
-        if st.button(t_act["btn_reporte"], type="primary", use_container_width=True):
-            with st.status(t_act["rep_proceso"]) as s:
-                # Contenido que se enviará a la tienda
-                reporte_html = f"<h2>Resumen de Liquidez</h2><p>Capital Atrapado: ${atrapado_val}</p><p>Salud: {max(0, 100-int(riesgo_val/1000))}%</p>"
-                
-                # Intentar crear (usa modo demo si no hay token)
-                token_actual = st.session_state.token_session if st.session_state.token_session else "demo"
-                exito = crear_pagina_reporte(token_actual, reporte_html)
-                
-                if exito:
-                    s.update(label=t_act["rep_exito"], state="complete")
-                    st.balloons()
-                else:
-                    st.error("Error al conectar con la API")
+        # Lógica mejorada del reporte
+        csv = df.to_csv(index=False).encode('utf-8')
+        
+        # Botón de descarga de Streamlit (se activa visualmente al generar)
+        st.download_button(
+            label=t_act["btn_reporte"],
+            data=csv,
+            file_name=f'Reporte_Flowmerce_{int(time.time())}.csv',
+            mime='text/csv',
+            use_container_width=True,
+            type="primary",
+            on_click=lambda: st.toast(t_act["rep_exito"]) # Pequeño aviso visual
+        )
 
 with tabs[3]:
     st.markdown(f"### {t_act['equipo_tit']}")
