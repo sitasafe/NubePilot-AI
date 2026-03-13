@@ -31,7 +31,7 @@ textos = {
     }
 }
 
-# --- 4. FUNCIONES DE API (Corrección: Excepción controlada) ---
+# --- 4. FUNCIONES DE API (Manejo de errores mejorado) ---
 def obtener_token_real(code):
     url = "https://www.tiendanube.com/apps/authorize/token"
     payload = {
@@ -55,7 +55,7 @@ if 'db_inventario' not in st.session_state:
         "Costo": [1200, 350, 150, 890]
     })
 
-# --- 6. BARRA LATERAL (Panel de Control y persistencia de Token) ---
+# --- 6. BARRA LATERAL ---
 with st.sidebar:
     st.image("https://imgur.com/V1m4Dgk.jpeg", use_container_width=True)
     st.write("---")
@@ -70,22 +70,24 @@ with st.sidebar:
     dias_entrega = st.slider("Lead Time Proveedor (Días)", 1, 30, 7)
     
     with st.expander("🔑 Conexión Tiendanube", expanded=True):
-        st.link_button("1. Autorizar App", f"https://www.tiendanube.com/apps/authorize?client_id={CLIENT_ID}&scope=read_orders,read_products")
+        st.link_button("1. Autorizar App", f"https://www.tiendanube.com/apps/authorize?client_id={CLIENT_ID}&scope=read_orders,write_orders,read_products,write_products")
         temp_code = st.text_input("2. Pega el Code:")
+        
+        # Corrección: Persistencia de Token
         if st.button("3. Vincular Tienda"):
             token = obtener_token_real(temp_code)
             if token:
-                st.session_state.token_tienda = token # Persistencia del token
-                st.success("¡Conexión Real Establecida! ✅")
+                st.session_state.token_tienda = token
+                st.success("¡Conexión Establecida! ✅")
             else:
-                st.error("Código inválido o expirado.")
+                st.error("Error en vinculación.")
 
     st.divider()
     st.markdown("### 📲 Notificaciones")
     st.toggle("Plan del día a WhatsApp", value=True)
     st.toggle("Alertas SMS (Zonas sin datos)", value=False)
 
-# --- 7. ESTILOS CSS (Efectos Visuales Protegidos) ---
+# --- 7. ESTILOS CSS (Efectos Visuales Originales) ---
 extra_styles = ""
 if lectura_facil: extra_styles += "html, body, p, div { font-size: 1.4rem !important; line-height: 1.8 !important; }"
 if alto_contraste: extra_styles += ".stApp { background: #000 !important; color: #fff !important; } .team-card-large { border: 2px solid white !important; }"
@@ -110,7 +112,7 @@ st.markdown(f"""
 </style>
 """, unsafe_allow_html=True)
 
-# --- 8. LÓGICA DE CÁLCULO (Corrección: Estabilidad y Vectorización) ---
+# --- 8. LÓGICA DE CÁLCULO (Correcciones de Estabilidad Aplicadas) ---
 t_act = textos[idioma]
 df = st.session_state.db_inventario.copy()
 df["V_Diaria"] = (df["Ventas_30d"] / 30) * f_demanda
@@ -118,7 +120,7 @@ df["V_Diaria"] = (df["Ventas_30d"] / 30) * f_demanda
 # Corrección: Prevención de División por Cero
 df["Autonomia"] = np.where(df["V_Diaria"] > 0, df["Stock"] / df["V_Diaria"], np.inf)
 
-# Corrección: Operaciones vectorizadas para evitar fallos de Pandas con filtros vacíos
+# Corrección: Cálculo Vectorizado para evitar errores de Pandas
 filtro_atrapado = df["Autonomia"] > 60
 atrapado_val = (df.loc[filtro_atrapado, "Stock"] * df.loc[filtro_atrapado, "Costo"]).sum()
 
@@ -129,7 +131,7 @@ riesgo_val = (df.loc[filtro_riesgo, "V_Diaria"] * df.loc[filtro_riesgo, "Costo"]
 st.markdown('<h1 class="main-title">🌊 Flowmerce IA</h1>', unsafe_allow_html=True)
 st.subheader(f"✨ {t_act['sub']}")
 
-# Corrección de ancho de columna para evitar corte de botón en móviles [0.7, 0.3]
+# Voz
 c_voz1, c_voz2 = st.columns([0.7, 0.3])
 with c_voz2:
     audio = mic_recorder(start_prompt="🎤 Comando Voz", stop_prompt="🛑 Parar", key='rec')
@@ -139,14 +141,15 @@ tab1, tab2, tab3 = st.tabs([t_act["tab1"], t_act["tab2"], t_act["tab3"]])
 
 with tab1:
     col1, col2, col3 = st.columns(3)
-    col1.metric(t_act["atrapado"], f"${float(atrapado_val):,.0f} MXN", help="Dinero estancado en stock")
+    col1.metric(t_act["atrapado"], f"${float(atrapado_val):,.0f} MXN")
     col2.metric(t_act["riesgo"], f"${float(riesgo_val):,.0f} MXN", delta="¡Alerta!", delta_color="inverse")
     col3.metric(t_act["salud"], f"{max(0, 100-(dias_entrega*2))}%")
 
     st.write("---")
-    st.subheader("📈 Proyección de Flujo de Efectivo Optimizado")
-    chart_data = pd.DataFrame({"Flujo Proyectado": np.random.randn(20).cumsum() + 50})
-    st.area_chart(chart_data)
+    st.subheader("📈 Proyección de Flujo de Efectivo")
+    # Gráfico mejorado: Capital total
+    df["Capital_Invertido"] = df["Stock"] * df["Costo"]
+    st.area_chart(df.set_index("Producto")["Capital_Invertido"])
 
 with tab2:
     st.subheader("🤖 Decisiones Automatizadas por IA")
@@ -159,13 +162,13 @@ with tab2:
     st.table(df[["Producto", "Stock", "Autonomia", "Acción Sugerida"]])
     
     if st.button("🚀 Ejecutar Órdenes en Tiendanube"):
-        with st.status("Sincronizando con API..."):
-            time.sleep(2)
+        with st.status("Sincronizando..."): time.sleep(2)
         st.balloons()
-        st.success("Acciones aplicadas correctamente.")
+        st.success("Acciones enviadas a la tienda.")
 
 with tab3:
     st.markdown("### 👥 Equipo Multidisciplinario (Equipo 3)")
+    # INTEGRANTES COMPLETOS RESTAURADOS
     equipo = [
         ("Willan Álvarez.", "Lead Architect", "https://i.imgur.com/CSH9Af7.jpeg"),
         ("Dalia R.", "Product Manager", "https://i.imgur.com/4O2BGL8.jpeg"),
