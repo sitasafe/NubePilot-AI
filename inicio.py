@@ -71,13 +71,8 @@ with st.sidebar:
             if token: st.success("¡Conexión Establecida! ✅")
 
 # --- 7. ESTILOS CSS ---
-extra_styles = ""
-if lectura_facil: extra_styles += "html, body, p, div { font-size: 1.4rem !important; line-height: 1.8 !important; }"
-if alto_contraste: extra_styles += ".stApp { background: #000 !important; color: #fff !important; } .team-card-large { border: 2px solid white !important; }"
-
 st.markdown(f"""
 <style>
-    {extra_styles}
     .main-title {{
         background: linear-gradient(90deg, #0056ff, #00c6ff, #6200ea, #0056ff);
         background-size: 300% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
@@ -87,11 +82,11 @@ st.markdown(f"""
     .team-card-large {{
         text-align: center; padding: 25px; border-radius: 25px;
         background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(0, 86, 255, 0.2);
-        transition: all 0.4s ease; margin-bottom: 20px;
+        transition: all 0.4s ease; margin-bottom: 20px; min-height: 250px;
     }}
     .team-card-large:hover {{ transform: translateY(-10px); border-color: #0056ff; box-shadow: 0px 15px 30px rgba(0, 86, 255, 0.2); }}
     .stMetric {{ background: rgba(0, 86, 255, 0.05); padding: 20px; border-radius: 15px; border-left: 5px solid #0056ff; }}
-
+    
     @keyframes cloud-up {{
         0% {{ transform: translateY(100vh); opacity: 0; }}
         10% {{ opacity: 0.8; }} 90% {{ opacity: 0.8; }}
@@ -135,14 +130,14 @@ with tab0:
     with col_v1:
         st.write("""
         Hoy, miles de dueños de marcas pasan **5 horas por semana** frente a un Excel, intentando adivinar el futuro. 
-        Juegan a la ruleta con su inventario: o compran de más y entierran su capital, o compran de menos y pierden ventas.
+        Flowmerce transforma datos de ventas en decisiones automáticas.
         """)
         st.info("💡 **Dato:** Reducimos una tarde entera de trabajo a solo 5 minutos de certeza.")
     with col_v2:
         st.markdown("### 💎 Modelo de Negocio (SaaS)")
-        st.write("- **Starter (Gratis):** Alertas de stock.")
+        st.write("- **Starter (Gratis):** Alertas básicas.")
         st.write("- **Growth ($20 USD):** Predicción IA.")
-        st.write("- **Scale (Premium):** Simulador avanzado.")
+        st.write("- **Scale (Premium):** Simulador de escenarios.")
 
 with tab1:
     col1, col2, col3 = st.columns(3)
@@ -152,55 +147,38 @@ with tab1:
     st.area_chart(df.set_index("Producto")["Stock"])
 
 with tab2:
-    st.subheader("🧠 Estrategia Inteligente")
+    st.subheader("🧠 Estrategia e Inteligencia de Datos")
     
-    # --- SECCIÓN DE SIMULACIÓN (NUEVA) ---
     with st.expander("💎 Simulador de Liquidez (Nivel Scale)", expanded=True):
-        st.write("¿Qué pasaría si invertimos $50,000 MXN en los productos con mayor velocidad?")
-        sim_inv = st.number_input("Monto a Reinvertir ($)", value=50000, step=5000)
-        col_s1, col_s2 = st.columns(2)
-        
-        # Simulación de retorno
-        retorno_est = sim_inv * (f_demanda * 1.8)
-        tiempo_recuperacion = 30 / f_demanda
-        
-        with col_s1:
-            st.markdown(f"""<div class="sim-box">
-                <small>Ventas Proyectadas</small>
-                <h3>${retorno_est:,.0f} MXN</h3>
-                </div>""", unsafe_allow_html=True)
-        with col_s2:
-            st.markdown(f"""<div class="sim-box">
-                <small>Retorno de Inversión en</small>
-                <h3>{tiempo_recuperacion:.1f} días</h3>
-                </div>""", unsafe_allow_html=True)
-    
+        sim_inv = st.number_input("Inversión a Simular ($)", value=50000)
+        c_s1, c_s2 = st.columns(2)
+        with c_s1:
+            st.markdown(f'<div class="sim-box"><small>Ventas Proyectadas</small><h3>${sim_inv * (f_demanda * 1.8):,.0f} MXN</h3></div>', unsafe_allow_html=True)
+        with c_s2:
+            st.markdown(f'<div class="sim-box"><small>Recuperación en</small><h3>{30/f_demanda:.1f} días</h3></div>', unsafe_allow_html=True)
+
     st.write("---")
-    st.subheader("🤖 Recomendaciones Automáticas")
     def determinar_accion(row):
         if row["Autonomia"] < dias_entrega: return "🚨 REABASTECER"
         if row["Autonomia"] > 60: return "🔥 LIQUIDAR"
         return "✅ ESTABLE"
     df["Acción Sugerida"] = df.apply(determinar_accion, axis=1)
-    st.dataframe(df[["Producto", "Stock", "Autonomia", "Acción Sugerida"]], use_container_width=True)
+    st.table(df[["Producto", "Stock", "Autonomia", "Acción Sugerida"]])
     
-    if st.button("🚀 Sincronizar con Tiendanube"):
+    if st.button("🚀 Aplicar a Tiendanube"):
         cloud_placeholder = st.empty()
-        with st.status("Subiendo datos...", expanded=True) as s:
-            cloud_placeholder.markdown("""
-                <div class="cloud-ascend" style="left: 10%;">☁️</div>
-                <div class="cloud-ascend" style="left: 45%;">☁️</div>
-                <div class="cloud-ascend" style="left: 80%;">☁️</div>
-            """, unsafe_allow_html=True)
-            time.sleep(2.5)
-            s.update(label="¡Hecho! ☁️", state="complete")
+        with st.status("Sincronizando...", expanded=True) as s:
+            cloud_placeholder.markdown('<div class="cloud-ascend" style="left:15%;">☁️</div><div class="cloud-ascend" style="left:50%;">☁️</div>', unsafe_allow_html=True)
+            time.sleep(2)
+            s.update(label="Sincronización Exitosa!", state="complete")
         cloud_placeholder.empty()
 
 with tab3:
     st.markdown("### 👥 Equipo Multidisciplinario (Equipo 3)")
+    # URL DE DALIA ACTUALIZADA Y CORREGIDA
     equipo = [
         ("Willan Álvarez.", "Lead Architect", "https://i.imgur.com/CSH9Af7.jpeg"),
-        ("Dalia R.", "Product Manager", "https://i.imgur.com/4O2B8L8.jpeg"),
+        ("Dalia R.", "Product Manager", "https://i.imgur.com/4O2BGL8.jpeg"),
         ("Montserrat G.", "Strategy", "https://cdn-icons-png.flaticon.com/512/6997/6997674.png"),
         ("Jiram Cabrera", "Organización", "https://i.imgur.com/eamMDmE.jpeg"),
         ("Carlos Andrés A.", "Liderazgo", "https://cdn-icons-png.flaticon.com/512/2354/2354573.png"),
@@ -213,7 +191,7 @@ with tab3:
         for j, (nombre, cargo, img) in enumerate(equipo[i:i+4]):
             with cols[j]:
                 st.markdown(f"""<div class="team-card-large">
-                    <img src="{img}" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid #0056ff; margin-bottom: 10px;">
+                    <img src="{img}" style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 3px solid #0056ff; margin-bottom: 10px;">
                     <br><strong>{nombre}</strong><br><small style="color:#0056ff;">{cargo}</small>
                 </div>""", unsafe_allow_html=True)
 
