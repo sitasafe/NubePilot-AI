@@ -155,80 +155,18 @@ with st.sidebar:
                 st.session_state.token_session = "demo"
                 st.info("Modo Demo ✅")
 
-# --- 7. ESTILOS CON EFECTOS ESPECIALES ---
+# --- 7. ESTILOS ---
 bg_overlay = "rgba(255, 255, 255, 0.7)" if not alto_contraste else "rgba(0, 0, 0, 0.9)"
 text_color = "#1E1E1E" if not alto_contraste else "#000000"
 
 st.markdown(f"""
 <style>
-    @keyframes gradient-move {{
-        0% {{ background-position: 0% 50%; }}
-        50% {{ background-position: 100% 50%; }}
-        100% {{ background-position: 0% 50%; }}
-    }}
-
-    @keyframes clouds-up {{
-        0% {{ transform: translateY(100vh); opacity: 0; }}
-        20% {{ opacity: 0.8; }}
-        80% {{ opacity: 0.6; }}
-        100% {{ transform: translateY(-100vh); opacity: 0; }}
-    }}
-
-    .cloud-effect {{
-        position: fixed;
-        font-size: 50px;
-        z-index: 9999;
-        pointer-events: none;
-        animation: clouds-up 4s ease-in forwards;
-    }}
-
-    .stApp {{
-        background: linear-gradient({bg_overlay}, {bg_overlay}), 
-                    url("https://imgur.com/gQ7yynl.jpeg");
-        background-attachment: fixed;
-        background-size: cover;
-    }}
-
-    .main-title {{
-        background: linear-gradient(90deg, #0056ff, #00c6ff, #6200ea, #0056ff);
-        background-size: 200% auto;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        font-size: 4rem !important;
-        font-weight: 800;
-        animation: gradient-move 3s linear infinite;
-        margin-bottom: 0px;
-    }}
-    
-    div[data-testid="stMetric"], .stTable, .team-card-large, div[data-testid="stExpander"] {{
-        background-color: white !important;
-        border-radius: 15px !important;
-        border: none !important;
-        padding: 20px !important;
-        transition: all 0.3s ease-in-out !important;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.05) !important;
-    }}
-
-    div[data-testid="stMetric"]:hover, .stTable:hover, .team-card-large:hover {{
-        transform: translateY(-5px) scale(1.01) !important;
-        box-shadow: 0 12px 30px rgba(0,86,255,0.15) !important;
-    }}
-
-    div[data-testid="stTabs"] {{
-        background-color: rgba(255, 255, 255, 0.95) !important;
-        padding: 30px !important;
-        border-radius: 20px !important;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.1) !important;
-        border: none !important;
-    }}
-
-    div.stButton > button {{
-        background: linear-gradient(90deg, #0056ff, #00c6ff) !important;
-        color: white !important;
-        border: none !important;
-        border-radius: 10px !important;
-        transition: 0.3s !important;
-    }}
+    @keyframes gradient-move {{ 0% {{ background-position: 0% 50%; }} 50% {{ background-position: 100% 50%; }} 100% {{ background-position: 0% 50%; }} }}
+    @keyframes clouds-up {{ 0% {{ transform: translateY(100vh); opacity: 0; }} 20% {{ opacity: 0.8; }} 80% {{ opacity: 0.6; }} 100% {{ transform: translateY(-100vh); opacity: 0; }} }}
+    .cloud-effect {{ position: fixed; font-size: 50px; z-index: 9999; pointer-events: none; animation: clouds-up 4s ease-in forwards; }}
+    .stApp {{ background: linear-gradient({bg_overlay}, {bg_overlay}), url("https://imgur.com/gQ7yynl.jpeg"); background-attachment: fixed; background-size: cover; }}
+    .main-title {{ background: linear-gradient(90deg, #0056ff, #00c6ff, #6200ea, #0056ff); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 4rem !important; font-weight: 800; animation: gradient-move 3s linear infinite; margin-bottom: 0px; }}
+    div[data-testid="stMetric"], .team-card-large, div[data-testid="stExpander"], .stDataEditor {{ background-color: white !important; border-radius: 15px !important; border: none !important; padding: 20px !important; box-shadow: 0 4px 15px rgba(0,0,0,0.05) !important; }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -250,9 +188,7 @@ with c_enc1:
 with c_enc2: 
     audio_data = mic_recorder(start_prompt="🎤", stop_prompt="🛑", key='recorder')
     if audio_data:
-        st.toast(t_act["escuchando"])
-        time.sleep(1)
-        st.info(f"{t_act['voz_ok']} 'Optimizar inventario'")
+        st.info(f"{t_act['voz_ok']} 'Optimizar'")
 
 tabs = st.tabs([t_act["tab0"], t_act["tab1"], t_act["tab2"], t_act["tab3"]])
 
@@ -275,48 +211,61 @@ with tabs[1]:
 
 with tabs[2]:
     st.subheader(t_act["est_tit"])
+    
+    # 1. Tabla Editable (Editor de Datos)
+    st.markdown("#### 📝 Gestión de Stock e Inventario")
+    st.caption("Cambia los números en 'Stock' o 'Ventas_30d' y presiona Enter para ver la nueva Acción.")
+    
+    # Preparamos la columna de Acción antes de mostrarla
+    def asignar_label(autonomia):
+        if autonomia < dias_entrega: return "🚨 REABASTECER"
+        if autonomia > 60: return "🔥 LIQUIDAR"
+        return "✅ ESTABLE"
+    
+    df["Accion"] = df["Autonomia"].apply(asignar_label)
+    
+    # El editor que permite cambiar números y actualiza todo
+    df_editado = st.data_editor(
+        st.session_state.db_inventario,
+        column_config={
+            "Stock": st.column_config.NumberColumn("Stock Actual", help="Unidades en bodega", min_value=0),
+            "Ventas_30d": st.column_config.NumberColumn("Ventas 30d", min_value=0),
+            "Costo": st.column_config.NumberColumn("Costo Unitario ($)", min_value=0)
+        },
+        use_container_width=True,
+        hide_index=True,
+        key="mi_editor"
+    )
+
+    # Si hay cambios, guardamos en memoria y recargamos para actualizar las acciones
+    if not df_editado.equals(st.session_state.db_inventario):
+        st.session_state.db_inventario = df_editado
+        st.rerun()
+
+    # Mostrar la tabla de Acciones calculadas (Igual a tu imagen)
+    st.markdown("#### 🎯 Acciones Sugeridas")
+    st.dataframe(df[["Producto", "Stock", "Accion"]], use_container_width=True, hide_index=True)
+
+    st.write("---")
     with st.expander(t_act["sim_tit"], expanded=True):
         sim_inv = st.number_input(t_act["sim_inv"], value=50000)
         c_s1, c_s2 = st.columns(2)
-        with c_s1: st.markdown(f'<div style="background: linear-gradient(135deg, #0056ff 0%, #6200ea 100%); color: white; padding: 25px; border-radius: 15px; text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.15);"><small>{t_act["sim_proj"]}</small><h3>${sim_inv * (f_demanda * 1.8):,.0f} MXN</h3></div>', unsafe_allow_html=True)
-        with c_s2: st.markdown(f'<div style="background: linear-gradient(135deg, #00c6ff 0%, #0056ff 100%); color: white; padding: 25px; border-radius: 15px; text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.15);"><small>{t_act["sim_rec"]}</small><h3>{30/f_demanda:.1f} {t_act["sim_dias"]}</h3></div>', unsafe_allow_html=True)
-    
-    st.write("---")
-    def determinar_accion(row):
-        if row["Autonomia"] < dias_entrega: return "🚨 REABASTECER"
-        if row["Autonomia"] > 60: return "🔥 LIQUIDAR"
-        return "✅ ESTABLE"
-    df["Accion"] = df.apply(determinar_accion, axis=1)
-    st.table(df[["Producto", "Stock", "Accion"]])
-    
-    def animar_nubes():
-        cloud_placeholder = st.empty()
-        cloud_placeholder.markdown("""
-            <div class="cloud-effect" style="left: 10%; animation-delay: 0s;">☁️</div>
-            <div class="cloud-effect" style="left: 30%; animation-delay: 0.5s;">☁️</div>
-            <div class="cloud-effect" style="left: 55%; animation-delay: 0.2s;">☁️</div>
-            <div class="cloud-effect" style="left: 80%; animation-delay: 0.8s;">☁️</div>
-            <div class="cloud-effect" style="left: 45%; animation-delay: 1.2s;">☁️</div>
-        """, unsafe_allow_html=True)
-        time.sleep(0.1)
+        with c_s1: st.markdown(f'<div style="background: linear-gradient(135deg, #0056ff 0%, #6200ea 100%); color: white; padding: 25px; border-radius: 15px; text-align: center;">{t_act["sim_proj"]}<br><h3>${sim_inv * (f_demanda * 1.8):,.0f} MXN</h3></div>', unsafe_allow_html=True)
+        with c_s2: st.markdown(f'<div style="background: linear-gradient(135deg, #00c6ff 0%, #0056ff 100%); color: white; padding: 25px; border-radius: 15px; text-align: center;">{t_act["sim_rec"]}<br><h3>{30/f_demanda:.1f} {t_act["sim_dias"]}</h3></div>', unsafe_allow_html=True)
 
     col_b1, col_b2 = st.columns(2)
     with col_b1:
         if st.button(t_act["btn_app"], use_container_width=True):
-            animar_nubes()
             st.success(t_act["sync_ok"])
-    
     with col_b2:
         csv = df.to_csv(index=False).encode('utf-8')
-        if st.download_button(label=t_act["btn_reporte"], data=csv, file_name='Reporte_Flowmerce.csv', mime='text/csv', use_container_width=True):
-            animar_nubes()
-            st.toast(t_act["rep_exito"])
+        st.download_button(label=t_act["btn_reporte"], data=csv, file_name='Reporte_Flowmerce.csv', use_container_width=True)
 
 with tabs[3]:
     st.markdown(f"### {t_act['equipo_tit']}")
     equipo = [
         ("Willan Álvarez.", "Lead Architect", "https://i.imgur.com/CSH9Af7.jpeg"),
-        ("Dalia R.", "Product Manager", "https://i.imgur.com/4O2BGL8.jpeg"), # Foto actualizada
+        ("Dalia R.", "Product Manager", "https://i.imgur.com/4O2BGL8.jpeg"),
         ("Montserrat G.", "Strategy", "https://cdn-icons-png.flaticon.com/512/6997/6997674.png"),
         ("Jiram Cabrera", "Organización", "https://i.imgur.com/eamMDmE.jpeg"),
         ("Carlos Andrés A.", "Liderazgo", "https://cdn-icons-png.flaticon.com/512/2354/2354573.png"),
@@ -328,12 +277,10 @@ with tabs[3]:
         cols = st.columns(4)
         for j, (nombre, cargo, img) in enumerate(equipo[i:i+4]):
             with cols[j]:
-                st.markdown(f"""<div class="team-card-large">
-                    <img src="{img}" style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; margin-bottom: 10px;">
+                st.markdown(f"""<div class="team-card-large" style="text-align:center;">
+                    <img src="{img}" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin-bottom: 10px;">
                     <br><strong>{nombre}</strong><br><small style="color:#0056ff;">{cargo}</small>
                 </div>""", unsafe_allow_html=True)
 
 st.divider()
-st.caption("🌊 Flowmerce | Hackathon UTEL 2026 | Equipo 3 |TiendaNube")
-
-
+st.caption("🌊 Flowmerce | Hackathon UTEL 2026 | Equipo 3")
