@@ -108,16 +108,15 @@ st.markdown(f"""
     .team-card-large:hover {{ transform: translateY(-10px); border-color: #0056ff; box-shadow: 0px 15px 30px rgba(0, 86, 255, 0.2); }}
     .stMetric {{ background: rgba(0, 86, 255, 0.05); padding: 20px; border-radius: 15px; border-left: 5px solid #0056ff; }}
 
-    /* Estilo del Banner de Carga */
-    .loading-banner {{
-        background: linear-gradient(90deg, #001f54, #0056ff);
-        color: white;
-        padding: 20px;
-        border-radius: 15px;
-        text-align: center;
-        border: 1px solid #00c6ff;
-        margin-bottom: 20px;
-        box-shadow: 0px 10px 20px rgba(0,0,0,0.2);
+    /* EFECTO DE NUBES FLOTANDO */
+    @keyframes move-clouds {{
+        from {{ transform: translateX(-100%); }}
+        to {{ transform: translateX(100vw); }}
+    }}
+    .cloud-particle {{
+        position: fixed; top: 0; left: 0; font-size: 4rem;
+        animation: move-clouds 3s linear infinite;
+        z-index: 9999; pointer-events: none; opacity: 0.8;
     }}
 </style>
 """, unsafe_allow_html=True)
@@ -135,9 +134,6 @@ filtro_riesgo = df["Autonomia"] < dias_entrega
 riesgo_val = (df.loc[filtro_riesgo, "V_Diaria"] * df.loc[filtro_riesgo, "Costo"] * 1.5).sum()
 
 # --- 9. CUERPO DE LA APP ---
-# BANNER EN PRIMER PLANO (Placeholder)
-placeholder_banner = st.empty()
-
 st.markdown('<h1 class="main-title">🌊 Flowmerce</h1>', unsafe_allow_html=True)
 
 c_enc1, c_enc2 = st.columns([0.8, 0.2])
@@ -170,20 +166,18 @@ with tab2:
     st.table(df[["Producto", "Stock", "Autonomia", "Acción Sugerida"]])
     
     if st.button("🚀 Aplicar Cambios en Tiendanube"):
-        with placeholder_banner.container():
+        # CAMBIO: NUBES EN LUGAR DE GLOBOS
+        with st.status("Sincronizando con la nube...", expanded=True) as s:
+            time.sleep(1.5)
+            # Insertamos las nubes animadas vía HTML/CSS
             st.markdown("""
-                <div class="loading-banner">
-                    <h3>⚡ Sincronización Inteligente en Curso</h3>
-                    <p>Actualizando stock y optimizando liquidez en tiempo real...</p>
-                </div>
+                <div class="cloud-particle" style="top: 20%; animation-duration: 2s;">☁️</div>
+                <div class="cloud-particle" style="top: 50%; animation-duration: 3s;">☁️</div>
+                <div class="cloud-particle" style="top: 80%; animation-duration: 2.5s;">☁️</div>
+                <div class="cloud-particle" style="top: 10%; animation-duration: 4s;">☁️</div>
             """, unsafe_allow_html=True)
-            progreso = st.progress(0)
-            for i in range(101):
-                time.sleep(0.02)
-                progreso.progress(i)
-            st.success("✅ ¡Tienda sincronizada con éxito!")
-            time.sleep(1)
-        placeholder_banner.empty()
+            s.update(label="¡Sincronización Exitosa! ☁️", state="complete")
+        st.success("¡Datos actualizados en Tiendanube!")
 
 with tab3:
     st.markdown("### 👥 Equipo Multidisciplinario (Equipo 3)")
