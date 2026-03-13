@@ -57,7 +57,7 @@ if 'db_inventario' not in st.session_state:
 
 # --- 6. BARRA LATERAL ---
 with st.sidebar:
-    st.image("https://imgur.com/V1m4Dgk.jpeg", use_container_width=True)
+    st.image("https://imgur.com/YrVO3ZF.jpeg", use_container_width=True)
     st.write("---")
 
     with st.expander("🌐 Accesibilidad e Idioma", expanded=True):
@@ -231,3 +231,4 @@ with tab3:
 
 st.divider()
 st.caption("🌊 Flowmerce | Hackathon UTEL 2026 | Equipo 3")
+
