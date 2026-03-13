@@ -155,36 +155,48 @@ with st.sidebar:
                 st.session_state.token_session = "demo"
                 st.info("Modo Demo ✅")
 
-# --- 7. ESTILOS CSS ---
+# --- 7. ESTILOS CSS (INCLUYENDO FONDO IMAGEN) ---
 st.markdown(f"""
 <style>
+    /* FONDO DE PANTALLA DIFUMINADO */
+    .stApp {{
+        background-image: linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.85)), 
+                          url("https://imgur.com/gQ7yynl.jpeg");
+        background-attachment: fixed;
+        background-size: cover;
+        background-position: center;
+    }}
+
     .main-title {{
         background: linear-gradient(90deg, #0056ff, #00c6ff, #6200ea, #0056ff);
         background-size: 300% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         font-size: 4rem !important; font-weight: 800; animation: gradient-move 4s ease infinite; 
     }}
     @keyframes gradient-move {{ 0% {{background-position: 0% 50%;}} 50% {{background-position: 100% 50%;}} 100% {{background-position: 0% 50%;}} }}
+    
     div.stButton > button, div.stDownloadButton > button {{
         background: linear-gradient(145deg, #0056ff, #0045cc) !important;
         color: white !important; border: none !important; padding: 12px 24px !important;
         border-radius: 12px !important; box-shadow: 0 6px #003399, 0 8px 15px rgba(0,0,0,0.2) !important;
         transition: all 0.1s ease !important; font-weight: bold !important; text-transform: uppercase !important;
     }}
-    div.stButton > button:hover {{ transform: translateY(-2px) !important; box-shadow: 0 8px #003399, 0 12px 20px rgba(0,0,0,0.3) !important; }}
-    div.stButton > button:active, div.stDownloadButton > button:active {{ transform: translateY(4px) !important; box-shadow: 0 2px #003399 !important; }}
+    
     .stTable {{ background: white; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }}
+    
     @keyframes cloud-up {{
         0% {{ transform: translateY(100vh); opacity: 0; }}
         20% {{ opacity: 0.7; }} 80% {{ opacity: 0.7; }}
         100% {{ transform: translateY(-100vh); opacity: 0; }}
     }}
     .cloud-ascend {{ position: fixed; bottom: -100px; font-size: 5rem; z-index: 9999; pointer-events: none; animation: cloud-up 3s ease-in infinite; }}
+    
     .team-card-large {{
         text-align: center; padding: 25px; border-radius: 25px;
-        background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(0, 86, 255, 0.2);
+        background: rgba(255, 255, 255, 0.7); border: 1px solid rgba(0, 86, 255, 0.2);
         transition: all 0.4s ease; margin-bottom: 20px; min-height: 250px;
+        backdrop-filter: blur(5px);
     }}
-    .stMetric {{ background: rgba(0, 86, 255, 0.05); padding: 20px; border-radius: 15px; border-left: 5px solid #0056ff; }}
+    .stMetric {{ background: rgba(255, 255, 255, 0.8); padding: 20px; border-radius: 15px; border-left: 5px solid #0056ff; backdrop-filter: blur(5px); }}
     .sim-box {{ background: linear-gradient(135deg, #0056ff 0%, #6200ea 100%); color: white; padding: 20px; border-radius: 15px; margin-top: 10px; }}
 </style>
 """, unsafe_allow_html=True)
@@ -208,7 +220,6 @@ with c_enc2:
     audio_data = mic_recorder(start_prompt="🎤", stop_prompt="🛑", key='recorder')
     if audio_data:
         st.toast(t_act["escuchando"])
-        # Simulamos procesamiento de intención (en una app real aquí conectarías con OpenAI Whisper)
         time.sleep(1)
         st.info(f"{t_act['voz_ok']} 'Optimizar inventario'")
 
