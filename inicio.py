@@ -12,7 +12,7 @@ st.set_page_config(page_title="Flowmerce - Liquidez Inteligente", page_icon="�
 CLIENT_ID = "27483"
 CLIENT_SECRET = "d45072c95b889632ad3040bfd1dd951d981e0c38ff25877a"
 
-# --- 3. DICCIONARIO MULTILINGÜE ---
+# --- 3. DICCIONARIO MULTILINGÜE COMPLETO ---
 textos = {
     "Español": {
         "sub": "Donde los datos se convierten en ventas",
@@ -37,9 +37,7 @@ textos = {
         "sync_ok": "Sincronización Exitosa!",
         "equipo_tit": "👥 Equipo Multidisciplinario (Equipo 3)",
         "rep_proceso": "Procesando Reporte...",
-        "rep_exito": "¡Reporte listo para descargar! ✅",
-        "escuchando": "🎙️ Analizando comando de voz...",
-        "voz_ok": "✅ Comando recibido: "
+        "rep_exito": "¡Reporte listo para descargar! ✅"
     },
     "Português": {
         "sub": "Onde os dados se transformam em vendas",
@@ -57,16 +55,14 @@ textos = {
         "sim_inv": "Investimento para Simular ($)",
         "sim_proj": "Vendas Projetadas",
         "sim_rec": "Recuperação em",
-        "sim_dias": "días",
+        "sim_dias": "dias",
         "btn_app": "🚀 Aplicar na Tiendanube",
         "btn_reporte": "📝 Gerar Relatório e Baixar",
         "sync": "Sincronizando...",
         "sync_ok": "Sincronização com Sucesso!",
         "equipo_tit": "👥 Equipe Multidisciplinar (Equipe 3)",
         "rep_proceso": "Processando Relatório...",
-        "rep_exito": "Relatório pronto para baixar! ✅",
-        "escuchando": "🎙️ Analisando comando de voz...",
-        "voz_ok": "✅ Comando recebido: "
+        "rep_exito": "Relatório pronto para baixar! ✅"
     },
     "English": {
         "sub": "Where data turns into sales",
@@ -91,9 +87,7 @@ textos = {
         "sync_ok": "Successful Synchronization!",
         "equipo_tit": "👥 Multidisciplinary Team (Team 3)",
         "rep_proceso": "Processing Report...",
-        "rep_exito": "Report ready to download! ✅",
-        "escuchando": "🎙️ Analyzing voice command...",
-        "voz_ok": "✅ Command received: "
+        "rep_exito": "Report ready to download! ✅"
     }
 }
 
@@ -155,7 +149,7 @@ with st.sidebar:
                 st.session_state.token_session = "demo"
                 st.info("Modo Demo ✅")
 
-# --- 7. ESTILOS CON EFECTOS ESPECIALES ---
+# --- 7. ESTILOS CON EFECTOS ESPECIALES Y ANIMACIÓN DE NUBES ---
 bg_overlay = "rgba(255, 255, 255, 0.7)" if not alto_contraste else "rgba(0, 0, 0, 0.9)"
 text_color = "#1E1E1E" if not alto_contraste else "#000000"
 
@@ -166,6 +160,14 @@ st.markdown(f"""
         0% {{ background-position: 0% 50%; }}
         50% {{ background-position: 100% 50%; }}
         100% {{ background-position: 0% 50%; }}
+    }}
+
+    /* 2. ANIMACIÓN DE NUBES ASCENDENTES */
+    @keyframes cloud-up {{
+        0% {{ transform: translateY(100%); opacity: 0; }}
+        20% {{ opacity: 0.8; }}
+        80% {{ opacity: 0.8; }}
+        100% {{ transform: translateY(-200%); opacity: 0; }}
     }}
 
     .stApp {{
@@ -186,7 +188,7 @@ st.markdown(f"""
         margin-bottom: 0px;
     }}
     
-    /* 2. EFECTO DE ELEVACIÓN EN TABLAS Y TARJETAS */
+    /* 3. EFECTO DE ELEVACIÓN EN TABLAS Y TARJETAS */
     div[data-testid="stMetric"], .stTable, .team-card-large, div[data-testid="stExpander"] {{
         background-color: white !important;
         border-radius: 15px !important;
@@ -201,7 +203,7 @@ st.markdown(f"""
         box-shadow: 0 12px 30px rgba(0,86,255,0.15) !important;
     }}
 
-    /* 3. EFECTO EN LOS TABS (CONTENEDOR PRINCIPAL) */
+    /* 4. EFECTO EN LOS TABS (CONTENEDOR PRINCIPAL) */
     div[data-testid="stTabs"] {{
         background-color: rgba(255, 255, 255, 0.95) !important;
         padding: 30px !important;
@@ -210,13 +212,13 @@ st.markdown(f"""
         border: none !important;
     }}
 
-    /* 4. CENTRADO DE TEXTO EN TABLAS */
+    /* 5. CENTRADO DE TEXTO EN TABLAS */
     .stTable td, .stTable th {{
         text-align: center !important;
         vertical-align: middle !important;
     }}
 
-    /* 5. BOTÓN CON PULSO SUTIL */
+    /* 6. BOTÓN CON PULSO SUTIL */
     div.stButton > button {{
         background: linear-gradient(90deg, #0056ff, #00c6ff) !important;
         color: white !important;
@@ -228,6 +230,16 @@ st.markdown(f"""
     div.stButton > button:hover {{
         filter: brightness(1.2);
         box-shadow: 0 5px 15px rgba(0,198,255,0.4) !important;
+    }}
+
+    /* 7. CLASE PARA LAS NUBES ANIMADAS */
+    .cloud-effect {{
+        position: fixed;
+        bottom: -100px;
+        font-size: 4rem;
+        z-index: 9999;
+        pointer-events: none;
+        animation: cloud-up 4s ease-out forwards;
     }}
 </style>
 """, unsafe_allow_html=True)
@@ -294,12 +306,48 @@ with tabs[2]:
     
     col_b1, col_b2 = st.columns(2)
     with col_b1:
+        # Lógica para "Aplicar a Tiendanube" con efecto de nubes
         if st.button(t_act["btn_app"], use_container_width=True):
-            st.success(t_act["sync_ok"])
+            # Inyectamos las nubes animadas
+            cloud_placeholder = st.empty()
+            cloud_placeholder.markdown("""
+                <div class="cloud-effect" style="left: 10%; animation-delay: 0s;">☁️</div>
+                <div class="cloud-effect" style="left: 30%; animation-delay: 0.5s;">☁️</div>
+                <div class="cloud-effect" style="left: 55%; animation-delay: 0.2s;">☁️</div>
+                <div class="cloud-effect" style="left: 80%; animation-delay: 0.8s;">☁️</div>
+            """, unsafe_allow_html=True)
+            
+            with st.status(t_act["sync"], expanded=True) as s:
+                time.sleep(2.5) # Tiempo para ver el efecto
+                s.update(label=t_act["sync_ok"], state="complete")
+            
+            # Limpiamos las nubes después de un momento
+            time.sleep(1)
+            cloud_placeholder.empty()
     
     with col_b2:
+        # Lógica para "Generar Reporte" con efecto de nubes
         csv = df.to_csv(index=False).encode('utf-8')
-        st.download_button(label=t_act["btn_reporte"], data=csv, file_name='Reporte_Flowmerce.csv', mime='text/csv', use_container_width=True)
+        if st.download_button(
+            label=t_act["btn_reporte"],
+            data=csv,
+            file_name=f'Reporte_Flowmerce_{int(time.time())}.csv',
+            mime='text/csv',
+            use_container_width=True,
+            type="primary"
+        ):
+            # Inyectamos las nubes animadas
+            cloud_placeholder = st.empty()
+            cloud_placeholder.markdown("""
+                <div class="cloud-effect" style="left: 15%; animation-delay: 0.1s;">☁️</div>
+                <div class="cloud-effect" style="left: 45%; animation-delay: 0.6s;">☁️</div>
+                <div class="cloud-effect" style="left: 70%; animation-delay: 0.3s;">☁️</div>
+            """, unsafe_allow_html=True)
+            
+            st.toast(t_act["rep_exito"])
+            # Dejamos que las nubes terminen su animación antes de limpiar el contenedor
+            time.sleep(4)
+            cloud_placeholder.empty()
 
 with tabs[3]:
     st.markdown(f"### {t_act['equipo_tit']}")
