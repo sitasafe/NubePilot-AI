@@ -16,17 +16,17 @@ CLIENT_SECRET = "d45072c95b889632ad3040bfd1dd951d981e0c38ff25877a"
 textos = {
     "Español": {
         "sub": "Donde los datos se convierten en ventas",
-        "tab1": "📊 Monitor de Liquidez & ROI", "tab2": "🧠 Estrategia IA", "tab3": "👥 Equipo",
+        "tab0": "🚀 Nuestra Visión", "tab1": "📊 Monitor de Liquidez", "tab2": "🧠 Estrategia", "tab3": "👥 Equipo",
         "atrapado": "Capital Atrapado", "riesgo": "Ventas en Riesgo", "salud": "Salud de Caja"
     },
     "Português": {
         "sub": "Onde os datos se transformam em vendas",
-        "tab1": "📊 Monitor de Liquidez e ROI", "tab2": "🧠 Estratégia IA", "tab3": "👥 Equipe",
+        "tab0": "🚀 Nossa Visão", "tab1": "📊 Monitor de Liquidez", "tab2": "🧠 Estratégia", "tab3": "👥 Equipe",
         "atrapado": "Capital Preso", "riesgo": "Vendas em Risco", "salud": "Saúde do Caixa"
     },
     "English": {
         "sub": "Where data turns into sales",
-        "tab1": "📊 Liquidity & ROI Monitor", "tab2": "🧠 AI Strategy", "tab3": "👥 Team",
+        "tab0": "🚀 Our Vision", "tab1": "📊 Liquidity Monitor", "tab2": "🧠 Strategy", "tab3": "👥 Team",
         "atrapado": "Trapped Capital", "riesgo": "Sales at Risk", "salud": "Cash Health"
     }
 }
@@ -108,15 +108,16 @@ st.markdown(f"""
     .team-card-large:hover {{ transform: translateY(-10px); border-color: #0056ff; box-shadow: 0px 15px 30px rgba(0, 86, 255, 0.2); }}
     .stMetric {{ background: rgba(0, 86, 255, 0.05); padding: 20px; border-radius: 15px; border-left: 5px solid #0056ff; }}
 
-    /* EFECTO DE NUBES FLOTANDO */
-    @keyframes move-clouds {{
-        from {{ transform: translateX(-100%); }}
-        to {{ transform: translateX(100vw); }}
+    /* EFECTO DE NUBES SUBIENDO */
+    @keyframes cloud-up {{
+        0% {{ transform: translateY(100vh); opacity: 0; }}
+        10% {{ opacity: 0.8; }}
+        90% {{ opacity: 0.8; }}
+        100% {{ transform: translateY(-100vh); opacity: 0; }}
     }}
-    .cloud-particle {{
-        position: fixed; top: 0; left: 0; font-size: 4rem;
-        animation: move-clouds 3s linear infinite;
-        z-index: 9999; pointer-events: none; opacity: 0.8;
+    .cloud-ascend {{
+        position: fixed; bottom: 0; font-size: 5rem; z-index: 9999;
+        pointer-events: none; animation: cloud-up 3s linear infinite;
     }}
 </style>
 """, unsafe_allow_html=True)
@@ -140,9 +141,36 @@ c_enc1, c_enc2 = st.columns([0.8, 0.2])
 with c_enc1:
     st.markdown(f"**✨ {t_act['sub']}**")
 with c_enc2:
-    mic_recorder(start_prompt="🎤 Comando Voz", stop_prompt="🛑", key='rec')
+    mic_recorder(start_prompt="🎤 Voz", stop_prompt="🛑", key='rec')
 
-tab1, tab2, tab3 = st.tabs([t_act["tab1"], t_act["tab2"], t_act["tab3"]])
+tab0, tab1, tab2, tab3 = st.tabs([t_act["tab0"], t_act["tab1"], t_act["tab2"], t_act["tab3"]])
+
+with tab0:
+    st.markdown("## 🎯 ¿Qué nos diferencia?")
+    col_v1, col_v2 = st.columns([0.6, 0.4])
+    with col_v1:
+        st.write("""
+        Hoy, miles de dueños de marcas pasan **5 horas por semana** frente a un Excel, intentando adivinar el futuro. 
+        Juegan a la ruleta con su inventario: o compran de más y entierran su capital, o compran de menos y pierden ventas.
+        
+        **Tu negocio es un ritmo, no una adivinanza.** Flowmerce transforma datos en decisiones automáticas. 
+        Analizamos la velocidad real de venta para decirte **qué, cuánto y cuándo comprar**.
+        """)
+        st.info("💡 **Dato:** Reducimos una tarde entera de trabajo a solo 5 minutos de certeza.")
+    with col_v2:
+        st.markdown("""
+        ### 💎 Modelo de Negocio (SaaS)
+        - **Starter (Gratis):** Alertas básicas.
+        - **Growth ($20 USD):** Predicción IA.
+        - **Scale (Premium):** Simulación avanzada.
+        """)
+
+    st.divider()
+    st.markdown("### ⚙️ ¿Cómo funciona?")
+    c1, c2, c3 = st.columns(3)
+    c1.markdown("**1. Conexión Instantánea**\nInstalación desde Marketplace vía API V2.")
+    c2.markdown("**2. Análisis en Background**\nProcesamos órdenes mientras duermes.")
+    c3.markdown("**3. Tablero de Decisiones**\nLista de compras lista para ejecutar.")
 
 with tab1:
     col1, col2, col3 = st.columns(3)
@@ -156,7 +184,7 @@ with tab1:
     st.area_chart(df.set_index("Producto")["Capital_Invertido"])
 
 with tab2:
-    st.subheader("🤖 Recomendaciones Estratégicas")
+    st.subheader("🤖 Recomendaciones de Compra")
     def determinar_accion(row):
         if row["Autonomia"] < dias_entrega: return "🚨 REABASTECER"
         if row["Autonomia"] > 60: return "🔥 LIQUIDAR"
@@ -166,18 +194,17 @@ with tab2:
     st.table(df[["Producto", "Stock", "Autonomia", "Acción Sugerida"]])
     
     if st.button("🚀 Aplicar Cambios en Tiendanube"):
-        # CAMBIO: NUBES EN LUGAR DE GLOBOS
-        with st.status("Sincronizando con la nube...", expanded=True) as s:
-            time.sleep(1.5)
-            # Insertamos las nubes animadas vía HTML/CSS
-            st.markdown("""
-                <div class="cloud-particle" style="top: 20%; animation-duration: 2s;">☁️</div>
-                <div class="cloud-particle" style="top: 50%; animation-duration: 3s;">☁️</div>
-                <div class="cloud-particle" style="top: 80%; animation-duration: 2.5s;">☁️</div>
-                <div class="cloud-particle" style="top: 10%; animation-duration: 4s;">☁️</div>
+        cloud_placeholder = st.empty()
+        with st.status("Subiendo datos a la nube...", expanded=True) as s:
+            cloud_placeholder.markdown("""
+                <div class="cloud-ascend" style="left: 10%; animation-duration: 2.5s;">☁️</div>
+                <div class="cloud-ascend" style="left: 40%; animation-duration: 3s;">☁️</div>
+                <div class="cloud-ascend" style="left: 70%; animation-duration: 2s;">☁️</div>
             """, unsafe_allow_html=True)
+            time.sleep(2.5)
             s.update(label="¡Sincronización Exitosa! ☁️", state="complete")
-        st.success("¡Datos actualizados en Tiendanube!")
+        cloud_placeholder.empty()
+        st.success("¡Decisiones aplicadas con éxito!")
 
 with tab3:
     st.markdown("### 👥 Equipo Multidisciplinario (Equipo 3)")
@@ -191,14 +218,13 @@ with tab3:
         ("Amarilis Elizabeth", "Gestión", "https://cdn-icons-png.flaticon.com/512/201/201634.png"),
         ("Cesar Augusto F.", "Estrategia", "https://cdn-icons-png.flaticon.com/512/3001/3001764.png")
     ]
-    
     for i in range(0, len(equipo), 4):
         cols = st.columns(4)
         for j, (nombre, cargo, img) in enumerate(equipo[i:i+4]):
             with cols[j]:
                 st.markdown(f"""
                 <div class="team-card-large">
-                    <img src="{img}" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid #0056ff; margin-bottom: 15px;">
+                    <img src="{img}" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid #0056ff; margin-bottom: 10px;">
                     <br><strong>{nombre}</strong><br><small style="color:#0056ff;">{cargo}</small>
                 </div>
                 """, unsafe_allow_html=True)
