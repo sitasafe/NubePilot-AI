@@ -81,7 +81,7 @@ with st.sidebar:
             else:
                 st.error("Error en vinculación.")
 
-# --- 7. ESTILOS CSS (ALINEADO A LA IZQUIERDA Y SIN "IA") ---
+# --- 7. ESTILOS CSS ---
 extra_styles = ""
 if lectura_facil: extra_styles += "html, body, p, div { font-size: 1.4rem !important; line-height: 1.8 !important; }"
 if alto_contraste: extra_styles += ".stApp { background: #000 !important; color: #fff !important; } .team-card-large { border: 2px solid white !important; }"
@@ -123,15 +123,13 @@ filtro_riesgo = df["Autonomia"] < dias_entrega
 riesgo_val = (df.loc[filtro_riesgo, "V_Diaria"] * df.loc[filtro_riesgo, "Costo"] * 1.5).sum()
 
 # --- 9. CUERPO DE LA APP ---
-# Título sin "IA" y alineado a la izquierda
 st.markdown('<h1 class="main-title">🌊 Flowmerce</h1>', unsafe_allow_html=True)
 
-# Slogan y Voz alineados a la izquierda
 c_enc1, c_enc2 = st.columns([0.8, 0.2])
 with c_enc1:
     st.markdown(f"**✨ {t_act['sub']}**")
 with c_enc2:
-    mic_recorder(start_prompt="🎤 Comando Voz", stop_prompt="🛑", key='rec')
+    mic_recorder(start_prompt="🎤 Voz", stop_prompt="🛑", key='rec')
 
 tab1, tab2, tab3 = st.tabs([t_act["tab1"], t_act["tab2"], t_act["tab3"]])
 
@@ -156,13 +154,20 @@ with tab2:
     df["Acción Sugerida"] = df.apply(determinar_accion, axis=1)
     st.table(df[["Producto", "Stock", "Autonomia", "Acción Sugerida"]])
     
+    # --- CAMBIO: BARRA DE PROGRESO EN LUGAR DE GLOBOS ---
     if st.button("🚀 Aplicar Cambios en Tiendanube"):
-        with st.status("Sincronizando..."): time.sleep(1.5)
-        st.balloons()
+        progreso_bar = st.progress(0)
+        status_text = st.empty()
+        for percent_complete in range(100):
+            time.sleep(0.02) # Simulación de carga rápida
+            progreso_bar.progress(percent_complete + 1)
+            status_text.text(f"Sincronizando con Tiendanube... {percent_complete + 1}%")
+        
+        status_text.empty() # Limpiar texto
+        st.success("✅ ¡Inventario actualizado y cupones generados con éxito!")
 
 with tab3:
     st.markdown("### 👥 Equipo Multidisciplinario (Equipo 3)")
-    # INTEGRANTES COMPLETOS
     equipo = [
         ("Willan Álvarez.", "Lead Architect", "https://i.imgur.com/CSH9Af7.jpeg"),
         ("Dalia R.", "Product Manager", "https://i.imgur.com/4O2BGL8.jpeg"),
