@@ -6,13 +6,13 @@ import requests
 from streamlit_mic_recorder import mic_recorder
 
 # --- 1. CONFIGURACIÓN DE PÁGINA ---
-st.set_page_config(page_title="Flowmerce", page_icon="🌊", layout="wide")
+st.set_page_config(page_title="Flowmerce IA - Liquidez Inteligente", page_icon="🌊", layout="wide")
 
 # --- 2. CREDENCIALES TIENDANUBE ---
 CLIENT_ID = "27483"
 CLIENT_SECRET = "d45072c95b889632ad3040bfd1dd951d981e0c38ff25877a"
 
-# --- 3. DICCIONARIO MULTILINGÜE ---
+# --- 3. DICCIONARIO MULTILINGÜE (Actualizado con tu Slogan) ---
 textos = {
     "Español": {
         "sub": "Donde los datos se convierten en ventas",
@@ -20,12 +20,12 @@ textos = {
         "atrapado": "Capital Atrapado", "riesgo": "Ventas en Riesgo", "salud": "Salud de Caja"
     },
     "Português": {
-        "sub": "Seu Copiloto Estratégico para converter Estoque em Fluxo de Caixa",
+        "sub": "Onde os dados se transformam em vendas",
         "tab1": "📊 Monitor de Liquidez e ROI", "tab2": "🧠 Estratégia IA", "tab3": "👥 Equipe",
         "atrapado": "Capital Preso", "riesgo": "Vendas em Risco", "salud": "Saúde do Caixa"
     },
     "English": {
-        "sub": "Your Strategic Copilot to turn Inventory into Cash Flow",
+        "sub": "Where data turns into sales",
         "tab1": "📊 Liquidity & ROI Monitor", "tab2": "🧠 AI Strategy", "tab3": "👥 Team",
         "atrapado": "Trapped Capital", "riesgo": "Sales at Risk", "salud": "Cash Health"
     }
@@ -65,7 +65,7 @@ with st.sidebar:
         lectura_facil = st.toggle("Modo Lectura Fácil")
         alto_contraste = st.toggle("Modo Alto Contraste")
 
-    st.markdown("### ⚙️ Mercado")
+    st.markdown("### ⚙️ Simulador de Mercado")
     f_demanda = st.slider("Impulso de Demanda (Factor)", 0.5, 4.0, 1.0)
     dias_entrega = st.slider("Lead Time Proveedor (Días)", 1, 30, 7)
     
@@ -86,7 +86,7 @@ with st.sidebar:
     st.toggle("Plan del día a WhatsApp", value=True)
     st.toggle("Alertas SMS (Zonas sin datos)", value=False)
 
-# --- 7. ESTILOS CSS (ALINEADO A LA IZQUIERDA / ESQUINA) ---
+# --- 7. ESTILOS CSS (ALINEADO A LA IZQUIERDA) ---
 extra_styles = ""
 if lectura_facil: extra_styles += "html, body, p, div { font-size: 1.4rem !important; line-height: 1.8 !important; }"
 if alto_contraste: extra_styles += ".stApp { background: #000 !important; color: #fff !important; } .team-card-large { border: 2px solid white !important; }"
@@ -94,14 +94,13 @@ if alto_contraste: extra_styles += ".stApp { background: #000 !important; color:
 st.markdown(f"""
 <style>
     {extra_styles}
-    /* Título alineado a la izquierda */
     .main-title {{
         background: linear-gradient(90deg, #0056ff, #00c6ff, #6200ea, #0056ff);
         background-size: 300% auto;
         -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         font-size: 4rem !important; font-weight: 800; 
         animation: gradient-move 4s ease infinite; 
-        text-align: left; /* AQUÍ CAMBIAMOS A LA ESQUINA */
+        text-align: left;
         margin-bottom: 0px;
     }}
     @keyframes gradient-move {{ 0% {{background-position: 0% 50%;}} 50% {{background-position: 100% 50%;}} 100% {{background-position: 0% 50%;}} }}
@@ -129,14 +128,14 @@ filtro_riesgo = df["Autonomia"] < dias_entrega
 riesgo_val = (df.loc[filtro_riesgo, "V_Diaria"] * df.loc[filtro_riesgo, "Costo"] * 1.5).sum()
 
 # --- 9. CUERPO DE LA APP ---
-# Encabezado alineado a la izquierda
 st.markdown('<h1 class="main-title">🌊 Flowmerce IA</h1>', unsafe_allow_html=True)
 
+# Slogan y Botón de Voz en una fila alineada a la izquierda
 c_voz1, c_voz2 = st.columns([0.8, 0.2])
 with c_voz1:
     st.markdown(f"**✨ {t_act['sub']}**")
 with c_voz2:
-    audio = mic_recorder(start_prompt="🎤 Voz", stop_prompt="🛑", key='rec')
+    mic_recorder(start_prompt="🎤 Voz", stop_prompt="🛑", key='rec')
 
 tab1, tab2, tab3 = st.tabs([t_act["tab1"], t_act["tab2"], t_act["tab3"]])
 
@@ -167,7 +166,6 @@ with tab2:
 
 with tab3:
     st.markdown("### 👥 Equipo Multidisciplinario (Equipo 3)")
-    # INTEGRANTES COMPLETOS (LOS 8)
     equipo = [
         ("Willan Álvarez.", "Lead Architect", "https://i.imgur.com/CSH9Af7.jpeg"),
         ("Dalia R.", "Product Manager", "https://i.imgur.com/4O2BGL8.jpeg"),
@@ -179,7 +177,6 @@ with tab3:
         ("Cesar Augusto F.", "Estrategia", "https://cdn-icons-png.flaticon.com/512/3001/3001764.png")
     ]
     
-    # Grid de 4 columnas para que quepan bien los 8
     for i in range(0, len(equipo), 4):
         cols = st.columns(4)
         for j, (nombre, cargo, img) in enumerate(equipo[i:i+4]):
@@ -193,5 +190,3 @@ with tab3:
 
 st.divider()
 st.caption("🌊 Flowmerce IA | Hackathon UTEL 2026 | Equipo 3")
-
-
