@@ -20,7 +20,7 @@ textos = {
         "atrapado": "Capital Atrapado", "riesgo": "Ventas en Riesgo", "salud": "Salud de Caja"
     },
     "Português": {
-        "sub": "Onde os datos se transformam em vendas",
+        "sub": "Onde os dados se transformam em vendas",
         "tab1": "📊 Monitor de Liquidez e ROI", "tab2": "🧠 Estratégia IA", "tab3": "👥 Equipe",
         "atrapado": "Capital Preso", "riesgo": "Vendas em Risco", "salud": "Saúde do Caixa"
     },
@@ -81,7 +81,7 @@ with st.sidebar:
             else:
                 st.error("Error en vinculación.")
 
-# --- 7. ESTILOS CSS ---
+# --- 7. ESTILOS CSS (ALINEADO A LA IZQUIERDA Y SIN "IA") ---
 extra_styles = ""
 if lectura_facil: extra_styles += "html, body, p, div { font-size: 1.4rem !important; line-height: 1.8 !important; }"
 if alto_contraste: extra_styles += ".stApp { background: #000 !important; color: #fff !important; } .team-card-large { border: 2px solid white !important; }"
@@ -107,22 +107,6 @@ st.markdown(f"""
     }}
     .team-card-large:hover {{ transform: translateY(-10px); border-color: #0056ff; box-shadow: 0px 15px 30px rgba(0, 86, 255, 0.2); }}
     .stMetric {{ background: rgba(0, 86, 255, 0.05); padding: 20px; border-radius: 15px; border-left: 5px solid #0056ff; }}
-
-    /* NUEVO EFECTO: NUBES SUBIENDO HACIA ARRIBA */
-    @keyframes cloud-up {{
-        0% {{ transform: translateY(100vh); opacity: 0; }}
-        10% {{ opacity: 0.8; }}
-        90% {{ opacity: 0.8; }}
-        100% {{ transform: translateY(-100vh); opacity: 0; }}
-    }}
-    .cloud-ascend {{
-        position: fixed;
-        bottom: 0;
-        font-size: 4rem;
-        z-index: 9999;
-        pointer-events: none;
-        animation: cloud-up 3s linear infinite;
-    }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -139,8 +123,10 @@ filtro_riesgo = df["Autonomia"] < dias_entrega
 riesgo_val = (df.loc[filtro_riesgo, "V_Diaria"] * df.loc[filtro_riesgo, "Costo"] * 1.5).sum()
 
 # --- 9. CUERPO DE LA APP ---
+# Título sin "IA" y alineado a la izquierda
 st.markdown('<h1 class="main-title">🌊 Flowmerce</h1>', unsafe_allow_html=True)
 
+# Slogan y Voz alineados a la izquierda
 c_enc1, c_enc2 = st.columns([0.8, 0.2])
 with c_enc1:
     st.markdown(f"**✨ {t_act['sub']}**")
@@ -171,26 +157,12 @@ with tab2:
     st.table(df[["Producto", "Stock", "Autonomia", "Acción Sugerida"]])
     
     if st.button("🚀 Aplicar Cambios en Tiendanube"):
-        # Contenedor para el efecto visual
-        cloud_container = st.empty()
-        with st.status("Subiendo datos a la nube...", expanded=True) as s:
-            # Generamos las nubes que suben
-            cloud_container.markdown("""
-                <div class="cloud-ascend" style="left: 15%; animation-duration: 2.5s;">☁️</div>
-                <div class="cloud-ascend" style="left: 35%; animation-duration: 3.5s;">☁️</div>
-                <div class="cloud-ascend" style="left: 55%; animation-duration: 3s;">☁️</div>
-                <div class="cloud-ascend" style="left: 75%; animation-duration: 2s;">☁️</div>
-                <div class="cloud-ascend" style="left: 90%; animation-duration: 4s;">☁️</div>
-            """, unsafe_allow_html=True)
-            
-            time.sleep(2.5)
-            s.update(label="¡Sincronización Exitosa! ☁️", state="complete")
-        
-        cloud_container.empty() # Limpiar nubes después de la animación
-        st.success("¡Datos actualizados en Tiendanube!")
+        with st.status("Sincronizando..."): time.sleep(1.5)
+        st.balloons()
 
 with tab3:
     st.markdown("### 👥 Equipo Multidisciplinario (Equipo 3)")
+    # INTEGRANTES COMPLETOS
     equipo = [
         ("Willan Álvarez.", "Lead Architect", "https://i.imgur.com/CSH9Af7.jpeg"),
         ("Dalia R.", "Product Manager", "https://i.imgur.com/4O2BGL8.jpeg"),
@@ -215,3 +187,4 @@ with tab3:
 
 st.divider()
 st.caption("🌊 Flowmerce | Hackathon UTEL 2026 | Equipo 3")
+
