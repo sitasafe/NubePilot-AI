@@ -9,8 +9,12 @@ from streamlit_mic_recorder import mic_recorder
 st.set_page_config(page_title="Flowmerce - Liquidez Inteligente", page_icon="🌊", layout="wide")
 
 # --- 2. CREDENCIALES TIENDANUBE ---
-CLIENT_ID = "27483"
-CLIENT_SECRET = "d45072c95b889632ad3040bfd1dd951d981e0c38ff25877a"
+try:
+    CLIENT_ID = st.secrets["CLIENT_ID"]
+    CLIENT_SECRET = st.secrets["CLIENT_SECRET"]
+except:
+    CLIENT_ID = "27483"
+    CLIENT_SECRET = "d45072c95b889632ad3040bfd1dd951d981e0c38ff25877a"
 
 # --- 3. DICCIONARIO MULTILINGÜE ---
 textos = {
@@ -20,7 +24,7 @@ textos = {
         "atrapado": "Capital Atrapado", "riesgo": "Ventas en Riesgo", "salud": "Salud de Caja"
     },
     "Português": {
-        "sub": "Onde os dados se transformam em vendas", # CORRECCIÓN: "dados"
+        "sub": "Onde os dados se transformam em vendas",
         "tab0": "🚀 Nossa Visão", "tab1": "📊 Monitor de Liquidez", "tab2": "🧠 Estratégia", "tab3": "👥 Equipe",
         "atrapado": "Capital Preso", "riesgo": "Vendas em Risco", "salud": "Saúde do Caixa"
     },
@@ -33,9 +37,8 @@ textos = {
 
 # --- 4. FUNCIONES DE API ---
 def obtener_token_real(code):
-    if not code: # CORRECCIÓN: Evita error de .strip() si es None
+    if not code:
         return None
-        
     url = "https://www.tiendanube.com/apps/authorize/token"
     payload = {
         "client_id": int(CLIENT_ID),
@@ -49,7 +52,7 @@ def obtener_token_real(code):
     except Exception:
         return None
 
-# --- 5. GESTIÓN DE MEMORIA (SESSION STATE) ---
+# --- 5. GESTIÓN DE MEMORIA ---
 if 'db_inventario' not in st.session_state:
     st.session_state.db_inventario = pd.DataFrame({
         "Producto": ["Tenis Pro Runner", "Gorra Blue Urban", "Calcetín Sport", "Sudadera Lino"],
@@ -80,7 +83,7 @@ with st.sidebar:
             token = obtener_token_real(temp_code)
             if token:
                 st.session_state.token_tienda = token
-                st.balloons() # Mejora visual
+                st.balloons()
                 st.success("¡Conexión Establecida! ✅")
             else:
                 st.error("Error en vinculación.")
@@ -88,7 +91,7 @@ with st.sidebar:
 # --- 7. ESTILOS CSS ---
 extra_styles = ""
 if lectura_facil: 
-    extra_styles += "p, span, label, li { font-size: 1.4rem !important; line-height: 1.8 !important; }" # CORRECCIÓN: CSS menos agresivo
+    extra_styles += "p, span, label, li { font-size: 1.4rem !important; line-height: 1.8 !important; }"
 if alto_contraste: 
     extra_styles += ".stApp { background: #000 !important; color: #fff !important; } .team-card-large { border: 2px solid white !important; }"
 
@@ -105,7 +108,6 @@ st.markdown(f"""
         margin-bottom: 5px;
     }}
     @keyframes gradient-move {{ 0% {{background-position: 0% 50%;}} 50% {{background-position: 100% 50%;}} 100% {{background-position: 0% 50%;}} }}
-    
     .team-card-large {{
         text-align: center; padding: 25px; border-radius: 25px;
         background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(0, 86, 255, 0.2);
@@ -113,8 +115,6 @@ st.markdown(f"""
     }}
     .team-card-large:hover {{ transform: translateY(-10px); border-color: #0056ff; box-shadow: 0px 15px 30px rgba(0, 86, 255, 0.2); }}
     .stMetric {{ background: rgba(0, 86, 255, 0.05); padding: 20px; border-radius: 15px; border-left: 5px solid #0056ff; }}
-
-    /* EFECTO DE NUBES SUBIENDO */
     @keyframes cloud-up {{
         0% {{ transform: translateY(100vh); opacity: 0; }}
         10% {{ opacity: 0.8; }}
@@ -131,10 +131,8 @@ st.markdown(f"""
 # --- 8. LÓGICA DE CÁLCULO ---
 t_act = textos[idioma]
 df = st.session_state.db_inventario.copy()
-df["Ventas_30d"] = df["Ventas_30d"].fillna(0) # Manejo de nulos
+df["Ventas_30d"] = df["Ventas_30d"].fillna(0)
 df["V_Diaria"] = (df["Ventas_30d"] / 30) * f_demanda
-
-# CORRECCIÓN: Autonomía 999 en lugar de infinito
 df["Autonomia"] = np.where(df["V_Diaria"] > 0, df["Stock"] / df["V_Diaria"], 999)
 
 filtro_atrapado = df["Autonomia"] > 60
@@ -145,12 +143,8 @@ riesgo_val = (df.loc[filtro_riesgo, "V_Diaria"] * df.loc[filtro_riesgo, "Costo"]
 
 # --- 9. CUERPO DE LA APP ---
 st.markdown('<h1 class="main-title">🌊 Flowmerce</h1>', unsafe_allow_html=True)
-
-c_enc1, c_enc2 = st.columns([0.8, 0.2])
-with c_enc1:
-    st.markdown(f"**✨ {t_act['sub']}**")
-with c_enc2:
-    mic_recorder(start_prompt="🎤 Voz", stop_prompt="🛑", key='rec')
+st.markdown(f"**✨ {t_act['sub']}**")
+mic_recorder(start_prompt="🎤 Voz", stop_prompt="🛑", key='rec')
 
 tab0, tab1, tab2, tab3 = st.tabs([t_act["tab0"], t_act["tab1"], t_act["tab2"], t_act["tab3"]])
 
@@ -158,65 +152,31 @@ with tab0:
     st.markdown("## 🎯 ¿Qué nos diferencia?")
     col_v1, col_v2 = st.columns([0.6, 0.4])
     with col_v1:
-        st.write("""
-        Hoy, miles de dueños de marcas pasan **5 horas por semana** frente a un Excel, intentando adivinar el futuro. 
-        Juegan a la ruleta con su inventario: o compran de más y entierran su capital, o compran de menos y pierden ventas.
-        
-        **Tu negocio es un ritmo, no una adivinanza.** Flowmerce transforma datos en decisiones automáticas. 
-        Analizamos la velocidad real de venta para decirte **qué, cuánto y cuándo comprar**.
-        """)
-        st.info("💡 **Dato:** Reducimos una tarde entera de trabajo a solo 5 minutos de certeza.")
+        st.write("Flowmerce lee tus datos de Tiendanube y te dice qué, cuánto y cuándo comprar.")
+        st.info("💡 **Dato:** Reducimos una tarde de trabajo a solo 5 minutos.")
     with col_v2:
-        st.markdown("""
-        ### 💎 Modelo de Negocio (SaaS)
-        - **Starter (Gratis):** Alertas básicas.
-        - **Growth ($20 USD):** Predicción IA.
-        - **Scale (Premium):** Simulación avanzada.
-        """)
-
-    st.divider()
-    st.markdown("### ⚙️ ¿Cómo funciona?")
-    c1, c2, c3 = st.columns(3)
-    c1.markdown("**1. Conexión Instantánea**\nInstalación desde Marketplace vía API V2.")
-    c2.markdown("**2. Análisis en Background**\nProcesamos órdenes mientras duermes.")
-    c3.markdown("**3. Tablero de Decisiones**\nLista de compras lista para ejecutar.")
+        st.markdown("### 💎 Modelo SaaS\n- Starter (Gratis)\n- Growth ($20 USD)\n- Scale (Premium)")
 
 with tab1:
-    st.toast("Datos sincronizados", icon="☁️") # Mejora UX
+    st.toast("Datos sincronizados", icon="☁️")
     col1, col2, col3 = st.columns(3)
     col1.metric(t_act["atrapado"], f"${float(atrapado_val):,.0f} MXN")
     col2.metric(t_act["riesgo"], f"${float(riesgo_val):,.0f} MXN", delta="¡Alerta!", delta_color="inverse")
     col3.metric(t_act["salud"], f"{max(0, 100-(dias_entrega*2))}%")
-
-    st.write("---")
-    st.subheader("📈 Proyección de Capital Invertido")
-    df["Capital_Invertido"] = df["Stock"] * df["Costo"]
-    st.area_chart(df.set_index("Producto")["Capital_Invertido"])
+    st.area_chart(df.set_index("Producto")["Stock"])
 
 with tab2:
-    st.subheader("🤖 Recomendaciones de Compra")
-    
-    # CORRECCIÓN: Acción sugerida más eficiente
+    st.subheader("🤖 Estrategia")
     df["Acción Sugerida"] = np.select(
         [df["Autonomia"] < dias_entrega, df["Autonomia"] > 60],
         ["🚨 REABASTECER", "🔥 LIQUIDAR"],
         default="✅ ESTABLE"
     )
-
     st.table(df[["Producto", "Stock", "Autonomia", "Acción Sugerida"]])
-    
-    if st.button("🚀 Aplicar Cambios en Tiendanube"):
-        cloud_placeholder = st.empty()
-        with st.status("Subiendo datos a la nube...", expanded=True) as s:
-            cloud_placeholder.markdown("""
-                <div class="cloud-ascend" style="left: 10%; animation-duration: 2.5s;">☁️</div>
-                <div class="cloud-ascend" style="left: 40%; animation-duration: 3s;">☁️</div>
-                <div class="cloud-ascend" style="left: 70%; animation-duration: 2s;">☁️</div>
-            """, unsafe_allow_html=True)
-            time.sleep(2.5)
-            s.update(label="¡Sincronización Exitosa! ☁️", state="complete")
-        cloud_placeholder.empty()
-        st.success("¡Decisiones aplicadas con éxito!")
+    if st.button("🚀 Aplicar Cambios"):
+        with st.status("Sincronizando...", expanded=True) as s:
+            time.sleep(2.0)
+            s.update(label="Sincronización Exitosa! ☁️", state="complete")
 
 with tab3:
     st.markdown("### 👥 Equipo Multidisciplinario (Equipo 3)")
@@ -232,7 +192,7 @@ with tab3:
     ]
     for i in range(0, len(equipo), 4):
         cols = st.columns(4)
-        for j, (nombre, cargo, img) in equipo[i:i+4]:
+        for j, (nombre, cargo, img) in enumerate(equipo[i:i+4]): # CORRECCIÓN: Volvimos a poner enumerate
             with cols[j]:
                 st.markdown(f"""
                 <div class="team-card-large">
