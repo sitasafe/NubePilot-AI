@@ -35,7 +35,7 @@ textos = {
         "btn_reporte": "📝 Generar Reporte y Descargar",
         "sync": "Sincronizando...",
         "sync_ok": "Sincronización Exitosa!",
-        "equipo_tit": "👥 Equipo Multidisciplinario (Equipo 3)",
+        "equipo_tit": "👥 Nuestro Equipo",
         "rep_proceso": "Procesando Reporte...",
         "rep_exito": "¡Reporte listo para descargar! ✅",
         "escuchando": "🎙️ Analizando comando de voz...",
@@ -334,5 +334,6 @@ with tabs[3]:
                 </div>""", unsafe_allow_html=True)
 
 st.divider()
-st.caption("🌊 Flowmerce | Hackathon UTEL 2026 | Equipo 3")
+st.caption("🌊 Flowmerce | Hackathon UTEL 2026 | Equipo 3 |TiendaNube")
+
 
