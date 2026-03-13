@@ -6,7 +6,7 @@ import requests
 from streamlit_mic_recorder import mic_recorder
 
 # --- 1. CONFIGURACIÓN DE PÁGINA ---
-st.set_page_config(page_title="Flowmerce IA - Liquidez Inteligente", page_icon="🌊", layout="wide")
+st.set_page_config(page_title="Flowmerce", page_icon="🌊", layout="wide")
 
 # --- 2. CREDENCIALES TIENDANUBE ---
 CLIENT_ID = "27483"
@@ -65,7 +65,7 @@ with st.sidebar:
         lectura_facil = st.toggle("Modo Lectura Fácil")
         alto_contraste = st.toggle("Modo Alto Contraste")
 
-    st.markdown("### ⚙️ Simulador de Mercado")
+    st.markdown("### ⚙️ Mercado")
     f_demanda = st.slider("Impulso de Demanda (Factor)", 0.5, 4.0, 1.0)
     dias_entrega = st.slider("Lead Time Proveedor (Días)", 1, 30, 7)
     
@@ -193,4 +193,5 @@ with tab3:
 
 st.divider()
 st.caption("🌊 Flowmerce IA | Hackathon UTEL 2026 | Equipo 3")
+
 
