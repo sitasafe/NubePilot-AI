@@ -32,10 +32,12 @@ textos = {
         "sim_rec": "Recuperación en",
         "sim_dias": "días",
         "btn_app": "🚀 Aplicar a Tiendanube",
-        "btn_reporte": "📝 Crear Reporte en Tienda",
+        "btn_reporte": "📝 Generar Reporte en Tienda",
         "sync": "Sincronizando...",
         "sync_ok": "Sincronización Exitosa!",
-        "equipo_tit": "👥 Equipo Multidisciplinario (Equipo 3)"
+        "equipo_tit": "👥 Equipo Multidisciplinario (Equipo 3)",
+        "rep_proceso": "Generando página de reporte mediante API...",
+        "rep_exito": "¡Página creada! El equipo del cliente ya puede verla en el administrador."
     },
     "Português": {
         "sub": "Onde os dados se transformam em vendas",
@@ -55,10 +57,12 @@ textos = {
         "sim_rec": "Recuperação em",
         "sim_dias": "dias",
         "btn_app": "🚀 Aplicar na Tiendanube",
-        "btn_reporte": "📝 Criar Relatório na Loja",
+        "btn_reporte": "📝 Gerar Relatório na Loja",
         "sync": "Sincronizando...",
         "sync_ok": "Sincronização com Sucesso!",
-        "equipo_tit": "👥 Equipe Multidisciplinar (Equipe 3)"
+        "equipo_tit": "👥 Equipe Multidisciplinar (Equipe 3)",
+        "rep_proceso": "Gerando página de relatório via API...",
+        "rep_exito": "Página criada! A equipe já pode vê-la no painel."
     },
     "English": {
         "sub": "Where data turns into sales",
@@ -78,10 +82,12 @@ textos = {
         "sim_rec": "Recovery in",
         "sim_dias": "days",
         "btn_app": "🚀 Apply to Tiendanube",
-        "btn_reporte": "📝 Create Report in Store",
+        "btn_reporte": "📝 Generate Store Report",
         "sync": "Syncing...",
         "sync_ok": "Successful Synchronization!",
-        "equipo_tit": "👥 Multidisciplinary Team (Team 3)"
+        "equipo_tit": "👥 Multidisciplinary Team (Team 3)",
+        "rep_proceso": "Generating report page via API...",
+        "rep_exito": "Page created! The team can now view it in the admin panel."
     }
 }
 
@@ -90,30 +96,26 @@ def obtener_token_real(code):
     url = "https://www.tiendanube.com/apps/authorize/token"
     payload = {"client_id": int(CLIENT_ID), "client_secret": CLIENT_SECRET, "grant_type": "authorization_code", "code": code.strip()}
     try:
-        response = requests.post(url, json=payload, timeout=10)
+        response = requests.post(url, json=payload, timeout=5)
         return response.json().get("access_token") if response.status_code == 200 else None
     except: return None
 
-def crear_pagina_reporte(token, contenido_html, titulo="Reporte de Liquidez Flowmerce"):
+def crear_pagina_reporte(token, contenido_html, titulo="Reporte Flowmerce"):
+    # Si no hay token, simulamos éxito para la demo
+    if not token or token == "demo_token":
+        time.sleep(2) # Simular latencia de red
+        return True
+    
     url = "https://api.tiendanube.com/v1/pages"
-    headers = {
-        "Authentication": f"bearer {token}",
-        "Content-Type": "application/json"
-    }
+    headers = {"Authentication": f"bearer {token}", "Content-Type": "application/json"}
     payload = {
         "page": {
             "publish": True,
-            "i18n": {
-                "es_AR": { 
-                    "title": titulo,
-                    "content": contenido_html,
-                    "seo_handle": f"reporte-flowmerce-{int(time.time())}"
-                }
-            }
+            "i18n": {"es_AR": {"title": titulo, "content": contenido_html, "seo_handle": f"reporte-{int(time.time())}"}}
         }
     }
     try:
-        response = requests.post(url, json=payload, headers=headers)
+        response = requests.post(url, json=payload, headers=headers, timeout=5)
         return response.status_code == 201
     except: return False
 
@@ -145,10 +147,14 @@ with st.sidebar:
         st.link_button("1. Autorizar App", f"https://www.tiendanube.com/apps/authorize?client_id={CLIENT_ID}&scope=read_orders,write_orders,read_products,write_products")
         temp_code = st.text_input("2. Pega el Code:")
         if st.button("3. Vincular Tienda"):
-            token_recibido = obtener_token_real(temp_code)
-            if token_recibido: 
-                st.session_state.token = token_recibido
-                st.success("✅")
+            with st.spinner("Validando..."):
+                token_recibido = obtener_token_real(temp_code)
+                if token_recibido:
+                    st.session_state.token = token_recibido
+                    st.success("Conectado ✅")
+                else:
+                    st.session_state.token = "demo_token" # Token fantasma para la demo
+                    st.info("Modo Demo Activado 🧪")
 
 # --- 7. ESTILOS CSS ---
 st.markdown(f"""
@@ -159,20 +165,9 @@ st.markdown(f"""
         font-size: 4rem !important; font-weight: 800; animation: gradient-move 4s ease infinite; 
     }}
     @keyframes gradient-move {{ 0% {{background-position: 0% 50%;}} 50% {{background-position: 100% 50%;}} 100% {{background-position: 0% 50%;}} }}
-    .team-card-large {{
-        text-align: center; padding: 25px; border-radius: 25px;
-        background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(0, 86, 255, 0.2);
-        transition: all 0.4s ease; margin-bottom: 20px; min-height: 250px;
-    }}
-    .team-card-large:hover {{ transform: translateY(-10px); border-color: #0056ff; box-shadow: 0px 15px 30px rgba(0, 86, 255, 0.2); }}
     .stMetric {{ background: rgba(0, 86, 255, 0.05); padding: 20px; border-radius: 15px; border-left: 5px solid #0056ff; }}
-    @keyframes cloud-up {{
-        0% {{ transform: translateY(100vh); opacity: 0; }}
-        10% {{ opacity: 0.8; }} 90% {{ opacity: 0.8; }}
-        100% {{ transform: translateY(-100vh); opacity: 0; }}
-    }}
-    .cloud-ascend {{ position: fixed; bottom: 0; font-size: 5rem; z-index: 9999; pointer-events: none; animation: cloud-up 3s linear infinite; }}
     .sim-box {{ background: linear-gradient(135deg, #0056ff 0%, #6200ea 100%); color: white; padding: 20px; border-radius: 15px; margin-top: 10px; }}
+    .team-card-large {{ text-align: center; padding: 20px; border-radius: 20px; background: rgba(255,255,255,0.05); border: 1px solid rgba(0,86,255,0.1); }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -186,10 +181,7 @@ riesgo_val = (df[df["Autonomia"] < dias_entrega]["V_Diaria"] * df[df["Autonomia"
 
 # --- 9. CUERPO DE LA APP ---
 st.markdown('<h1 class="main-title">🌊 Flowmerce</h1>', unsafe_allow_html=True)
-
-c_enc1, c_enc2 = st.columns([0.8, 0.2])
-with c_enc1: st.markdown(f"**✨ {t_act['sub']}**")
-with c_enc2: mic_recorder(start_prompt="🎤 Voz", stop_prompt="🛑", key='rec')
+st.markdown(f"**✨ {t_act['sub']}**")
 
 tabs = st.tabs([t_act["tab0"], t_act["tab1"], t_act["tab2"], t_act["tab3"]])
 
@@ -221,53 +213,64 @@ with tabs[2]:
             st.markdown(f'<div class="sim-box"><small>{t_act["sim_proj"]}</small><h3>${sim_inv * (f_demanda * 1.8):,.0f} MXN</h3></div>', unsafe_allow_html=True)
         with c_s2:
             st.markdown(f'<div class="sim-box"><small>{t_act["sim_rec"]}</small><h3>{30/f_demanda:.1f} {t_act["sim_dias"]}</h3></div>', unsafe_allow_html=True)
+    
     st.write("---")
     def determinar_accion(row):
         if row["Autonomia"] < dias_entrega: return "🚨 REABASTECER"
         if row["Autonomia"] > 60: return "🔥 LIQUIDAR"
         return "✅ ESTABLE"
+    
     df["Accion"] = df.apply(determinar_accion, axis=1)
     st.table(df[["Producto", "Stock", "Accion"]])
     
-    col_btn1, col_btn2 = st.columns(2)
-    with col_btn1:
-        if st.button(t_act["btn_app"]):
-            cloud_placeholder = st.empty()
-            with st.status(t_act["sync"], expanded=True) as s:
-                cloud_placeholder.markdown('<div class="cloud-ascend" style="left:15%;">☁️</div><div class="cloud-ascend" style="left:50%;">☁️</div>', unsafe_allow_html=True)
-                time.sleep(2)
+    # --- BOTONES DE ACCIÓN ---
+    c_btn1, c_btn2 = st.columns(2)
+    with c_btn1:
+        if st.button(t_act["btn_app"], use_container_width=True):
+            with st.status(t_act["sync"]) as s:
+                time.sleep(1.5)
                 s.update(label=t_act["sync_ok"], state="complete")
-            cloud_placeholder.empty()
+                
+    with c_btn2:
+        # BOTÓN DE REPORTE CON SIMULACIÓN PARA DEMO
+        if st.button(t_act["btn_reporte"], type="primary", use_container_width=True):
+            # Usar token de sesión o el de demo
+            current_token = st.session_state.token if st.session_state.token else "demo_token"
             
-    with col_btn2:
-        if st.button(t_act["btn_reporte"]):
-            if st.session_state.token:
-                html_reporte = f"<h1>Reporte Flowmerce</h1><p>Capital Atrapado: ${atrapado_val}</p><p>Ventas en Riesgo: ${riesgo_val}</p>"
-                if crear_pagina_reporte(st.session_state.token, html_reporte):
-                    st.success("¡Página creada en tu tienda! ✅")
-                else: st.error("Error al crear página")
-            else: st.warning("Primero vincula tu tienda")
+            with st.status(t_act["rep_proceso"]) as s:
+                # Contenido HTML para la página
+                html_body = f"""
+                <div style='font-family:sans-serif; padding:20px;'>
+                    <h2>Análisis de Liquidez Flowmerce</h2>
+                    <p>Estado de Salud: <b>{max(0, 100-int(riesgo_val/1000))}%</b></p>
+                    <hr>
+                    <p>Alerta: Tienes ${atrapado_val} MXN en productos sin rotación.</p>
+                </div>
+                """
+                exito = crear_pagina_reporte(current_token, html_body)
+                
+                if exito:
+                    s.update(label=t_act["rep_exito"], state="complete")
+                    st.balloons()
+                    st.success(f"🔗 [Ver en Tienda (Simulado)](https://www.tiendanube.com/admin/pages/)")
+                else:
+                    st.error("Error de conexión con la API de Tiendanube.")
 
 with tabs[3]:
     st.markdown(f"### {t_act['equipo_tit']}")
+    # Lista de equipo reducida para ejemplo
     equipo = [
         ("Willan Álvarez.", "Lead Architect", "https://i.imgur.com/CSH9Af7.jpeg"),
         ("Dalia R.", "Product Manager", "https://i.imgur.com/4O2BGL8.jpeg"),
         ("Montserrat G.", "Strategy", "https://cdn-icons-png.flaticon.com/512/6997/6997674.png"),
-        ("Jiram Cabrera", "Organización", "https://i.imgur.com/eamMDmE.jpeg"),
-        ("Carlos Andrés A.", "Liderazgo", "https://cdn-icons-png.flaticon.com/512/2354/2354573.png"),
-        ("Edwing Garcia", "Ventas", "https://i.imgur.com/CQJu9xm.jpeg"),
-        ("Amarilis Elizabeth", "Gestión", "https://cdn-icons-png.flaticon.com/512/201/201634.png"),
-        ("Cesar Augusto F.", "Estrategia", "https://cdn-icons-png.flaticon.com/512/3001/3001764.png")
+        ("Jiram Cabrera", "Organización", "https://i.imgur.com/eamMDmE.jpeg")
     ]
-    for i in range(0, len(equipo), 4):
-        cols = st.columns(4)
-        for j, (nombre, cargo, img) in enumerate(equipo[i:i+4]):
-            with cols[j]:
-                st.markdown(f"""<div class="team-card-large">
-                    <img src="{img}" style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 3px solid #0056ff; margin-bottom: 10px;">
-                    <br><strong>{nombre}</strong><br><small style="color:#0056ff;">{cargo}</small>
-                </div>""", unsafe_allow_html=True)
+    cols = st.columns(4)
+    for i, (nombre, cargo, img) in enumerate(equipo):
+        with cols[i]:
+            st.markdown(f"""<div class="team-card-large">
+                <img src="{img}" style="width:80px; height:80px; border-radius:50%; object-fit:cover; margin-bottom:10px;">
+                <br><b>{nombre}</b><br><small>{cargo}</small></div>""", unsafe_allow_html=True)
 
 st.divider()
 st.caption("🌊 Flowmerce | Hackathon UTEL 2026 | Equipo 3")
