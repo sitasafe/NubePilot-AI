@@ -81,7 +81,7 @@ with st.sidebar:
             else:
                 st.error("Error en vinculación.")
 
-# --- 7. ESTILOS CSS (Alineado a la izquierda) ---
+# --- 7. ESTILOS CSS ---
 extra_styles = ""
 if lectura_facil: extra_styles += "html, body, p, div { font-size: 1.4rem !important; line-height: 1.8 !important; }"
 if alto_contraste: extra_styles += ".stApp { background: #000 !important; color: #fff !important; } .team-card-large { border: 2px solid white !important; }"
@@ -108,14 +108,14 @@ st.markdown(f"""
     .team-card-large:hover {{ transform: translateY(-10px); border-color: #0056ff; box-shadow: 0px 15px 30px rgba(0, 86, 255, 0.2); }}
     .stMetric {{ background: rgba(0, 86, 255, 0.05); padding: 20px; border-radius: 15px; border-left: 5px solid #0056ff; }}
 
-    /* EFECTO DE NUBES ASCENDIENDO */
-    @keyframes move-clouds-up {{
-        from {{ transform: translateY(100vh); opacity: 0; }} /* Empieza abajo invisible */
-        to {{ transform: translateY(-100%); opacity: 1; }} /* Sube y aparece */
+    /* EFECTO DE NUBES FLOTANDO */
+    @keyframes move-clouds {{
+        from {{ transform: translateX(-100%); }}
+        to {{ transform: translateX(100vw); }}
     }}
     .cloud-particle {{
-        position: fixed; left: 0; font-size: 5rem; /* Más grandes */
-        animation: move-clouds-up 4s linear infinite; /* Un poco más lenta */
+        position: fixed; top: 0; left: 0; font-size: 4rem;
+        animation: move-clouds 3s linear infinite;
         z-index: 9999; pointer-events: none; opacity: 0.8;
     }}
 </style>
@@ -166,14 +166,15 @@ with tab2:
     st.table(df[["Producto", "Stock", "Autonomia", "Acción Sugerida"]])
     
     if st.button("🚀 Aplicar Cambios en Tiendanube"):
+        # CAMBIO: NUBES EN LUGAR DE GLOBOS
         with st.status("Sincronizando con la nube...", expanded=True) as s:
             time.sleep(1.5)
-            # Insertamos las nubes ascendentes vía HTML/CSS
+            # Insertamos las nubes animadas vía HTML/CSS
             st.markdown("""
-                <div class="cloud-particle" style="left: 10%; animation-duration: 3s;">☁️</div>
-                <div class="cloud-particle" style="left: 30%; animation-duration: 4s;">☁️</div>
-                <div class="cloud-particle" style="left: 60%; animation-duration: 2.5s;">☁️</div>
-                <div class="cloud-particle" style="left: 80%; animation-duration: 3.5s;">☁️</div>
+                <div class="cloud-particle" style="top: 20%; animation-duration: 2s;">☁️</div>
+                <div class="cloud-particle" style="top: 50%; animation-duration: 3s;">☁️</div>
+                <div class="cloud-particle" style="top: 80%; animation-duration: 2.5s;">☁️</div>
+                <div class="cloud-particle" style="top: 10%; animation-duration: 4s;">☁️</div>
             """, unsafe_allow_html=True)
             s.update(label="¡Sincronización Exitosa! ☁️", state="complete")
         st.success("¡Datos actualizados en Tiendanube!")
