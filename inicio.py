@@ -6,7 +6,7 @@ import requests
 from streamlit_mic_recorder import mic_recorder
 
 # --- 1. CONFIGURACIÓN DE PÁGINA ---
-st.set_page_config(page_title="Flowmerce IA - Liquidez Inteligente", page_icon="🌊", layout="wide")
+st.set_page_config(page_title="Flowmerce - Liquidez Inteligente", page_icon="🌊", layout="wide")
 
 # --- 2. CREDENCIALES TIENDANUBE ---
 CLIENT_ID = "27483"
@@ -190,3 +190,4 @@ with tab3:
 
 st.divider()
 st.caption("🌊 Flowmerce IA | Hackathon UTEL 2026 | Equipo 3")
+
