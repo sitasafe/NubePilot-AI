@@ -32,37 +32,37 @@ textos = {
         "sim_rec": "Recuperación en",
         "sim_dias": "días",
         "btn_app": "🚀 Aplicar a Tiendanube",
-        "btn_reporte": "📝 Generar Reporte en Tienda",
+        "btn_reporte": "📝 Crear Reporte en Tienda", # Añadido
         "sync": "Sincronizando...",
         "sync_ok": "Sincronización Exitosa!",
         "equipo_tit": "👥 Equipo Multidisciplinario (Equipo 3)",
-        "rep_proceso": "Generando página de reporte mediante API...",
-        "rep_exito": "¡Página creada! El equipo del cliente ya puede verla en el administrador."
+        "rep_proceso": "Generando página de reporte vía API...", # Añadido
+        "rep_exito": "¡Página creada exitosamente en la tienda! ✅" # Añadido
     },
     "Português": {
         "sub": "Onde os dados se transformam em vendas",
         "tab0": "🚀 Nossa Visão", "tab1": "📊 Monitor de Liquidez", "tab2": "🧠 Estratégia", "tab3": "👥 Equipe",
         "atrapado": "Capital Preso", "riesgo": "Vendas em Risco", "salud": "Saúde do Caixa",
         "diferencia": "🎯 O que nos diferencia?",
-        "dolor": "Hoje, milhares de donos de marcas passam **5 horas por semana** na frente de um Excel, tentando adivinhar o futuro. Flowmerce transforma dados de vendas em decisões automáticas.",
+        "dolor": "Hoje, milhares de donos de marcas passam **5 horas por semana** na frente de um Excel, tentando adivinhar o futuro. Flowmerce transforma datos de vendas em decisões automáticas.",
         "modelo_t": "### 💎 Modelo de Negócio (SaaS)",
         "starter": "- **Starter (Grátis):** Alertas básicos.",
         "growth": "- **Growth ($20 USD):** Predição IA.",
         "scale": "- **Scale (Premium):** Simulador de cenários.",
         "dato_cert": "💡 **Dado:** Reduzimos uma tarde inteira de trabalho a apenas 5 minutos de certeza.",
-        "est_tit": "🧠 Estratégia e Inteligência de Dados",
+        "est_tit": "🧠 Estratégia e Inteligência de Datos",
         "sim_tit": "💎 Simulador de Liquidez (Nível Scale)",
         "sim_inv": "Investimento para Simular ($)",
         "sim_proj": "Vendas Projetadas",
         "sim_rec": "Recuperação em",
         "sim_dias": "dias",
         "btn_app": "🚀 Aplicar na Tiendanube",
-        "btn_reporte": "📝 Gerar Relatório na Loja",
+        "btn_reporte": "📝 Criar Relatório na Loja",
         "sync": "Sincronizando...",
         "sync_ok": "Sincronização com Sucesso!",
         "equipo_tit": "👥 Equipe Multidisciplinar (Equipe 3)",
-        "rep_proceso": "Gerando página de relatório via API...",
-        "rep_exito": "Página criada! A equipe já pode vê-la no painel."
+        "rep_proceso": "Gerando página de relatório...",
+        "rep_exito": "Página criada com sucesso! ✅"
     },
     "English": {
         "sub": "Where data turns into sales",
@@ -82,12 +82,12 @@ textos = {
         "sim_rec": "Recovery in",
         "sim_dias": "days",
         "btn_app": "🚀 Apply to Tiendanube",
-        "btn_reporte": "📝 Generate Store Report",
+        "btn_reporte": "📝 Create Report in Store",
         "sync": "Syncing...",
         "sync_ok": "Successful Synchronization!",
         "equipo_tit": "👥 Multidisciplinary Team (Team 3)",
-        "rep_proceso": "Generating report page via API...",
-        "rep_exito": "Page created! The team can now view it in the admin panel."
+        "rep_proceso": "Generating report page...",
+        "rep_exito": "Page created successfully! ✅"
     }
 }
 
@@ -96,14 +96,14 @@ def obtener_token_real(code):
     url = "https://www.tiendanube.com/apps/authorize/token"
     payload = {"client_id": int(CLIENT_ID), "client_secret": CLIENT_SECRET, "grant_type": "authorization_code", "code": code.strip()}
     try:
-        response = requests.post(url, json=payload, timeout=5)
+        response = requests.post(url, json=payload, timeout=10)
         return response.json().get("access_token") if response.status_code == 200 else None
     except: return None
 
+# Función para el botón de reporte (Modo real + Modo demo)
 def crear_pagina_reporte(token, contenido_html, titulo="Reporte Flowmerce"):
-    # Si no hay token, simulamos éxito para la demo
-    if not token or token == "demo_token":
-        time.sleep(2) # Simular latencia de red
+    if not token or token == "demo": # Soporte para simulación en la Hackathon
+        time.sleep(2)
         return True
     
     url = "https://api.tiendanube.com/v1/pages"
@@ -127,8 +127,8 @@ if 'db_inventario' not in st.session_state:
         "Ventas_30d": [45, 10, 30, 42],
         "Costo": [1200, 350, 150, 890]
     })
-if 'token' not in st.session_state:
-    st.session_state.token = None
+if 'token_session' not in st.session_state: # Usamos nombre distinto para no chocar
+    st.session_state.token_session = None
 
 # --- 6. BARRA LATERAL ---
 with st.sidebar:
@@ -147,14 +147,13 @@ with st.sidebar:
         st.link_button("1. Autorizar App", f"https://www.tiendanube.com/apps/authorize?client_id={CLIENT_ID}&scope=read_orders,write_orders,read_products,write_products")
         temp_code = st.text_input("2. Pega el Code:")
         if st.button("3. Vincular Tienda"):
-            with st.spinner("Validando..."):
-                token_recibido = obtener_token_real(temp_code)
-                if token_recibido:
-                    st.session_state.token = token_recibido
-                    st.success("Conectado ✅")
-                else:
-                    st.session_state.token = "demo_token" # Token fantasma para la demo
-                    st.info("Modo Demo Activado 🧪")
+            token = obtener_token_real(temp_code)
+            if token:
+                st.session_state.token_session = token
+                st.success("✅")
+            else:
+                st.session_state.token_session = "demo" # Activa modo demo si falla el code real
+                st.info("Modo Demo ✅")
 
 # --- 7. ESTILOS CSS ---
 st.markdown(f"""
@@ -165,9 +164,20 @@ st.markdown(f"""
         font-size: 4rem !important; font-weight: 800; animation: gradient-move 4s ease infinite; 
     }}
     @keyframes gradient-move {{ 0% {{background-position: 0% 50%;}} 50% {{background-position: 100% 50%;}} 100% {{background-position: 0% 50%;}} }}
+    .team-card-large {{
+        text-align: center; padding: 25px; border-radius: 25px;
+        background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(0, 86, 255, 0.2);
+        transition: all 0.4s ease; margin-bottom: 20px; min-height: 250px;
+    }}
+    .team-card-large:hover {{ transform: translateY(-10px); border-color: #0056ff; box-shadow: 0px 15px 30px rgba(0, 86, 255, 0.2); }}
     .stMetric {{ background: rgba(0, 86, 255, 0.05); padding: 20px; border-radius: 15px; border-left: 5px solid #0056ff; }}
+    @keyframes cloud-up {{
+        0% {{ transform: translateY(100vh); opacity: 0; }}
+        10% {{ opacity: 0.8; }} 90% {{ opacity: 0.8; }}
+        100% {{ transform: translateY(-100vh); opacity: 0; }}
+    }}
+    .cloud-ascend {{ position: fixed; bottom: 0; font-size: 5rem; z-index: 9999; pointer-events: none; animation: cloud-up 3s linear infinite; }}
     .sim-box {{ background: linear-gradient(135deg, #0056ff 0%, #6200ea 100%); color: white; padding: 20px; border-radius: 15px; margin-top: 10px; }}
-    .team-card-large {{ text-align: center; padding: 20px; border-radius: 20px; background: rgba(255,255,255,0.05); border: 1px solid rgba(0,86,255,0.1); }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -181,7 +191,10 @@ riesgo_val = (df[df["Autonomia"] < dias_entrega]["V_Diaria"] * df[df["Autonomia"
 
 # --- 9. CUERPO DE LA APP ---
 st.markdown('<h1 class="main-title">🌊 Flowmerce</h1>', unsafe_allow_html=True)
-st.markdown(f"**✨ {t_act['sub']}**")
+
+c_enc1, c_enc2 = st.columns([0.8, 0.2])
+with c_enc1: st.markdown(f"**✨ {t_act['sub']}**")
+with c_enc2: mic_recorder(start_prompt="🎤 Voz", stop_prompt="🛑", key='rec')
 
 tabs = st.tabs([t_act["tab0"], t_act["tab1"], t_act["tab2"], t_act["tab3"]])
 
@@ -213,64 +226,62 @@ with tabs[2]:
             st.markdown(f'<div class="sim-box"><small>{t_act["sim_proj"]}</small><h3>${sim_inv * (f_demanda * 1.8):,.0f} MXN</h3></div>', unsafe_allow_html=True)
         with c_s2:
             st.markdown(f'<div class="sim-box"><small>{t_act["sim_rec"]}</small><h3>{30/f_demanda:.1f} {t_act["sim_dias"]}</h3></div>', unsafe_allow_html=True)
-    
     st.write("---")
     def determinar_accion(row):
         if row["Autonomia"] < dias_entrega: return "🚨 REABASTECER"
         if row["Autonomia"] > 60: return "🔥 LIQUIDAR"
         return "✅ ESTABLE"
-    
     df["Accion"] = df.apply(determinar_accion, axis=1)
     st.table(df[["Producto", "Stock", "Accion"]])
     
-    # --- BOTONES DE ACCIÓN ---
-    c_btn1, c_btn2 = st.columns(2)
-    with c_btn1:
+    # --- SECCIÓN DE BOTONES ---
+    col_b1, col_b2 = st.columns(2)
+    with col_b1:
         if st.button(t_act["btn_app"], use_container_width=True):
-            with st.status(t_act["sync"]) as s:
-                time.sleep(1.5)
+            cloud_placeholder = st.empty()
+            with st.status(t_act["sync"], expanded=True) as s:
+                cloud_placeholder.markdown('<div class="cloud-ascend" style="left:15%;">☁️</div><div class="cloud-ascend" style="left:50%;">☁️</div>', unsafe_allow_html=True)
+                time.sleep(2)
                 s.update(label=t_act["sync_ok"], state="complete")
-                
-    with c_btn2:
-        # BOTÓN DE REPORTE CON SIMULACIÓN PARA DEMO
+            cloud_placeholder.empty()
+    
+    with col_b2:
+        # BOTÓN NUEVO: CREAR REPORTE
         if st.button(t_act["btn_reporte"], type="primary", use_container_width=True):
-            # Usar token de sesión o el de demo
-            current_token = st.session_state.token if st.session_state.token else "demo_token"
-            
             with st.status(t_act["rep_proceso"]) as s:
-                # Contenido HTML para la página
-                html_body = f"""
-                <div style='font-family:sans-serif; padding:20px;'>
-                    <h2>Análisis de Liquidez Flowmerce</h2>
-                    <p>Estado de Salud: <b>{max(0, 100-int(riesgo_val/1000))}%</b></p>
-                    <hr>
-                    <p>Alerta: Tienes ${atrapado_val} MXN en productos sin rotación.</p>
-                </div>
-                """
-                exito = crear_pagina_reporte(current_token, html_body)
+                # Contenido que se enviará a la tienda
+                reporte_html = f"<h2>Resumen de Liquidez</h2><p>Capital Atrapado: ${atrapado_val}</p><p>Salud: {max(0, 100-int(riesgo_val/1000))}%</p>"
+                
+                # Intentar crear (usa modo demo si no hay token)
+                token_actual = st.session_state.token_session if st.session_state.token_session else "demo"
+                exito = crear_pagina_reporte(token_actual, reporte_html)
                 
                 if exito:
                     s.update(label=t_act["rep_exito"], state="complete")
                     st.balloons()
-                    st.success(f"🔗 [Ver en Tienda (Simulado)](https://www.tiendanube.com/admin/pages/)")
                 else:
-                    st.error("Error de conexión con la API de Tiendanube.")
+                    st.error("Error al conectar con la API")
 
 with tabs[3]:
     st.markdown(f"### {t_act['equipo_tit']}")
-    # Lista de equipo reducida para ejemplo
     equipo = [
         ("Willan Álvarez.", "Lead Architect", "https://i.imgur.com/CSH9Af7.jpeg"),
         ("Dalia R.", "Product Manager", "https://i.imgur.com/4O2BGL8.jpeg"),
         ("Montserrat G.", "Strategy", "https://cdn-icons-png.flaticon.com/512/6997/6997674.png"),
-        ("Jiram Cabrera", "Organización", "https://i.imgur.com/eamMDmE.jpeg")
+        ("Jiram Cabrera", "Organización", "https://i.imgur.com/eamMDmE.jpeg"),
+        ("Carlos Andrés A.", "Liderazgo", "https://cdn-icons-png.flaticon.com/512/2354/2354573.png"),
+        ("Edwing Garcia", "Ventas", "https://i.imgur.com/CQJu9xm.jpeg"),
+        ("Amarilis Elizabeth", "Gestión", "https://cdn-icons-png.flaticon.com/512/201/201634.png"),
+        ("Cesar Augusto F.", "Estrategia", "https://cdn-icons-png.flaticon.com/512/3001/3001764.png")
     ]
-    cols = st.columns(4)
-    for i, (nombre, cargo, img) in enumerate(equipo):
-        with cols[i]:
-            st.markdown(f"""<div class="team-card-large">
-                <img src="{img}" style="width:80px; height:80px; border-radius:50%; object-fit:cover; margin-bottom:10px;">
-                <br><b>{nombre}</b><br><small>{cargo}</small></div>""", unsafe_allow_html=True)
+    for i in range(0, len(equipo), 4):
+        cols = st.columns(4)
+        for j, (nombre, cargo, img) in enumerate(equipo[i:i+4]):
+            with cols[j]:
+                st.markdown(f"""<div class="team-card-large">
+                    <img src="{img}" style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 3px solid #0056ff; margin-bottom: 10px;">
+                    <br><strong>{nombre}</strong><br><small style="color:#0056ff;">{cargo}</small>
+                </div>""", unsafe_allow_html=True)
 
 st.divider()
 st.caption("🌊 Flowmerce | Hackathon UTEL 2026 | Equipo 3")
