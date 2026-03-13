@@ -12,7 +12,7 @@ st.set_page_config(page_title="Flowmerce - Liquidez Inteligente", page_icon="�
 CLIENT_ID = "27483"
 CLIENT_SECRET = "d45072c95b889632ad3040bfd1dd951d981e0c38ff25877a"
 
-# --- 3. DICCIONARIO MULTILINGÜE (Actualizado con tu Slogan) ---
+# --- 3. DICCIONARIO MULTILINGÜE ---
 textos = {
     "Español": {
         "sub": "Donde los datos se convierten en ventas",
@@ -81,12 +81,7 @@ with st.sidebar:
             else:
                 st.error("Error en vinculación.")
 
-    st.divider()
-    st.markdown("### 📲 Notificaciones")
-    st.toggle("Plan del día a WhatsApp", value=True)
-    st.toggle("Alertas SMS (Zonas sin datos)", value=False)
-
-# --- 7. ESTILOS CSS (ALINEADO A LA IZQUIERDA) ---
+# --- 7. ESTILOS CSS (ALINEADO A LA IZQUIERDA Y SIN "IA") ---
 extra_styles = ""
 if lectura_facil: extra_styles += "html, body, p, div { font-size: 1.4rem !important; line-height: 1.8 !important; }"
 if alto_contraste: extra_styles += ".stApp { background: #000 !important; color: #fff !important; } .team-card-large { border: 2px solid white !important; }"
@@ -101,7 +96,7 @@ st.markdown(f"""
         font-size: 4rem !important; font-weight: 800; 
         animation: gradient-move 4s ease infinite; 
         text-align: left;
-        margin-bottom: 0px;
+        margin-bottom: 5px;
     }}
     @keyframes gradient-move {{ 0% {{background-position: 0% 50%;}} 50% {{background-position: 100% 50%;}} 100% {{background-position: 0% 50%;}} }}
     
@@ -128,14 +123,15 @@ filtro_riesgo = df["Autonomia"] < dias_entrega
 riesgo_val = (df.loc[filtro_riesgo, "V_Diaria"] * df.loc[filtro_riesgo, "Costo"] * 1.5).sum()
 
 # --- 9. CUERPO DE LA APP ---
-st.markdown('<h1 class="main-title">🌊 Flowmerce IA</h1>', unsafe_allow_html=True)
+# Título sin "IA" y alineado a la izquierda
+st.markdown('<h1 class="main-title">🌊 Flowmerce</h1>', unsafe_allow_html=True)
 
-# Slogan y Botón de Voz en una fila alineada a la izquierda
-c_voz1, c_voz2 = st.columns([0.8, 0.2])
-with c_voz1:
+# Slogan y Voz alineados a la izquierda
+c_enc1, c_enc2 = st.columns([0.8, 0.2])
+with c_enc1:
     st.markdown(f"**✨ {t_act['sub']}**")
-with c_voz2:
-    mic_recorder(start_prompt="🎤 Voz", stop_prompt="🛑", key='rec')
+with c_enc2:
+    mic_recorder(start_prompt="🎤 Comando Voz", stop_prompt="🛑", key='rec')
 
 tab1, tab2, tab3 = st.tabs([t_act["tab1"], t_act["tab2"], t_act["tab3"]])
 
@@ -146,26 +142,27 @@ with tab1:
     col3.metric(t_act["salud"], f"{max(0, 100-(dias_entrega*2))}%")
 
     st.write("---")
-    st.subheader("📈 Análisis de Capital por Producto")
+    st.subheader("📈 Proyección de Capital Invertido")
     df["Capital_Invertido"] = df["Stock"] * df["Costo"]
     st.area_chart(df.set_index("Producto")["Capital_Invertido"])
 
 with tab2:
-    st.subheader("🤖 Decisiones Automatizadas por IA")
+    st.subheader("🤖 Recomendaciones Estratégicas")
     def determinar_accion(row):
-        if row["Autonomia"] < dias_entrega: return "🚨 COMPRAR YA"
-        if row["Autonomia"] > 60: return "🔥 LIQUIDAR STOCK"
+        if row["Autonomia"] < dias_entrega: return "🚨 REABASTECER"
+        if row["Autonomia"] > 60: return "🔥 LIQUIDAR"
         return "✅ ESTABLE"
 
     df["Acción Sugerida"] = df.apply(determinar_accion, axis=1)
     st.table(df[["Producto", "Stock", "Autonomia", "Acción Sugerida"]])
     
-    if st.button("🚀 Sincronizar con Tiendanube"):
-        with st.status("Procesando..."): time.sleep(1.5)
+    if st.button("🚀 Aplicar Cambios en Tiendanube"):
+        with st.status("Sincronizando..."): time.sleep(1.5)
         st.balloons()
 
 with tab3:
     st.markdown("### 👥 Equipo Multidisciplinario (Equipo 3)")
+    # INTEGRANTES COMPLETOS
     equipo = [
         ("Willan Álvarez.", "Lead Architect", "https://i.imgur.com/CSH9Af7.jpeg"),
         ("Dalia R.", "Product Manager", "https://i.imgur.com/4O2BGL8.jpeg"),
@@ -189,5 +186,4 @@ with tab3:
                 """, unsafe_allow_html=True)
 
 st.divider()
-st.caption("🌊 Flowmerce IA | Hackathon UTEL 2026 | Equipo 3")
-
+st.caption("🌊 Flowmerce | Hackathon UTEL 2026 | Equipo 3")
