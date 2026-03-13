@@ -168,6 +168,22 @@ st.markdown(f"""
         100% {{ background-position: 0% 50%; }}
     }}
 
+    /* EFECTO DE NUBES ASCENDENTES */
+    @keyframes clouds-up {{
+        0% {{ transform: translateY(100vh); opacity: 0; }}
+        20% {{ opacity: 0.8; }}
+        80% {{ opacity: 0.6; }}
+        100% {{ transform: translateY(-100vh); opacity: 0; }}
+    }}
+
+    .cloud-effect {{
+        position: fixed;
+        font-size: 50px;
+        z-index: 9999;
+        pointer-events: none;
+        animation: clouds-up 4s ease-in forwards;
+    }}
+
     .stApp {{
         background: linear-gradient({bg_overlay}, {bg_overlay}), 
                     url("https://imgur.com/gQ7yynl.jpeg");
@@ -186,7 +202,6 @@ st.markdown(f"""
         margin-bottom: 0px;
     }}
     
-    /* 2. EFECTO DE ELEVACIÓN EN TABLAS Y TARJETAS */
     div[data-testid="stMetric"], .stTable, .team-card-large, div[data-testid="stExpander"] {{
         background-color: white !important;
         border-radius: 15px !important;
@@ -201,7 +216,6 @@ st.markdown(f"""
         box-shadow: 0 12px 30px rgba(0,86,255,0.15) !important;
     }}
 
-    /* 3. EFECTO EN LOS TABS (CONTENEDOR PRINCIPAL) */
     div[data-testid="stTabs"] {{
         background-color: rgba(255, 255, 255, 0.95) !important;
         padding: 30px !important;
@@ -210,13 +224,11 @@ st.markdown(f"""
         border: none !important;
     }}
 
-    /* 4. CENTRADO DE TEXTO EN TABLAS */
     .stTable td, .stTable th {{
         text-align: center !important;
         vertical-align: middle !important;
     }}
 
-    /* 5. BOTÓN CON PULSO SUTIL */
     div.stButton > button {{
         background: linear-gradient(90deg, #0056ff, #00c6ff) !important;
         color: white !important;
@@ -241,12 +253,10 @@ atrapado_val = (df[df["Autonomia"] > 60]["Stock"] * df[df["Autonomia"] > 60]["Co
 riesgo_val = (df[df["Autonomia"] < dias_entrega]["V_Diaria"] * df[df["Autonomia"] < dias_entrega]["Costo"] * 1.5).sum()
 
 # --- 9. CUERPO DE LA APP ---
-# Título con el efecto de gradiente animado
 st.markdown('<h1 class="main-title">🌊 Flowmerce</h1>', unsafe_allow_html=True)
 
 c_enc1, c_enc2 = st.columns([0.8, 0.2])
 with c_enc1: 
-    # Slogan con fondo limpio
     st.markdown(f"<div style='background:white; padding:10px 20px; border-radius:10px; display:inline-block; color:{text_color}; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px;'><strong>✨ {t_act['sub']}</strong></div>", unsafe_allow_html=True)
 
 with c_enc2: 
@@ -280,7 +290,6 @@ with tabs[2]:
     with st.expander(t_act["sim_tit"], expanded=True):
         sim_inv = st.number_input(t_act["sim_inv"], value=50000)
         c_s1, c_s2 = st.columns(2)
-        # Cuadros de simulación con gradiente
         with c_s1: st.markdown(f'<div style="background: linear-gradient(135deg, #0056ff 0%, #6200ea 100%); color: white; padding: 25px; border-radius: 15px; text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.15);"><small>{t_act["sim_proj"]}</small><h3>${sim_inv * (f_demanda * 1.8):,.0f} MXN</h3></div>', unsafe_allow_html=True)
         with c_s2: st.markdown(f'<div style="background: linear-gradient(135deg, #00c6ff 0%, #0056ff 100%); color: white; padding: 25px; border-radius: 15px; text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.15);"><small>{t_act["sim_rec"]}</small><h3>{30/f_demanda:.1f} {t_act["sim_dias"]}</h3></div>', unsafe_allow_html=True)
     
@@ -292,14 +301,29 @@ with tabs[2]:
     df["Accion"] = df.apply(determinar_accion, axis=1)
     st.table(df[["Producto", "Stock", "Accion"]])
     
+    # --- EFECTO NUBES (FUNCIONES) ---
+    def animar_nubes():
+        cloud_placeholder = st.empty()
+        cloud_placeholder.markdown("""
+            <div class="cloud-effect" style="left: 10%; animation-delay: 0s;">☁️</div>
+            <div class="cloud-effect" style="left: 30%; animation-delay: 0.5s;">☁️</div>
+            <div class="cloud-effect" style="left: 55%; animation-delay: 0.2s;">☁️</div>
+            <div class="cloud-effect" style="left: 80%; animation-delay: 0.8s;">☁️</div>
+            <div class="cloud-effect" style="left: 45%; animation-delay: 1.2s;">☁️</div>
+        """, unsafe_allow_html=True)
+        time.sleep(0.1) # Breve pausa para render
+
     col_b1, col_b2 = st.columns(2)
     with col_b1:
         if st.button(t_act["btn_app"], use_container_width=True):
+            animar_nubes()
             st.success(t_act["sync_ok"])
     
     with col_b2:
         csv = df.to_csv(index=False).encode('utf-8')
-        st.download_button(label=t_act["btn_reporte"], data=csv, file_name='Reporte_Flowmerce.csv', mime='text/csv', use_container_width=True)
+        if st.download_button(label=t_act["btn_reporte"], data=csv, file_name='Reporte_Flowmerce.csv', mime='text/csv', use_container_width=True):
+            animar_nubes()
+            st.toast(t_act["rep_exito"])
 
 with tabs[3]:
     st.markdown(f"### {t_act['equipo_tit']}")
@@ -324,4 +348,3 @@ with tabs[3]:
 
 st.divider()
 st.caption("🌊 Flowmerce | Hackathon UTEL 2026 | Equipo 3")
-
