@@ -125,7 +125,25 @@ if 'token_session' not in st.session_state:
 
 # --- 6. BARRA LATERAL ---
 with st.sidebar:
-    st.image("https://imgur.com/YrVO3ZF.jpeg", use_container_width=True)
+    # --- EFECTO DE LOGO FLOTANTE ---
+    st.markdown("""
+    <style>
+        @keyframes float {
+            0% { transform: translateY(0px); filter: drop-shadow(0 5px 15px rgba(0,86,255,0.2)); }
+            50% { transform: translateY(-10px); filter: drop-shadow(0 25px 15px rgba(0,86,255,0.1)); }
+            100% { transform: translateY(0px); filter: drop-shadow(0 5px 15px rgba(0,86,255,0.2)); }
+        }
+        .logo-flow {
+            animation: float 4s ease-in-out infinite;
+            border-radius: 20px;
+            margin-bottom: 20px;
+        }
+    </style>
+    <div style="text-align: center;">
+        <img src="https://imgur.com/YrVO3ZF.jpeg" class="logo-flow" style="width: 100%;">
+    </div>
+    """, unsafe_allow_html=True)
+    
     st.write("---")
     with st.expander("🌐 Accesibilidad e Idioma", expanded=True):
         idioma = st.selectbox("Idioma Interfaz", ["Español", "Português", "English"])
@@ -148,10 +166,9 @@ with st.sidebar:
                 st.session_state.token_session = "demo"
                 st.info("Modo Demo ✅")
 
-# --- 7. ESTILOS CSS (MEJORADOS CON EFECTOS 3D Y NUBES) ---
+# --- 7. ESTILOS CSS ---
 st.markdown(f"""
 <style>
-    /* Título con Gradiente Animado */
     .main-title {{
         background: linear-gradient(90deg, #0056ff, #00c6ff, #6200ea, #0056ff);
         background-size: 300% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
@@ -159,7 +176,7 @@ st.markdown(f"""
     }}
     @keyframes gradient-move {{ 0% {{background-position: 0% 50%;}} 50% {{background-position: 100% 50%;}} 100% {{background-position: 0% 50%;}} }}
 
-    /* BOTONES 3D DINÁMICOS */
+    /* BOTONES 3D */
     div.stButton > button, div.stDownloadButton > button {{
         background: linear-gradient(145deg, #0056ff, #0045cc) !important;
         color: white !important;
@@ -171,36 +188,19 @@ st.markdown(f"""
         font-weight: bold !important;
         text-transform: uppercase !important;
     }}
-    div.stButton > button:hover {{
-        transform: translateY(-2px) !important;
-        box-shadow: 0 8px #003399, 0 12px 20px rgba(0,0,0,0.3) !important;
-    }}
-    div.stButton > button:active, div.stDownloadButton > button:active {{
-        transform: translateY(4px) !important;
-        box-shadow: 0 2px #003399 !important;
-    }}
+    div.stButton > button:hover {{ transform: translateY(-2px) !important; box-shadow: 0 8px #003399, 0 12px 20px rgba(0,0,0,0.3) !important; }}
+    div.stButton > button:active, div.stDownloadButton > button:active {{ transform: translateY(4px) !important; box-shadow: 0 2px #003399 !important; }}
 
-    /* EFECTOS EN TABLAS */
-    .stTable {{
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    }}
-    tr:hover {{
-        background-color: rgba(0, 86, 255, 0.05) !important;
-    }}
+    /* TABLAS Y OTROS */
+    .stTable {{ background: white; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }}
+    tr:hover {{ background-color: rgba(0, 86, 255, 0.05) !important; }}
 
-    /* ANIMACIÓN DE NUBES */
     @keyframes cloud-up {{
         0% {{ transform: translateY(100vh); opacity: 0; }}
-        20% {{ opacity: 0.7; }}
-        80% {{ opacity: 0.7; }}
+        20% {{ opacity: 0.7; }} 80% {{ opacity: 0.7; }}
         100% {{ transform: translateY(-100vh); opacity: 0; }}
     }}
-    .cloud-ascend {{
-        position: fixed; bottom: -100px; font-size: 5rem; z-index: 9999;
-        pointer-events: none; animation: cloud-up 3s ease-in infinite;
-    }}
+    .cloud-ascend {{ position: fixed; bottom: -100px; font-size: 5rem; z-index: 9999; pointer-events: none; animation: cloud-up 3s ease-in infinite; }}
 
     .team-card-large {{
         text-align: center; padding: 25px; border-radius: 25px;
@@ -266,7 +266,6 @@ with tabs[2]:
     df["Accion"] = df.apply(determinar_accion, axis=1)
     st.table(df[["Producto", "Stock", "Accion"]])
     
-    # --- SECCIÓN DE BOTONES ---
     col_b1, col_b2 = st.columns(2)
     with col_b1:
         if st.button(t_act["btn_app"], use_container_width=True):
@@ -279,7 +278,6 @@ with tabs[2]:
     
     with col_b2:
         csv = df.to_csv(index=False).encode('utf-8')
-        # Efecto de nubes activado por el botón de descarga
         if st.download_button(
             label=t_act["btn_reporte"],
             data=csv,
@@ -288,9 +286,8 @@ with tabs[2]:
             use_container_width=True,
             type="primary"
         ):
-            # Mostramos nubes al procesar la descarga
             cloud_wrap = st.empty()
-            cloud_wrap.markdown('<div class="cloud-ascend" style="left:20%;">☁️</div><div class="cloud-ascend" style="left:40%;">☁️</div><div class="cloud-ascend" style="left:70%;">☁️</div>', unsafe_allow_html=True)
+            cloud_wrap.markdown('<div class="cloud-ascend" style="left:20%;">☁️</div><div class="cloud-ascend" style="left:70%;">☁️</div>', unsafe_allow_html=True)
             st.toast(t_act["rep_exito"])
             time.sleep(2)
             cloud_wrap.empty()
