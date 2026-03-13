@@ -155,24 +155,12 @@ with st.sidebar:
                 st.session_state.token_session = "demo"
                 st.info("Modo Demo ✅")
 
-# --- 7. LÓGICA DINÁMICA DE CSS (Contraste y Lectura) ---
-# Definimos variables según los toggles
-bg_overlay = "rgba(255, 255, 255, 0.7)" if not alto_contraste else "rgba(0, 0, 0, 0.9)"
-card_bg = "rgba(255, 255, 255, 0.9)" if not alto_contraste else "#FFFFFF"
-text_color = "#1E1E1E" if not alto_contraste else "#000000"
-font_size = "1.2rem" if lectura_facil else "1rem"
-title_size = "5rem" if lectura_facil else "4rem"
-
+# --- 7. ESTILOS CSS MEJORADOS PARA LEGIBILIDAD ---
 st.markdown(f"""
 <style>
-    /* APLICACIÓN DE ESTILOS GLOBALES */
-    html, body, [class*="st-"] {{
-        font-size: {font_size} !important;
-        { 'font-family: Arial, sans-serif !important;' if lectura_facil else '' }
-    }}
-
+    /* FONDO OSCURECIDO PARA MEJOR LECTURA */
     .stApp {{
-        background: linear-gradient({bg_overlay}, {bg_overlay}), 
+        background: linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)), 
                     url("https://imgur.com/gQ7yynl.jpeg");
         background-attachment: fixed;
         background-size: cover;
@@ -181,33 +169,47 @@ st.markdown(f"""
     .main-title {{
         background: linear-gradient(90deg, #0056ff, #00c6ff, #6200ea, #0056ff);
         background-size: 300% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        font-size: {title_size} !important; font-weight: 800; animation: gradient-move 4s ease infinite; 
+        font-size: 4rem !important; font-weight: 800; animation: gradient-move 4s ease infinite; 
         text-shadow: 2px 2px 10px rgba(255,255,255,0.5);
     }}
     
-    /* TARJETAS Y TABLAS */
-    div[data-testid="stMetric"], .stTable, .team-card-large, .stTabs, div[data-testid="stExpander"] {{
-        background-color: {card_bg} !important;
+    /* CONTENEDORES CON FONDO SEMI-BLANCO (GLASSMORPHISM) */
+    div[data-testid="stMetric"], .stTable, .team-card-large, .stTabs {{
+        background-color: rgba(255, 255, 255, 0.85) !important;
         backdrop-filter: blur(10px);
         border-radius: 15px !important;
-        border: 2px solid #0056ff !important;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
-        color: {text_color} !important;
+        padding: 15px !important;
+        border: 1px solid rgba(0, 86, 255, 0.1) !important;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
     }}
 
-    /* AJUSTE DE TEXTO EN TABLAS */
-    .stTable td, .stTable th, .stTable p {{
-        color: {text_color} !important;
-        font-size: {font_size} !important;
+    .stTable p, .stTable td, .stTable th {{
+        color: #1E1E1E !important;
+        font-weight: 500 !important;
     }}
 
-    div.stButton > button {{
-        background: #0056ff !important;
-        color: white !important;
-        font-size: {font_size} !important;
+    @keyframes gradient-move {{ 0% {{background-position: 0% 50%;}} 50% {{background-position: 100% 50%;}} 100% {{background-position: 0% 50%;}} }}
+    
+    div.stButton > button, div.stDownloadButton > button {{
+        background: linear-gradient(145deg, #0056ff, #0045cc) !important;
+        color: white !important; border: none !important; padding: 12px 24px !important;
+        border-radius: 12px !important; box-shadow: 0 6px #003399, 0 8px 15px rgba(0,0,0,0.2) !important;
+        transition: all 0.1s ease !important; font-weight: bold !important; text-transform: uppercase !important;
     }}
 
-    .team-card-large strong {{ color: #0056ff !important; }}
+    .team-card-large {{
+        text-align: center; margin-bottom: 20px; min-height: 250px;
+    }}
+    
+    .sim-box {{ background: linear-gradient(135deg, #0056ff 0%, #6200ea 100%); color: white; padding: 20px; border-radius: 15px; margin-top: 10px; }}
+    
+    /* NUBES */
+    @keyframes cloud-up {{
+        0% {{ transform: translateY(100vh); opacity: 0; }}
+        20% {{ opacity: 0.7; }} 80% {{ opacity: 0.7; }}
+        100% {{ transform: translateY(-100vh); opacity: 0; }}
+    }}
+    .cloud-ascend {{ position: fixed; bottom: -100px; font-size: 5rem; z-index: 9999; pointer-events: none; animation: cloud-up 3s ease-in infinite; }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -223,9 +225,9 @@ riesgo_val = (df[df["Autonomia"] < dias_entrega]["V_Diaria"] * df[df["Autonomia"
 st.markdown('<h1 class="main-title">🌊 Flowmerce</h1>', unsafe_allow_html=True)
 
 c_enc1, c_enc2 = st.columns([0.8, 0.2])
-with c_enc1: 
-    st.markdown(f"<div style='background:{card_bg}; padding:10px; border-radius:10px; display:inline-block; color:{text_color}; border:1px solid #0056ff;'><strong>✨ {t_act['sub']}</strong></div>", unsafe_allow_html=True)
+with c_enc1: st.markdown(f"<div style='background:rgba(255,255,255,0.6); padding:5px; border-radius:10px; display:inline-block;'><strong>✨ {t_act['sub']}</strong></div>", unsafe_allow_html=True)
 
+# --- LÓGICA DE VOZ MEJORADA ---
 with c_enc2: 
     audio_data = mic_recorder(start_prompt="🎤", stop_prompt="🛑", key='recorder')
     if audio_data:
@@ -257,8 +259,8 @@ with tabs[2]:
     with st.expander(t_act["sim_tit"], expanded=True):
         sim_inv = st.number_input(t_act["sim_inv"], value=50000)
         c_s1, c_s2 = st.columns(2)
-        with c_s1: st.markdown(f'<div style="background: linear-gradient(135deg, #0056ff 0%, #6200ea 100%); color: white; padding: 20px; border-radius: 15px;"><small>{t_act["sim_proj"]}</small><h3>${sim_inv * (f_demanda * 1.8):,.0f} MXN</h3></div>', unsafe_allow_html=True)
-        with c_s2: st.markdown(f'<div style="background: linear-gradient(135deg, #0056ff 0%, #6200ea 100%); color: white; padding: 20px; border-radius: 15px;"><small>{t_act["sim_rec"]}</small><h3>{30/f_demanda:.1f} {t_act["sim_dias"]}</h3></div>', unsafe_allow_html=True)
+        with c_s1: st.markdown(f'<div class="sim-box"><small>{t_act["sim_proj"]}</small><h3>${sim_inv * (f_demanda * 1.8):,.0f} MXN</h3></div>', unsafe_allow_html=True)
+        with c_s2: st.markdown(f'<div class="sim-box"><small>{t_act["sim_rec"]}</small><h3>{30/f_demanda:.1f} {t_act["sim_dias"]}</h3></div>', unsafe_allow_html=True)
     
     st.write("---")
     def determinar_accion(row):
@@ -271,11 +273,17 @@ with tabs[2]:
     col_b1, col_b2 = st.columns(2)
     with col_b1:
         if st.button(t_act["btn_app"], use_container_width=True):
-            st.success(t_act["sync_ok"])
+            cloud_placeholder = st.empty()
+            with st.status(t_act["sync"], expanded=True) as s:
+                cloud_placeholder.markdown('<div class="cloud-ascend" style="left:15%;">☁️</div><div class="cloud-ascend" style="left:50%;">☁️</div>', unsafe_allow_html=True)
+                time.sleep(2)
+                s.update(label=t_act["sync_ok"], state="complete")
+            cloud_placeholder.empty()
     
     with col_b2:
         csv = df.to_csv(index=False).encode('utf-8')
-        st.download_button(label=t_act["btn_reporte"], data=csv, file_name='Reporte_Flowmerce.csv', mime='text/csv', use_container_width=True)
+        if st.download_button(label=t_act["btn_reporte"], data=csv, file_name='Reporte_Flowmerce.csv', mime='text/csv', use_container_width=True, type="primary"):
+            st.toast(t_act["rep_exito"])
 
 with tabs[3]:
     st.markdown(f"### {t_act['equipo_tit']}")
