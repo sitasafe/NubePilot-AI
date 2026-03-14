@@ -350,4 +350,4 @@ with tabs[3]:
             </div>""", unsafe_allow_html=True)
 
 st.divider()
-st.caption("🌊 Flowmerce | Hackathon UTEL 2026 | Equipo 3 | TiendaNube")
+st.caption("🌊 Flowmerce | Hackathon UTEL 2026 | Equipo 3 | TiendaNube |")
