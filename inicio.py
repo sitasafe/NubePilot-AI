@@ -5,8 +5,18 @@ import time
 import requests
 from streamlit_mic_recorder import mic_recorder
 
-# --- 1. CONFIGURACIÓN DE PÁGINA ---
+# --- 1. CONFIGURACIÓN DE PÁGINA (Blindaje PWA/Mobile) ---
 st.set_page_config(page_title="Flowmerce - Liquidez Inteligente", page_icon="🌊", layout="wide")
+
+# Inyección de metadatos para simular comportamiento de App Nativa (iOS/Android)
+st.markdown("""
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <link rel="apple-touch-icon" href="https://imgur.com/YrVO3ZF.jpeg">
+    </head>
+""", unsafe_allow_html=True)
 
 # --- 2. CREDENCIALES TIENDANUBE ---
 CLIENT_ID = "27483"
@@ -38,7 +48,7 @@ textos = {
         "equipo_tit": "👥 Nuestro Equipo",
         "rep_proceso": "Procesando Reporte...",
         "rep_exito": "¡Reporte listo para descargar! ✅",
-        "escuchando": "🎙️ Analizando comando de voz...",
+        "escuchando": "🎙️ Analizando captura de voz...",
         "voz_ok": "✅ Comando recibido: "
     },
     "Português": {
@@ -92,12 +102,12 @@ textos = {
         "equipo_tit": "👥 Multidisciplinary Team (Team 3)",
         "rep_proceso": "Processing Report...",
         "rep_exito": "Report ready to download! ✅",
-        "escuchando": "🎙️ Analyzing voice command...",
+        "escuchando": "🎙️ Analyzing voice capture...",
         "voz_ok": "✅ Command received: "
     }
 }
 
-# --- 4. FUNCIONES DE API ---
+# --- 4. FUNCIONES DE API (OAuth 2.0 con Modo Demo) ---
 def obtener_token_real(code):
     url = "https://www.tiendanube.com/apps/authorize/token"
     payload = {"client_id": int(CLIENT_ID), "client_secret": CLIENT_SECRET, "grant_type": "authorization_code", "code": code.strip()}
@@ -106,7 +116,7 @@ def obtener_token_real(code):
         return response.json().get("access_token") if response.status_code == 200 else None
     except: return None
 
-# --- 5. GESTIÓN DE MEMORIA ---
+# --- 5. GESTIÓN DE MEMORIA (Persistencia de datos) ---
 if 'db_inventario' not in st.session_state:
     st.session_state.db_inventario = pd.DataFrame({
         "Producto": ["Tenis Pro Runner", "Gorra Blue Urban", "Calcetín Sport", "Sudadera Lino"],
@@ -232,11 +242,13 @@ st.markdown(f"""
 </style>
 """, unsafe_allow_html=True)
 
-# --- 8. LÓGICA DE CÁLCULO ---
+# --- 8. LÓGICA DE CÁLCULO (Motor de Análisis Pandas/NumPy) ---
 t_act = textos[idioma]
 df = st.session_state.db_inventario.copy()
 df["V_Diaria"] = (df["Ventas_30d"] / 30) * f_demanda
 df["Autonomia"] = np.where(df["V_Diaria"] > 0, df["Stock"] / df["V_Diaria"], 999)
+
+# Métrica de Capital Atrapado (Correcto según el código)
 atrapado_val = (df[df["Autonomia"] > 60]["Stock"] * df[df["Autonomia"] > 60]["Costo"]).sum()
 riesgo_val = (df[df["Autonomia"] < dias_entrega]["V_Diaria"] * df[df["Autonomia"] < dias_entrega]["Costo"] * 1.5).sum()
 
@@ -248,6 +260,7 @@ with c_enc1:
     st.markdown(f"<div style='background:white; padding:10px 20px; border-radius:10px; display:inline-block; color:{text_color}; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px;'><strong>✨ {t_act['sub']}</strong></div>", unsafe_allow_html=True)
 
 with c_enc2: 
+    # Captura de voz para interacción manos libres
     audio_data = mic_recorder(start_prompt="🎤", stop_prompt="🛑", key='recorder')
     if audio_data:
         st.toast(t_act["escuchando"])
@@ -316,7 +329,7 @@ with tabs[3]:
     st.markdown(f"### {t_act['equipo_tit']}")
     equipo = [
         ("Willan Álvarez.", "Lead Architect", "https://i.imgur.com/CSH9Af7.jpeg"),
-        ("Dalia R.", "Product Manager", "https://i.imgur.com/4O2BGL8.jpeg"), # Foto actualizada
+        ("Dalia R.", "Product Manager", "https://i.imgur.com/4O2BGL8.jpeg"), 
         ("Montserrat G.", "Strategy", "https://cdn-icons-png.flaticon.com/512/6997/6997674.png"),
         ("Jiram Cabrera", "Organización", "https://i.imgur.com/eamMDmE.jpeg"),
         ("Carlos Andrés A.", "Liderazgo", "https://cdn-icons-png.flaticon.com/512/2354/2354573.png"),
@@ -334,6 +347,4 @@ with tabs[3]:
                 </div>""", unsafe_allow_html=True)
 
 st.divider()
-st.caption("🌊 Flowmerce | Hackathon UTEL 2026 | Equipo 3 |TiendaNube")
-
-
+st.caption("🌊 Flowmerce | Hackathon UTEL 2026 | Equipo 3 | TiendaNube")
