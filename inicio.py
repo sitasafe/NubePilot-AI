@@ -50,7 +50,7 @@ textos = {
         "rep_exito": "¡Reporte listo para descargar! ✅",
         "escuchando": "🎙️ Analizando captura de voz...",
         "voz_ok": "✅ Comando recibido: ",
-        "criticos_tit": "🔎 Productos Críticos (Prioridad Alta)"
+        "criticos_tit": "🔎 Productos Críticos "
     },
     "Português": {
         "sub": "Onde os dados se transformam em vendas",
