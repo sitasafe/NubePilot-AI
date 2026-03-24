@@ -1,8 +1,8 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import time
 import requests
+import os
 from streamlit_mic_recorder import mic_recorder
 
 # --- 1. CONFIGURACIÓN DE PÁGINA (Blindaje PWA/Mobile) ---
@@ -20,7 +20,7 @@ st.markdown("""
 
 # --- 2. CREDENCIALES TIENDANUBE ---
 CLIENT_ID = "27483"
-CLIENT_SECRET = "d45072c95b889632ad3040bfd1dd951d981e0c38ff25877a"
+CLIENT_SECRET = st.secrets.get("TIENDANUBE_CLIENT_SECRET", os.getenv("TIENDANUBE_CLIENT_SECRET", ""))
 
 # --- 3. DICCIONARIO MULTILINGÜE ---
 textos = {
@@ -111,13 +111,52 @@ textos = {
 }
 
 # --- 4. FUNCIONES MODULARES (Arquitectura 5 estrellas) ---
+@st.cache_resource
+def get_http_session():
+    session = requests.Session()
+    session.headers.update({"Accept": "application/json"})
+    return session
+
 def obtener_token_real(code):
+    if not code or not CLIENT_SECRET:
+        return None
     url = "https://www.tiendanube.com/apps/authorize/token"
     payload = {"client_id": int(CLIENT_ID), "client_secret": CLIENT_SECRET, "grant_type": "authorization_code", "code": code.strip()}
     try:
-        response = requests.post(url, json=payload, timeout=10)
+        response = get_http_session().post(url, json=payload, timeout=10)
         return response.json().get("access_token") if response.status_code == 200 else None
-    except: return None
+    except requests.RequestException:
+        return None
+
+@st.cache_data(ttl=60)
+def obtener_snapshot_tiendanube(store_id, access_token):
+    if not store_id or not access_token:
+        return None
+
+    base_url = f"https://api.tiendanube.com/v1/{str(store_id).strip()}"
+    headers = {
+        "Authentication": f"bearer {access_token}",
+        "User-Agent": f"Flowmerce ({CLIENT_ID})",
+    }
+    session = get_http_session()
+    try:
+        r_products = session.get(f"{base_url}/products", headers=headers, timeout=10)
+        r_orders = session.get(f"{base_url}/orders", headers=headers, timeout=10)
+        if r_products.status_code != 200 or r_orders.status_code != 200:
+            return {"ok": False, "status_products": r_products.status_code, "status_orders": r_orders.status_code}
+
+        products = r_products.json() if isinstance(r_products.json(), list) else []
+        orders = r_orders.json() if isinstance(r_orders.json(), list) else []
+        total_orders = len(orders)
+        paid_orders = sum(1 for o in orders if str(o.get("payment_status", "")).lower() == "paid")
+        return {
+            "ok": True,
+            "products_count": len(products),
+            "orders_count": total_orders,
+            "paid_rate": (paid_orders / total_orders * 100) if total_orders else 0.0,
+        }
+    except requests.RequestException:
+        return {"ok": False, "error": "network"}
 
 def calcular_motor_analisis(df, f_demanda):
     # Agregamos factor de tendencia (IA simulada)
@@ -126,15 +165,14 @@ def calcular_motor_analisis(df, f_demanda):
     df["Autonomia"] = np.where(df["V_Diaria"] > 0, df["Stock"] / df["V_Diaria"], 999)
     return df
 
-def determinar_accion(row, lead_time):
-    if row["Autonomia"] < lead_time: return "🚨 REABASTECER"
-    if row["Autonomia"] > 60: return "🔥 LIQUIDAR"
-    return "✅ ESTABLE"
-
 def color_estado(val):
     if "REABASTECER" in val: return "background-color: #ffcccc; color: black;"
     if "LIQUIDAR" in val: return "background-color: #fff3cd; color: black;"
     return "background-color: #d4edda; color: black;"
+
+@st.cache_data
+def exportar_csv(df_export):
+    return df_export.to_csv(index=False).encode("utf-8")
 
 # --- 5. GESTIÓN DE MEMORIA ---
 if 'db_inventario' not in st.session_state:
@@ -146,6 +184,10 @@ if 'db_inventario' not in st.session_state:
     })
 if 'token_session' not in st.session_state:
     st.session_state.token_session = None
+if "tn_store_id" not in st.session_state:
+    st.session_state.tn_store_id = ""
+if "tn_snapshot" not in st.session_state:
+    st.session_state.tn_snapshot = None
 
 # --- 6. BARRA LATERAL ---
 with st.sidebar:
@@ -176,6 +218,7 @@ with st.sidebar:
     with st.expander("🔑 Conexión Tiendanube", expanded=True):
         st.link_button("1. Autorizar App", f"https://www.tiendanube.com/apps/authorize?client_id={CLIENT_ID}&scope=read_orders,write_orders,read_products,write_products")
         temp_code = st.text_input("2. Pega el Code:")
+        st.session_state.tn_store_id = st.text_input("3. Store ID", value=st.session_state.tn_store_id)
         if st.button("3. Vincular Tienda"):
             token = obtener_token_real(temp_code)
             if token:
@@ -184,6 +227,16 @@ with st.sidebar:
             else:
                 st.session_state.token_session = "demo"
                 st.info("Modo Demo ✅")
+        if st.button("4. Sincronizar ahora", use_container_width=True):
+            if st.session_state.token_session and st.session_state.token_session != "demo":
+                with st.spinner("Sincronizando Tiendanube..."):
+                    st.session_state.tn_snapshot = obtener_snapshot_tiendanube(st.session_state.tn_store_id, st.session_state.token_session)
+                if st.session_state.tn_snapshot and st.session_state.tn_snapshot.get("ok"):
+                    st.success("Snapshot actualizado")
+                else:
+                    st.warning("No se pudo actualizar el snapshot. Verifica Store ID y permisos.")
+            else:
+                st.info("Vincula una tienda real para sincronizar datos.")
 
 # --- 7. ESTILOS ---
 bg_overlay = "rgba(255, 255, 255, 0.7)" if not alto_contraste else "rgba(0, 0, 0, 0.9)"
@@ -220,7 +273,6 @@ with c_enc2:
     audio_data = mic_recorder(start_prompt="🎤", stop_prompt="🛑", key='recorder')
     if audio_data:
         st.toast(t_act["escuchando"])
-        time.sleep(1)
         st.info(f"{t_act['voz_ok']} 'Optimizar inventario'")
 
 tabs = st.tabs([t_act["tab0"], t_act["tab1"], t_act["tab2"], t_act["tab3"]])
@@ -236,6 +288,13 @@ with tabs[0]:
         st.write(f"{t_act['starter']}\n{t_act['growth']}\n{t_act['scale']}")
 
 with tabs[1]:
+    if st.session_state.tn_snapshot and st.session_state.tn_snapshot.get("ok"):
+        s1, s2, s3 = st.columns(3)
+        s1.metric("Productos Tiendanube", f"{st.session_state.tn_snapshot['products_count']}")
+        s2.metric("Órdenes Tiendanube", f"{st.session_state.tn_snapshot['orders_count']}")
+        s3.metric("Pago confirmado", f"{st.session_state.tn_snapshot['paid_rate']:.1f}%")
+        st.caption("Datos cacheados por 60 segundos para respuesta instantánea.")
+
     col1, col2, col3 = st.columns(3)
     col1.metric(t_act["atrapado"], f"${float(atrapado_val):,.0f} MXN")
     col2.metric(t_act["riesgo"], f"${float(riesgo_val):,.0f} MXN", delta="!", delta_color="inverse")
@@ -254,7 +313,9 @@ with tabs[2]:
         with c_s2: st.markdown(f'<div style="background: linear-gradient(135deg, #00c6ff 0%, #0056ff 100%); color: white; padding: 25px; border-radius: 15px; text-align: center;"><small>{t_act["sim_rec"]}</small><h3>{30/f_demanda:.1f} {t_act["sim_dias"]}</h3></div>', unsafe_allow_html=True)
     
     st.write("---")
-    df["Accion"] = df.apply(lambda row: determinar_accion(row, dias_entrega), axis=1)
+    condiciones = [df["Autonomia"] < dias_entrega, df["Autonomia"] > 60]
+    acciones = ["🚨 REABASTECER", "🔥 LIQUIDAR"]
+    df["Accion"] = np.select(condiciones, acciones, default="✅ ESTABLE")
     
     # Tabla con colores (Efecto SaaS Profesional)
     st.dataframe(df[["Producto", "Stock", "Autonomia", "Accion"]].style.applymap(color_estado, subset=["Accion"]), use_container_width=True)
@@ -273,7 +334,7 @@ with tabs[2]:
             animar_nubes()
             st.success(t_act["sync_ok"])
     with col_b2:
-        csv = df.to_csv(index=False).encode('utf-8')
+        csv = exportar_csv(df)
         if st.download_button(label=t_act["btn_reporte"], data=csv, file_name='Reporte_Flowmerce.csv', use_container_width=True):
             st.toast(t_act["rep_exito"])
 
