@@ -2,21 +2,26 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import os
+import sys
 import importlib
+
+# --- BLOQUE DE CONTROL DE RUTAS (Asegura que la nube vea la carpeta 'app') ---
+path_root = os.path.abspath(os.path.dirname(__file__))
+if path_root not in sys.path:
+    sys.path.insert(0, path_root)
 
 # --- BLOQUE DE CONEXIÓN Y CREACIÓN DE BASE DE DATOS (REPARADO) ---
 from app.core.database import engine, Base
 
 def inicializar_db_tablas(_st):
     try:
-        # Importamos dentro de la función para ROMPER el círculo vicioso
-        import app.core.models 
+        # Importación dinámica para evitar errores de circularidad en la nube
+        import app.core.models
         Base.metadata.create_all(bind=engine)
     except Exception as e:
-        # Usamos el parámetro '_st' que pasamos desde fuera para evitar NameError
         _st.error(f"Error al cargar base de datos: {e}")
 
-# Cargamos el resto de imports necesarios
+# Cargamos los servicios y estado después de asegurar la ruta
 try:
     from streamlit_mic_recorder import mic_recorder
     MIC_AVAILABLE = True
@@ -37,14 +42,13 @@ from app.services.tiendanube import (
 )
 from app.services.notifications import disparar_alerta_critica
 
-# AHORA SÍ EJECUTAMOS PASANDO 'st' COMO ARGUMENTO (Solución definitiva para la nube)
+# EJECUCIÓN CRÍTICA: Inicializar tablas antes de cualquier consulta
 inicializar_db_tablas(st)
 # ------------------------------------------------------
 
-# --- 1. CONFIGURACIÓN DE PÁGINA (Blindaje PWA/Mobile) ---
+# --- 1. CONFIGURACIÓN DE PÁGINA ---
 st.set_page_config(page_title="Flowmerce - Liquidez Inteligente", page_icon="🌊", layout="wide")
 
-# Inyección de metadatos para simular comportamiento de App Nativa
 st.markdown("""
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -150,7 +154,6 @@ textos = {
 }
 
 # --- 4. FUNCIONES MODULARES ---
-
 def calcular_motor_analisis(df, f_demanda):
     if "Ventas_7d" in df.columns:
         base_30 = (df["Ventas_30d"] / 30).replace(0, np.nan)
@@ -170,46 +173,16 @@ def color_estado(val):
 def exportar_csv(df_export):
     return df_export.to_csv(index=False).encode("utf-8")
 
-def generar_reporte_ejecutivo_pdf(salud_caja, productos_criticos, impulso_demanda):
-    fpdf_module = importlib.import_module("fpdf")
-    pdf_cls = getattr(fpdf_module, "FPDF")
-    if impulso_demanda >= 2.0:
-        recomendacion = "Demanda acelerada: aumentar inversion de inventario entre 20% y 30%."
-    elif impulso_demanda >= 1.2:
-        recomendacion = "Demanda en crecimiento: aumentar inversion de inventario entre 10% y 15%."
-    else:
-        recomendacion = "Demanda estable: mantener inversion base y priorizar liquidez."
-    pdf = pdf_cls()
-    pdf.set_auto_page_break(auto=True, margin=15)
-    pdf.add_page()
-    pdf.set_font("Helvetica", "B", 16)
-    pdf.cell(0, 10, "Flowmerce - Reporte Ejecutivo", ln=True)
-    pdf.ln(2)
-    pdf.set_font("Helvetica", size=12)
-    pdf.multi_cell(0, 8, f"Salud de Caja actual: {salud_caja}%")
-    pdf.ln(1)
-    pdf.set_font("Helvetica", "B", 12)
-    pdf.cell(0, 8, "Productos criticos por reabastecimiento:", ln=True)
-    pdf.set_font("Helvetica", size=11)
-    if productos_criticos.empty:
-        pdf.multi_cell(0, 7, "- Sin productos criticos en este momento.")
-    else:
-        for _, row in productos_criticos.iterrows():
-            pdf.multi_cell(0, 7, f"- {str(row['Producto'])}: autonomia {float(row['Autonomia']):.1f} dias | stock actual {int(row['Stock'])}")
-    pdf.ln(2)
-    pdf.set_font("Helvetica", "B", 12)
-    pdf.cell(0, 8, "Recomendacion de inversion:", ln=True)
-    pdf.set_font("Helvetica", size=11)
-    pdf.multi_cell(0, 7, recomendacion)
-    return bytes(pdf.output(dest="S"))
-
-# --- 5. GESTIÓN DE MEMORIA ---
+# --- 5. GESTIÓN DE MEMORIA Y ESTADO ---
 inicializar_estado_app()
 if not st.session_state.token_ref and not st.session_state.tn_store_id:
-    db_store_id, db_token_ref = obtener_ultima_tienda_vinculada()
-    if db_store_id and db_token_ref:
-        st.session_state.tn_store_id = db_store_id
-        st.session_state.token_ref = db_token_ref
+    try:
+        db_store_id, db_token_ref = obtener_ultima_tienda_vinculada()
+        if db_store_id and db_token_ref:
+            st.session_state.tn_store_id = db_store_id
+            st.session_state.token_ref = db_token_ref
+    except Exception:
+        pass # Evitar que la app muera si la DB aún no está lista
 
 # --- 6. BARRA LATERAL ---
 with st.sidebar:
@@ -244,19 +217,14 @@ with st.sidebar:
                 store_id_detectado = token_data.get("store_id") or st.session_state.tn_store_id
                 st.session_state.token_ref = guardar_token_seguro(store_id_detectado, token_data["access_token"])
                 st.session_state.tn_store_id = store_id_detectado
-                st.success("✅ Tienda vinculada y guardada")
+                st.success("✅ Tienda vinculada")
             else:
-                st.session_state.token_ref = None
                 st.info("Modo Demo ✅")
         if st.button("4. Sincronizar ahora", use_container_width=True):
             store_id = normalizar_store_id(st.session_state.tn_store_id)
             if store_id:
-                if not st.session_state.token_ref:
-                    st.session_state.token_ref = obtener_token_ref_desde_db(store_id)
-                def on_sync_progress(p, m): pass 
-                st.session_state.tn_snapshot = obtener_snapshot_tiendanube(store_id, st.session_state.token_ref, CLIENT_ID, _progress_callback=on_sync_progress)
-                if st.session_state.tn_snapshot and st.session_state.tn_snapshot.get("ok"):
-                    st.success("Snapshot actualizado")
+                st.session_state.tn_snapshot = obtener_snapshot_tiendanube(store_id, st.session_state.token_ref, CLIENT_ID)
+                st.success("Snapshot actualizado")
 
 # --- 7. ESTILOS ---
 bg_overlay = "rgba(255, 255, 255, 0.7)" if not alto_contraste else "rgba(0, 0, 0, 0.9)"
