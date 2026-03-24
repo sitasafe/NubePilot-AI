@@ -13,16 +13,22 @@ if path_root not in sys.path:
 # Forzar que busque dentro de la carpeta raíz para los módulos de app
 sys.path.append(path_root)
 
-# --- BLOQUE DE CONEXIÓN Y CREACIÓN DE BASE DE DATOS ---
+# --- BLOQUE DE CONEXIÓN CORREGIDO SEGÚN TU ESTRUCTURA ---
 from app.core.database import engine, Base
 
 def inicializar_db_tablas(_st):
     try:
-        # Intentamos importación absoluta para Streamlit Cloud
-        import app.core.models
+        # Según tu imagen, el archivo está en app/models/store.py
+        import app.models.store 
         Base.metadata.create_all(bind=engine)
+    except ImportError as e:
+        # Si lo anterior falla, intentamos la ruta directa
+        try:
+            import models.store
+            Base.metadata.create_all(bind=engine)
+        except Exception as e2:
+            _st.warning(f"Aviso de Base de Datos: No se encontró el módulo. Detalles: {e2}")
     except Exception as e:
-        # Si falla, mostramos un aviso amigable, no un error fatal
         _st.warning(f"Aviso de Base de Datos: {e}")
 
 try:
@@ -292,7 +298,6 @@ with tabs[2]:
         if not en_riesgo.empty:
             ok, msg = disparar_alerta_critica(en_riesgo)
             if ok:
-                # CORRECCIÓN: Evitamos imprimir el objeto DeltaGenerator
                 st.error(str(msg))
             else:
                 st.info("Sin alertas pendientes")
@@ -322,7 +327,6 @@ with tabs[3]:
         cols = st.columns(4)
         for j, (nombre, cargo, img) in enumerate(equipo[i:i+4]):
             with cols[j]:
-                # CORRECCIÓN: Usamos solo HTML para el nombre para evitar el error de st.bold
                 card_html = f"""
                 <div class="team-card-large" style="text-align:center; height: 220px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
                     <img src="{img}" style="width:100px; height:100px; border-radius:50%; object-fit:cover; margin-bottom:10px;">
