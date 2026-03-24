@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 import requests
 import os
+import re
+import uuid
 from streamlit_mic_recorder import mic_recorder
 
 # --- 1. CONFIGURACIÓN DE PÁGINA (Blindaje PWA/Mobile) ---
@@ -20,7 +22,10 @@ st.markdown("""
 
 # --- 2. CREDENCIALES TIENDANUBE ---
 CLIENT_ID = "27483"
-CLIENT_SECRET = st.secrets.get("TIENDANUBE_CLIENT_SECRET", os.getenv("TIENDANUBE_CLIENT_SECRET", ""))
+try:
+    CLIENT_SECRET = st.secrets["TIENDANUBE_CLIENT_SECRET"]
+except (KeyError, FileNotFoundError):
+    CLIENT_SECRET = os.getenv("TIENDANUBE_CLIENT_SECRET", "")
 
 # --- 3. DICCIONARIO MULTILINGÜE ---
 textos = {
@@ -117,6 +122,31 @@ def get_http_session():
     session.headers.update({"Accept": "application/json"})
     return session
 
+@st.cache_resource
+def get_token_vault():
+    # Token storage in server memory to avoid exposing raw token in session_state.
+    return {}
+
+def guardar_token_seguro(token):
+    token_ref = str(uuid.uuid4())
+    get_token_vault()[token_ref] = token
+    return token_ref
+
+def obtener_token_seguro(token_ref):
+    return get_token_vault().get(token_ref) if token_ref else None
+
+def normalizar_store_id(raw_store_id):
+    if raw_store_id is None:
+        return ""
+    text = str(raw_store_id).strip()
+    if not text:
+        return ""
+    match = re.search(r"/(\d+)(?:/|$)", text)
+    if match:
+        return match.group(1)
+    only_digits = re.sub(r"\D", "", text)
+    return only_digits if only_digits else ""
+
 def obtener_token_real(code):
     if not code or not CLIENT_SECRET:
         return None
@@ -130,10 +160,11 @@ def obtener_token_real(code):
 
 @st.cache_data(ttl=60)
 def obtener_snapshot_tiendanube(store_id, access_token):
-    if not store_id or not access_token:
-        return None
+    normalized_store_id = normalizar_store_id(store_id)
+    if not normalized_store_id or not access_token:
+        return {"ok": False, "error": "invalid_store_id"}
 
-    base_url = f"https://api.tiendanube.com/v1/{str(store_id).strip()}"
+    base_url = f"https://api.tiendanube.com/v1/{normalized_store_id}"
     headers = {
         "Authentication": f"bearer {access_token}",
         "User-Agent": f"Flowmerce ({CLIENT_ID})",
@@ -160,9 +191,9 @@ def obtener_snapshot_tiendanube(store_id, access_token):
 
 def calcular_motor_analisis(df, f_demanda):
     # Agregamos factor de tendencia (IA simulada)
-    df["Tendencia"] = [1.1, 0.9, 1.2, 0.8] # Simulación de estacionalidad
+    df["Tendencia"] = np.resize([1.1, 0.9, 1.2, 0.8], len(df))
     df["V_Diaria"] = (df["Ventas_30d"] / 30) * f_demanda * df["Tendencia"]
-    df["Autonomia"] = np.where(df["V_Diaria"] > 0, df["Stock"] / df["V_Diaria"], 999)
+    df["Autonomia"] = np.where(df["V_Diaria"] > 0, df["Stock"] / df["V_Diaria"], np.inf)
     return df
 
 def color_estado(val):
@@ -170,7 +201,6 @@ def color_estado(val):
     if "LIQUIDAR" in val: return "background-color: #fff3cd; color: black;"
     return "background-color: #d4edda; color: black;"
 
-@st.cache_data
 def exportar_csv(df_export):
     return df_export.to_csv(index=False).encode("utf-8")
 
@@ -184,6 +214,8 @@ if 'db_inventario' not in st.session_state:
     })
 if 'token_session' not in st.session_state:
     st.session_state.token_session = None
+if "token_ref" not in st.session_state:
+    st.session_state.token_ref = None
 if "tn_store_id" not in st.session_state:
     st.session_state.tn_store_id = ""
 if "tn_snapshot" not in st.session_state:
@@ -222,19 +254,28 @@ with st.sidebar:
         if st.button("3. Vincular Tienda"):
             token = obtener_token_real(temp_code)
             if token:
-                st.session_state.token_session = token
+                st.session_state.token_ref = guardar_token_seguro(token)
+                st.session_state.token_session = "linked"
                 st.success("✅")
             else:
                 st.session_state.token_session = "demo"
+                st.session_state.token_ref = None
                 st.info("Modo Demo ✅")
         if st.button("4. Sincronizar ahora", use_container_width=True):
-            if st.session_state.token_session and st.session_state.token_session != "demo":
-                with st.spinner("Sincronizando Tiendanube..."):
-                    st.session_state.tn_snapshot = obtener_snapshot_tiendanube(st.session_state.tn_store_id, st.session_state.token_session)
-                if st.session_state.tn_snapshot and st.session_state.tn_snapshot.get("ok"):
-                    st.success("Snapshot actualizado")
+            store_id = normalizar_store_id(st.session_state.tn_store_id)
+            if not store_id:
+                st.warning("Store ID inválido. Pega solo el ID numérico o la URL de tu tienda.")
+            elif st.session_state.token_session and st.session_state.token_session != "demo":
+                secure_token = obtener_token_seguro(st.session_state.token_ref)
+                if not secure_token:
+                    st.warning("La sesión del token expiró. Vuelve a vincular la tienda.")
                 else:
-                    st.warning("No se pudo actualizar el snapshot. Verifica Store ID y permisos.")
+                    with st.spinner("Sincronizando Tiendanube..."):
+                        st.session_state.tn_snapshot = obtener_snapshot_tiendanube(store_id, secure_token)
+                    if st.session_state.tn_snapshot and st.session_state.tn_snapshot.get("ok"):
+                        st.success("Snapshot actualizado")
+                    else:
+                        st.warning("No se pudo actualizar el snapshot. Verifica Store ID y permisos.")
             else:
                 st.info("Vincula una tienda real para sincronizar datos.")
 
@@ -257,10 +298,13 @@ st.markdown(f"""
 # --- 8. EJECUCIÓN DEL MOTOR ---
 t_act = textos[idioma]
 df = calcular_motor_analisis(st.session_state.db_inventario.copy(), f_demanda)
+autonomia_finita = np.isfinite(df["Autonomia"])
 
-atrapado_val = (df[df["Autonomia"] > 60]["Stock"] * df[df["Autonomia"] > 60]["Costo"]).sum()
-riesgo_val = (df[df["Autonomia"] < dias_entrega]["V_Diaria"] * df[df["Autonomia"] < dias_entrega]["Costo"] * 1.5).sum()
-salud_neta = max(0, 100-int(riesgo_val/1000))
+atrapado_mask = (df["Autonomia"] > 60) & autonomia_finita
+riesgo_mask = (df["Autonomia"] < dias_entrega) & autonomia_finita
+atrapado_val = (df.loc[atrapado_mask, "Stock"] * df.loc[atrapado_mask, "Costo"]).sum()
+riesgo_val = (df.loc[riesgo_mask, "V_Diaria"] * df.loc[riesgo_mask, "Costo"] * 1.5).sum()
+salud_neta = min(100, max(0, 100 - int(riesgo_val / 1000)))
 
 # --- 9. CUERPO DE LA APP ---
 st.markdown('<h1 class="main-title">🌊 Flowmerce</h1>', unsafe_allow_html=True)
@@ -299,7 +343,7 @@ with tabs[1]:
     col1.metric(t_act["atrapado"], f"${float(atrapado_val):,.0f} MXN")
     col2.metric(t_act["riesgo"], f"${float(riesgo_val):,.0f} MXN", delta="!", delta_color="inverse")
     col3.metric(t_act["salud"], f"{salud_neta}%")
-    st.progress(salud_neta / 100) # Indicador visual de salud
+    st.progress(min(1.0, max(0.0, salud_neta / 100.0))) # Indicador visual de salud
     
     st.write("### 📈 Autonomía de Inventario (Días)")
     st.bar_chart(df.set_index("Producto")["Autonomia"])
