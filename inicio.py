@@ -281,10 +281,20 @@ with tabs[2]:
     condiciones = [df["Autonomia"] < dias_entrega, df["Autonomia"] > 60]
     df["Accion"] = np.select(condiciones, ["🚨 REABASTECER", "🔥 LIQUIDAR"], default="✅ ESTABLE")
     st.dataframe(df[["Producto", "Stock", "Autonomia", "Accion"]].style.map(color_estado, subset=["Accion"]), use_container_width=True)
+    
+    # --- BLOQUE CORREGIDO DE ALERTAS ---
     if st.button("🔔 Activar Monitor de Alertas Críticas", use_container_width=True):
         en_riesgo = df[df["Accion"] == "🚨 REABASTECER"]
-        ok, msg = disparar_alerta_critica(en_riesgo)
-        st.error(msg) if ok else st.info("Todo estable")
+        if not en_riesgo.empty:
+            ok, msg = disparar_alerta_critica(en_riesgo)
+            if ok:
+                st.error(msg)
+            else:
+                st.info("Sin alertas pendientes")
+        else:
+            st.info("Todo estable")
+    # -----------------------------------
+
     colb1, colb2 = st.columns(2)
     with colb1:
         if st.button(t_act["btn_app"], use_container_width=True): st.success(t_act["sync_ok"])
@@ -304,12 +314,10 @@ with tabs[3]:
         ("Cesar Augusto F.", "Estrategia", "https://cdn-icons-png.flaticon.com/512/3001/3001764.png")
     ]
     
-    # Renderizado corregido del equipo
     for i in range(0, len(equipo), 4):
         cols = st.columns(4)
         for j, (nombre, cargo, img) in enumerate(equipo[i:i+4]):
             with cols[j]:
-                # Usamos un solo bloque de HTML por tarjeta para asegurar el renderizado
                 card_html = f"""
                 <div class="team-card-large" style="text-align:center; height: 220px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
                     <img src="{img}" style="width:100px; height:100px; border-radius:50%; object-fit:cover; margin-bottom:10px;">
