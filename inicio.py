@@ -1,15 +1,27 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import requests
 import os
-import re
-import uuid
+import importlib
 try:
     from streamlit_mic_recorder import mic_recorder
     MIC_AVAILABLE = True
 except ImportError:
     MIC_AVAILABLE = False
+
+from app.core.state import (
+    guardar_token_seguro,
+    inicializar_estado_app,
+    obtener_token_ref_desde_db,
+    obtener_ultima_tienda_vinculada,
+)
+from app.services.tiendanube import (
+    extraer_inventario_desde_snapshot,
+    normalizar_store_id,
+    obtener_snapshot_tiendanube,
+    obtener_token_real,
+)
+from app.services.notifications import disparar_alerta_critica
 
 # --- 1. CONFIGURACIÓN DE PÁGINA (Blindaje PWA/Mobile) ---
 st.set_page_config(page_title="Flowmerce - Liquidez Inteligente", page_icon="🌊", layout="wide")
@@ -120,132 +132,6 @@ textos = {
 }
 
 # --- 4. FUNCIONES MODULARES (Arquitectura 5 estrellas) ---
-@st.cache_resource
-def get_http_session():
-    session = requests.Session()
-    session.headers.update({"Accept": "application/json"})
-    return session
-
-@st.cache_resource
-def get_token_vault():
-    # Token storage in server memory to avoid exposing raw token in session_state.
-    return {}
-
-def guardar_token_seguro(token):
-    token_ref = str(uuid.uuid4())
-    get_token_vault()[token_ref] = token
-    return token_ref
-
-def obtener_token_seguro(token_ref):
-    return get_token_vault().get(token_ref) if token_ref else None
-
-def normalizar_store_id(raw_store_id):
-    if raw_store_id is None:
-        return ""
-    text = str(raw_store_id).strip()
-    if not text:
-        return ""
-    match = re.search(r"/(\d+)(?:/|$)", text)
-    if match:
-        return match.group(1)
-    only_digits = re.sub(r"\D", "", text)
-    return only_digits if only_digits else ""
-
-def obtener_token_real(code):
-    if not code or not CLIENT_SECRET:
-        return None
-    url = "https://www.tiendanube.com/apps/authorize/token"
-    payload = {"client_id": int(CLIENT_ID), "client_secret": CLIENT_SECRET, "grant_type": "authorization_code", "code": code.strip()}
-    try:
-        response = get_http_session().post(url, json=payload, timeout=10)
-        if response.status_code != 200:
-            return None
-        body = response.json()
-        return {
-            "access_token": body.get("access_token"),
-            "store_id": str(body.get("user_id", "")).strip(),
-        }
-    except requests.RequestException:
-        return None
-
-def extraer_inventario_desde_snapshot(snapshot):
-    products = snapshot.get("products", []) if snapshot else []
-    rows = []
-    for p in products:
-        nombre = p.get("name", {})
-        if isinstance(nombre, dict):
-            nombre = nombre.get("es") or nombre.get("pt") or nombre.get("en") or p.get("handle") or "Producto"
-        nombre = str(nombre) if nombre else "Producto"
-        variants = p.get("variants", []) if isinstance(p.get("variants", []), list) else []
-        stock_total = sum(int(v.get("stock", 0) or 0) for v in variants) if variants else int(p.get("stock", 0) or 0)
-        rows.append({
-            "Producto": nombre,
-            "Stock": max(0, stock_total),
-            "Ventas_30d": 0,
-            "Ventas_7d": 0,
-            "Costo": 0,
-        })
-    if not rows:
-        return pd.DataFrame(columns=["Producto", "Stock", "Ventas_30d", "Ventas_7d", "Costo"])
-    return pd.DataFrame(rows)
-
-@st.cache_data(ttl=60)
-def obtener_snapshot_tiendanube(store_id, token_ref):
-    access_token = obtener_token_seguro(token_ref)
-    normalized_store_id = normalizar_store_id(store_id)
-    if not normalized_store_id or not access_token:
-        return {"ok": False, "error": "invalid_store_id"}
-
-    base_url = f"https://api.tiendanube.com/v1/{normalized_store_id}"
-    headers = {
-        "Authorization": f"Bearer {access_token}",
-        "User-Agent": f"Flowmerce ({CLIENT_ID})",
-    }
-    session = get_http_session()
-    try:
-        products = []
-        page = 1
-        while True:
-            r_products = session.get(f"{base_url}/products", headers=headers, params={"page": page, "per_page": 50}, timeout=10)
-            if r_products.status_code == 401:
-                return {"ok": False, "error": "unauthorized"}
-            if r_products.status_code == 429:
-                return {"ok": False, "error": "rate_limit"}
-            if r_products.status_code != 200:
-                return {"ok": False, "status_products": r_products.status_code}
-            page_items = r_products.json() if isinstance(r_products.json(), list) else []
-            products.extend(page_items)
-            if len(page_items) < 50 or page >= 5:
-                break
-            page += 1
-
-        orders = []
-        page = 1
-        while True:
-            r_orders = session.get(f"{base_url}/orders", headers=headers, params={"page": page, "per_page": 50}, timeout=10)
-            if r_orders.status_code == 401:
-                return {"ok": False, "error": "unauthorized"}
-            if r_orders.status_code == 429:
-                return {"ok": False, "error": "rate_limit"}
-            if r_orders.status_code != 200:
-                return {"ok": False, "status_orders": r_orders.status_code}
-            page_items = r_orders.json() if isinstance(r_orders.json(), list) else []
-            orders.extend(page_items)
-            if len(page_items) < 50 or page >= 5:
-                break
-            page += 1
-
-        total_orders = len(orders)
-        paid_orders = sum(1 for o in orders if str(o.get("payment_status", "")).lower() == "paid")
-        return {
-            "ok": True,
-            "products": products,
-            "products_count": len(products),
-            "orders_count": total_orders,
-            "paid_rate": (paid_orders / total_orders * 100) if total_orders else 0.0,
-        }
-    except requests.RequestException:
-        return {"ok": False, "error": "network"}
 
 def calcular_motor_analisis(df, f_demanda):
     if "Ventas_7d" in df.columns:
@@ -266,21 +152,66 @@ def color_estado(val):
 def exportar_csv(df_export):
     return df_export.to_csv(index=False).encode("utf-8")
 
+
+def generar_reporte_ejecutivo_pdf(salud_caja, productos_criticos, impulso_demanda):
+    fpdf_module = importlib.import_module("fpdf")
+    pdf_cls = getattr(fpdf_module, "FPDF")
+
+    if impulso_demanda >= 2.0:
+        recomendacion = (
+            "Demanda acelerada: aumentar inversion de inventario entre 20% y 30%."
+        )
+    elif impulso_demanda >= 1.2:
+        recomendacion = (
+            "Demanda en crecimiento: aumentar inversion de inventario entre 10% y 15%."
+        )
+    else:
+        recomendacion = (
+            "Demanda estable: mantener inversion base y priorizar liquidez."
+        )
+
+    pdf = pdf_cls()
+    pdf.set_auto_page_break(auto=True, margin=15)
+    pdf.add_page()
+    pdf.set_font("Helvetica", "B", 16)
+    pdf.cell(0, 10, "Flowmerce - Reporte Ejecutivo", ln=True)
+    pdf.ln(2)
+
+    pdf.set_font("Helvetica", size=12)
+    pdf.multi_cell(0, 8, f"Salud de Caja actual: {salud_caja}%")
+    pdf.ln(1)
+    pdf.set_font("Helvetica", "B", 12)
+    pdf.cell(0, 8, "Productos criticos por reabastecimiento:", ln=True)
+    pdf.set_font("Helvetica", size=11)
+
+    if productos_criticos.empty:
+        pdf.multi_cell(0, 7, "- Sin productos criticos en este momento.")
+    else:
+        for _, row in productos_criticos.iterrows():
+            producto = str(row["Producto"])
+            autonomia = float(row["Autonomia"])
+            stock = int(row["Stock"])
+            pdf.multi_cell(
+                0,
+                7,
+                f"- {producto}: autonomia {autonomia:.1f} dias | stock actual {stock}",
+            )
+
+    pdf.ln(2)
+    pdf.set_font("Helvetica", "B", 12)
+    pdf.cell(0, 8, "Recomendacion de inversion:", ln=True)
+    pdf.set_font("Helvetica", size=11)
+    pdf.multi_cell(0, 7, recomendacion)
+
+    return bytes(pdf.output(dest="S"))
+
 # --- 5. GESTIÓN DE MEMORIA ---
-if 'db_inventario' not in st.session_state:
-    st.session_state.db_inventario = pd.DataFrame({
-        "Producto": ["Tenis Pro Runner", "Gorra Blue Urban", "Calcetín Sport", "Sudadera Lino"],
-        "Stock": [15, 95, 45, 4],
-        "Ventas_30d": [45, 10, 30, 42],
-        "Ventas_7d": [11, 2, 8, 12],
-        "Costo": [1200, 350, 150, 890]
-    })
-if "token_ref" not in st.session_state:
-    st.session_state.token_ref = None
-if "tn_store_id" not in st.session_state:
-    st.session_state.tn_store_id = ""
-if "tn_snapshot" not in st.session_state:
-    st.session_state.tn_snapshot = None
+inicializar_estado_app()
+if not st.session_state.token_ref and not st.session_state.tn_store_id:
+    db_store_id, db_token_ref = obtener_ultima_tienda_vinculada()
+    if db_store_id and db_token_ref:
+        st.session_state.tn_store_id = db_store_id
+        st.session_state.token_ref = db_token_ref
 
 # --- 6. BARRA LATERAL ---
 with st.sidebar:
@@ -313,35 +244,61 @@ with st.sidebar:
         temp_code = st.text_input("2. Pega el Code:")
         st.session_state.tn_store_id = st.text_input("3. Store ID (opcional si vinculas)", value=st.session_state.tn_store_id)
         if st.button("3. Vincular Tienda"):
-            token_data = obtener_token_real(temp_code)
+            token_data = obtener_token_real(temp_code, CLIENT_ID, CLIENT_SECRET)
             if token_data and token_data.get("access_token"):
-                st.session_state.token_ref = guardar_token_seguro(token_data["access_token"])
+                store_id_detectado = token_data.get("store_id") or st.session_state.tn_store_id
+                st.session_state.token_ref = guardar_token_seguro(
+                    store_id_detectado, token_data["access_token"]
+                )
                 if token_data.get("store_id"):
                     st.session_state.tn_store_id = token_data["store_id"]
-                    st.success(f"✅ Tienda vinculada. Store ID detectado: {token_data['store_id']}")
-                else:
-                    st.success("✅ Tienda vinculada.")
+                st.success("✅ Tienda vinculada y guardada en la base de datos real")
             else:
                 st.session_state.token_ref = None
                 st.info("Modo Demo ✅")
         if st.button("4. Sincronizar ahora", use_container_width=True):
             store_id = normalizar_store_id(st.session_state.tn_store_id)
+            progress_bar = st.progress(0)
+            progress_text = st.empty()
             if not store_id:
+                progress_text.empty()
+                progress_bar.empty()
                 st.warning("No pude obtener un Store ID numérico. Vincula primero para autocompletarlo o pega el ID de Tiendanube.")
-            elif st.session_state.token_ref:
-                with st.spinner("Sincronizando Tiendanube..."):
-                    st.session_state.tn_snapshot = obtener_snapshot_tiendanube(store_id, st.session_state.token_ref)
+            else:
+                if not st.session_state.token_ref:
+                    st.session_state.token_ref = obtener_token_ref_desde_db(store_id)
+            if store_id and st.session_state.token_ref:
+                progress_text.write("Sincronizando...")
+
+                def on_sync_progress(progress, message):
+                    progress_bar.progress(max(0.0, min(1.0, float(progress))))
+                    progress_text.write(message)
+
+                st.session_state.tn_snapshot = obtener_snapshot_tiendanube(
+                    store_id,
+                    st.session_state.token_ref,
+                    CLIENT_ID,
+                    _progress_callback=on_sync_progress,
+                )
                 if st.session_state.tn_snapshot and st.session_state.tn_snapshot.get("ok"):
+                    progress_bar.progress(1.0)
+                    progress_text.empty()
                     st.success("Snapshot actualizado")
                 elif st.session_state.tn_snapshot and st.session_state.tn_snapshot.get("error") == "rate_limit":
+                    progress_text.empty()
                     st.warning("⏳ Límite de llamadas Tiendanube alcanzado. Espera 1 minuto e intenta de nuevo.")
                 elif st.session_state.tn_snapshot and st.session_state.tn_snapshot.get("error") == "unauthorized":
+                    progress_text.empty()
                     st.warning("🔐 Token expirado o inválido. Vuelve a vincular la tienda.")
                 elif st.session_state.tn_snapshot and st.session_state.tn_snapshot.get("error") == "invalid_store_id":
+                    progress_text.empty()
                     st.warning("Store ID o token inválido. Vuelve a vincular la tienda.")
                 else:
+                    progress_text.empty()
                     st.warning("No se pudo actualizar el snapshot. Verifica Store ID y permisos.")
-            else:
+            elif store_id:
+                progress_text.empty()
+                progress_bar.empty()
                 st.info("Vincula una tienda real para sincronizar datos.")
 
 # --- 7. ESTILOS ---
@@ -423,6 +380,7 @@ with tabs[1]:
 
 with tabs[2]:
     st.subheader(t_act["est_tit"])
+    vigilancia_activa = st.toggle("🛰️ Modo Vigilancia Activa")
     with st.expander(t_act["sim_tit"], expanded=True):
         sim_inv = st.number_input(t_act["sim_inv"], value=50000)
         c_s1, c_s2 = st.columns(2)
@@ -441,6 +399,70 @@ with tabs[2]:
     st.write(f"### {t_act['criticos_tit']}")
     criticos = df[np.isfinite(df["Autonomia"])].sort_values("Autonomia").head(2)
     st.table(criticos[["Producto", "Autonomia", "Stock"]])
+
+    en_riesgo = df[df["Accion"] == "🚨 REABASTECER"].copy()
+    riesgo_actual_set = set(en_riesgo["Producto"].astype(str).tolist())
+    if "riesgo_prev_set" not in st.session_state:
+        st.session_state.riesgo_prev_set = set()
+
+    if vigilancia_activa:
+        nuevos_en_riesgo = riesgo_actual_set - st.session_state.riesgo_prev_set
+        if nuevos_en_riesgo:
+            nuevos_df = en_riesgo[en_riesgo["Producto"].astype(str).isin(nuevos_en_riesgo)]
+            ok_alerta_auto, mensaje_alerta_auto = disparar_alerta_critica(nuevos_df)
+            st.markdown(
+                """
+                <style>
+                @keyframes pulse-alert {
+                    0% { transform: scale(1); opacity: 1; }
+                    50% { transform: scale(1.02); opacity: 0.9; }
+                    100% { transform: scale(1); opacity: 1; }
+                }
+                div[data-testid="stAlert"] {
+                    animation: pulse-alert 1.1s ease-in-out infinite;
+                }
+                </style>
+                """,
+                unsafe_allow_html=True,
+            )
+            if ok_alerta_auto:
+                st.error(mensaje_alerta_auto)
+                st.caption(
+                    "Simulando envío de reporte a WhatsApp del administrador..."
+                )
+            else:
+                st.warning(mensaje_alerta_auto)
+        st.session_state.riesgo_prev_set = riesgo_actual_set
+    else:
+        st.session_state.riesgo_prev_set = riesgo_actual_set
+
+    if st.button("🔔 Activar Monitor de Alertas Críticas", use_container_width=True):
+        if en_riesgo.empty:
+            st.info("No hay productos críticos por reabastecer en este momento.")
+        else:
+            ok_alerta, mensaje_alerta = disparar_alerta_critica(en_riesgo)
+            st.markdown(
+                """
+                <style>
+                @keyframes pulse-alert {
+                    0% { transform: scale(1); opacity: 1; }
+                    50% { transform: scale(1.02); opacity: 0.9; }
+                    100% { transform: scale(1); opacity: 1; }
+                }
+                div[data-testid="stAlert"] {
+                    animation: pulse-alert 1.1s ease-in-out infinite;
+                }
+                </style>
+                """,
+                unsafe_allow_html=True,
+            )
+            if ok_alerta:
+                st.error(mensaje_alerta)
+                st.caption(
+                    "Simulando envío de reporte a WhatsApp del administrador..."
+                )
+            else:
+                st.warning(mensaje_alerta)
     
     def animar_nubes():
         st.empty().markdown('<div class="cloud-effect" style="left: 50%;">☁️</div>', unsafe_allow_html=True)
@@ -454,6 +476,15 @@ with tabs[2]:
         csv = exportar_csv(df)
         if st.download_button(label=t_act["btn_reporte"], data=csv, file_name='Reporte_Flowmerce.csv', use_container_width=True):
             st.toast(t_act["rep_exito"])
+
+    reporte_pdf = generar_reporte_ejecutivo_pdf(salud_neta, en_riesgo, f_demanda)
+    st.download_button(
+        "📄 Descargar Reporte Ejecutivo (PDF)",
+        data=reporte_pdf,
+        file_name="Reporte_Ejecutivo_Flowmerce.pdf",
+        mime="application/pdf",
+        use_container_width=True,
+    )
 
 with tabs[3]:
     st.markdown(f"### {t_act['equipo_tit']}")

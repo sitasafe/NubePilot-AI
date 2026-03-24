@@ -3,3 +3,8 @@ pandas
 numpy
 requests
 streamlit-mic-recorder
+fastapi
+uvicorn
+sqlalchemy
+stripe
+fpdf2
