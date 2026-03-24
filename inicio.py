@@ -5,7 +5,11 @@ import requests
 import os
 import re
 import uuid
-from streamlit_mic_recorder import mic_recorder
+try:
+    from streamlit_mic_recorder import mic_recorder
+    MIC_AVAILABLE = True
+except ImportError:
+    MIC_AVAILABLE = False
 
 # --- 1. CONFIGURACIÓN DE PÁGINA (Blindaje PWA/Mobile) ---
 st.set_page_config(page_title="Flowmerce - Liquidez Inteligente", page_icon="🌊", layout="wide")
@@ -154,34 +158,88 @@ def obtener_token_real(code):
     payload = {"client_id": int(CLIENT_ID), "client_secret": CLIENT_SECRET, "grant_type": "authorization_code", "code": code.strip()}
     try:
         response = get_http_session().post(url, json=payload, timeout=10)
-        return response.json().get("access_token") if response.status_code == 200 else None
+        if response.status_code != 200:
+            return None
+        body = response.json()
+        return {
+            "access_token": body.get("access_token"),
+            "store_id": str(body.get("user_id", "")).strip(),
+        }
     except requests.RequestException:
         return None
 
+def extraer_inventario_desde_snapshot(snapshot):
+    products = snapshot.get("products", []) if snapshot else []
+    rows = []
+    for p in products:
+        nombre = p.get("name", {})
+        if isinstance(nombre, dict):
+            nombre = nombre.get("es") or nombre.get("pt") or nombre.get("en") or p.get("handle") or "Producto"
+        nombre = str(nombre) if nombre else "Producto"
+        variants = p.get("variants", []) if isinstance(p.get("variants", []), list) else []
+        stock_total = sum(int(v.get("stock", 0) or 0) for v in variants) if variants else int(p.get("stock", 0) or 0)
+        rows.append({
+            "Producto": nombre,
+            "Stock": max(0, stock_total),
+            "Ventas_30d": 0,
+            "Ventas_7d": 0,
+            "Costo": 0,
+        })
+    if not rows:
+        return pd.DataFrame(columns=["Producto", "Stock", "Ventas_30d", "Ventas_7d", "Costo"])
+    return pd.DataFrame(rows)
+
 @st.cache_data(ttl=60)
-def obtener_snapshot_tiendanube(store_id, access_token):
+def obtener_snapshot_tiendanube(store_id, token_ref):
+    access_token = obtener_token_seguro(token_ref)
     normalized_store_id = normalizar_store_id(store_id)
     if not normalized_store_id or not access_token:
         return {"ok": False, "error": "invalid_store_id"}
 
     base_url = f"https://api.tiendanube.com/v1/{normalized_store_id}"
     headers = {
-        "Authentication": f"bearer {access_token}",
+        "Authorization": f"Bearer {access_token}",
         "User-Agent": f"Flowmerce ({CLIENT_ID})",
     }
     session = get_http_session()
     try:
-        r_products = session.get(f"{base_url}/products", headers=headers, timeout=10)
-        r_orders = session.get(f"{base_url}/orders", headers=headers, timeout=10)
-        if r_products.status_code != 200 or r_orders.status_code != 200:
-            return {"ok": False, "status_products": r_products.status_code, "status_orders": r_orders.status_code}
+        products = []
+        page = 1
+        while True:
+            r_products = session.get(f"{base_url}/products", headers=headers, params={"page": page, "per_page": 50}, timeout=10)
+            if r_products.status_code == 401:
+                return {"ok": False, "error": "unauthorized"}
+            if r_products.status_code == 429:
+                return {"ok": False, "error": "rate_limit"}
+            if r_products.status_code != 200:
+                return {"ok": False, "status_products": r_products.status_code}
+            page_items = r_products.json() if isinstance(r_products.json(), list) else []
+            products.extend(page_items)
+            if len(page_items) < 50 or page >= 5:
+                break
+            page += 1
 
-        products = r_products.json() if isinstance(r_products.json(), list) else []
-        orders = r_orders.json() if isinstance(r_orders.json(), list) else []
+        orders = []
+        page = 1
+        while True:
+            r_orders = session.get(f"{base_url}/orders", headers=headers, params={"page": page, "per_page": 50}, timeout=10)
+            if r_orders.status_code == 401:
+                return {"ok": False, "error": "unauthorized"}
+            if r_orders.status_code == 429:
+                return {"ok": False, "error": "rate_limit"}
+            if r_orders.status_code != 200:
+                return {"ok": False, "status_orders": r_orders.status_code}
+            page_items = r_orders.json() if isinstance(r_orders.json(), list) else []
+            orders.extend(page_items)
+            if len(page_items) < 50 or page >= 5:
+                break
+            page += 1
+
         total_orders = len(orders)
         paid_orders = sum(1 for o in orders if str(o.get("payment_status", "")).lower() == "paid")
         return {
             "ok": True,
+            "products": products,
             "products_count": len(products),
             "orders_count": total_orders,
             "paid_rate": (paid_orders / total_orders * 100) if total_orders else 0.0,
@@ -190,8 +248,12 @@ def obtener_snapshot_tiendanube(store_id, access_token):
         return {"ok": False, "error": "network"}
 
 def calcular_motor_analisis(df, f_demanda):
-    # Agregamos factor de tendencia (IA simulada)
-    df["Tendencia"] = np.resize([1.1, 0.9, 1.2, 0.8], len(df))
+    if "Ventas_7d" in df.columns:
+        base_30 = (df["Ventas_30d"] / 30).replace(0, np.nan)
+        ratio = (df["Ventas_7d"] / 7) / base_30
+        df["Tendencia"] = ratio.fillna(1.0).clip(0.5, 2.0)
+    else:
+        df["Tendencia"] = 1.0
     df["V_Diaria"] = (df["Ventas_30d"] / 30) * f_demanda * df["Tendencia"]
     df["Autonomia"] = np.where(df["V_Diaria"] > 0, df["Stock"] / df["V_Diaria"], np.inf)
     return df
@@ -210,10 +272,9 @@ if 'db_inventario' not in st.session_state:
         "Producto": ["Tenis Pro Runner", "Gorra Blue Urban", "Calcetín Sport", "Sudadera Lino"],
         "Stock": [15, 95, 45, 4],
         "Ventas_30d": [45, 10, 30, 42],
+        "Ventas_7d": [11, 2, 8, 12],
         "Costo": [1200, 350, 150, 890]
     })
-if 'token_session' not in st.session_state:
-    st.session_state.token_session = None
 if "token_ref" not in st.session_state:
     st.session_state.token_ref = None
 if "tn_store_id" not in st.session_state:
@@ -250,38 +311,42 @@ with st.sidebar:
     with st.expander("🔑 Conexión Tiendanube", expanded=True):
         st.link_button("1. Autorizar App", f"https://www.tiendanube.com/apps/authorize?client_id={CLIENT_ID}&scope=read_orders,write_orders,read_products,write_products")
         temp_code = st.text_input("2. Pega el Code:")
-        st.session_state.tn_store_id = st.text_input("3. Store ID", value=st.session_state.tn_store_id)
+        st.session_state.tn_store_id = st.text_input("3. Store ID (opcional si vinculas)", value=st.session_state.tn_store_id)
         if st.button("3. Vincular Tienda"):
-            token = obtener_token_real(temp_code)
-            if token:
-                st.session_state.token_ref = guardar_token_seguro(token)
-                st.session_state.token_session = "linked"
-                st.success("✅")
+            token_data = obtener_token_real(temp_code)
+            if token_data and token_data.get("access_token"):
+                st.session_state.token_ref = guardar_token_seguro(token_data["access_token"])
+                if token_data.get("store_id"):
+                    st.session_state.tn_store_id = token_data["store_id"]
+                    st.success(f"✅ Tienda vinculada. Store ID detectado: {token_data['store_id']}")
+                else:
+                    st.success("✅ Tienda vinculada.")
             else:
-                st.session_state.token_session = "demo"
                 st.session_state.token_ref = None
                 st.info("Modo Demo ✅")
         if st.button("4. Sincronizar ahora", use_container_width=True):
             store_id = normalizar_store_id(st.session_state.tn_store_id)
             if not store_id:
-                st.warning("Store ID inválido. Pega solo el ID numérico o la URL de tu tienda.")
-            elif st.session_state.token_session and st.session_state.token_session != "demo":
-                secure_token = obtener_token_seguro(st.session_state.token_ref)
-                if not secure_token:
-                    st.warning("La sesión del token expiró. Vuelve a vincular la tienda.")
+                st.warning("No pude obtener un Store ID numérico. Vincula primero para autocompletarlo o pega el ID de Tiendanube.")
+            elif st.session_state.token_ref:
+                with st.spinner("Sincronizando Tiendanube..."):
+                    st.session_state.tn_snapshot = obtener_snapshot_tiendanube(store_id, st.session_state.token_ref)
+                if st.session_state.tn_snapshot and st.session_state.tn_snapshot.get("ok"):
+                    st.success("Snapshot actualizado")
+                elif st.session_state.tn_snapshot and st.session_state.tn_snapshot.get("error") == "rate_limit":
+                    st.warning("⏳ Límite de llamadas Tiendanube alcanzado. Espera 1 minuto e intenta de nuevo.")
+                elif st.session_state.tn_snapshot and st.session_state.tn_snapshot.get("error") == "unauthorized":
+                    st.warning("🔐 Token expirado o inválido. Vuelve a vincular la tienda.")
+                elif st.session_state.tn_snapshot and st.session_state.tn_snapshot.get("error") == "invalid_store_id":
+                    st.warning("Store ID o token inválido. Vuelve a vincular la tienda.")
                 else:
-                    with st.spinner("Sincronizando Tiendanube..."):
-                        st.session_state.tn_snapshot = obtener_snapshot_tiendanube(store_id, secure_token)
-                    if st.session_state.tn_snapshot and st.session_state.tn_snapshot.get("ok"):
-                        st.success("Snapshot actualizado")
-                    else:
-                        st.warning("No se pudo actualizar el snapshot. Verifica Store ID y permisos.")
+                    st.warning("No se pudo actualizar el snapshot. Verifica Store ID y permisos.")
             else:
                 st.info("Vincula una tienda real para sincronizar datos.")
 
 # --- 7. ESTILOS ---
 bg_overlay = "rgba(255, 255, 255, 0.7)" if not alto_contraste else "rgba(0, 0, 0, 0.9)"
-text_color = "#1E1E1E" if not alto_contraste else "#000000"
+text_color = "#1E1E1E" if not alto_contraste else "#FFFFFF"
 
 st.markdown(f"""
 <style>
@@ -297,7 +362,12 @@ st.markdown(f"""
 
 # --- 8. EJECUCIÓN DEL MOTOR ---
 t_act = textos[idioma]
-df = calcular_motor_analisis(st.session_state.db_inventario.copy(), f_demanda)
+snap = st.session_state.tn_snapshot
+if snap and snap.get("ok") and snap.get("products"):
+    df_source = extraer_inventario_desde_snapshot(snap)
+else:
+    df_source = st.session_state.db_inventario.copy()
+df = calcular_motor_analisis(df_source, f_demanda)
 autonomia_finita = np.isfinite(df["Autonomia"])
 
 atrapado_mask = (df["Autonomia"] > 60) & autonomia_finita
@@ -314,10 +384,11 @@ with c_enc1:
     st.markdown(f"<div style='background:white; padding:10px 20px; border-radius:10px; display:inline-block; color:{text_color}; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px;'><strong>✨ {t_act['sub']}</strong></div>", unsafe_allow_html=True)
 
 with c_enc2: 
-    audio_data = mic_recorder(start_prompt="🎤", stop_prompt="🛑", key='recorder')
-    if audio_data:
-        st.toast(t_act["escuchando"])
-        st.info(f"{t_act['voz_ok']} 'Optimizar inventario'")
+    if MIC_AVAILABLE:
+        audio_data = mic_recorder(start_prompt="🎤", stop_prompt="🛑", key='recorder')
+        if audio_data:
+            st.toast(t_act["escuchando"])
+            st.info(f"{t_act['voz_ok']} [procesamiento de voz no implementado aun]")
 
 tabs = st.tabs([t_act["tab0"], t_act["tab1"], t_act["tab2"], t_act["tab3"]])
 
@@ -346,7 +417,9 @@ with tabs[1]:
     st.progress(min(1.0, max(0.0, salud_neta / 100.0))) # Indicador visual de salud
     
     st.write("### 📈 Autonomía de Inventario (Días)")
-    st.bar_chart(df.set_index("Producto")["Autonomia"])
+    df_chart = df.copy()
+    df_chart["Autonomia"] = df_chart["Autonomia"].replace(np.inf, 90)
+    st.bar_chart(df_chart.set_index("Producto")["Autonomia"])
 
 with tabs[2]:
     st.subheader(t_act["est_tit"])
@@ -362,11 +435,11 @@ with tabs[2]:
     df["Accion"] = np.select(condiciones, acciones, default="✅ ESTABLE")
     
     # Tabla con colores (Efecto SaaS Profesional)
-    st.dataframe(df[["Producto", "Stock", "Autonomia", "Accion"]].style.applymap(color_estado, subset=["Accion"]), use_container_width=True)
+    st.dataframe(df[["Producto", "Stock", "Autonomia", "Accion"]].style.map(color_estado, subset=["Accion"]), use_container_width=True)
 
     # Ranking Crítico (Wow Moment)
     st.write(f"### {t_act['criticos_tit']}")
-    criticos = df.sort_values("Autonomia").head(2)
+    criticos = df[np.isfinite(df["Autonomia"])].sort_values("Autonomia").head(2)
     st.table(criticos[["Producto", "Autonomia", "Stock"]])
     
     def animar_nubes():
