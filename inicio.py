@@ -3,6 +3,15 @@ import pandas as pd
 import numpy as np
 import os
 import importlib
+
+# --- NUEVA SECCIÓN: INICIALIZACIÓN DE BASE DE DATOS ---
+from app.core.database import engine, Base
+from app.core import models # Esto asegura que Base conozca las tablas
+
+# Creamos las tablas justo antes de que la app empiece a funcionar
+Base.metadata.create_all(bind=engine)
+# -----------------------------------------------------
+
 try:
     from streamlit_mic_recorder import mic_recorder
     MIC_AVAILABLE = True
