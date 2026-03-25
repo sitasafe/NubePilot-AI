@@ -215,7 +215,7 @@ with st.sidebar:
     f_demanda = st.slider("Impulso de Demanda", 0.5, 4.0, 1.0)
     dias_entrega = st.slider("Lead Time Proveedor", 1, 30, 7)
     with st.expander("🔑 Conexión Tiendanube", expanded=True):
-        st.link_button("1. Autorizar App", f"https://www.tiendanube.com/apps/authorize?client_id={CLIENT_ID}&scope=read_orders,write_orders,read_products,write_products")
+        st.link_button("1. Autorizar App", f"https://www.tiendanube.com/apps/{CLIENT_ID}/authorize?scope=read_orders,write_orders,read_products,write_products")
         temp_code = st.text_input("2. Pega el Code:")
         st.session_state.tn_store_id = st.text_input("3. Store ID (opcional)", value=st.session_state.tn_store_id)
         if st.button("3. Vincular Tienda"):
