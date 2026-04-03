@@ -58,13 +58,14 @@ def obtener_snapshot_tiendanube(store_id, token_ref, client_id, _progress_callba
         return {"ok": False, "error": "invalid_store_id"}
 
     base_url = f"https://api.tiendanube.com/2025-03/{normalized_store_id}"
+    
+    # --- BLOQUE FINAL LIMPIO (Copia y pega esto sobre el anterior) ---
     headers = {
-        "Authorization": f"Bearer {access_token}",
-        "User-Agent": f"Flowmerce ({client_id})",
-        "Authentication": f"bearer {token}",
+        "Authentication": f"bearer {access_token}",
         "Content-Type": "application/json",
-        "User-Agent": "Flowmerce (walvarezc2@unemi.edu.ec)",
+        "User-Agent": "Flowmerce (walvarezc2@unemi.edu.ec)"
     }
+    # ----------------------------------------------------------------
     session = get_http_session()
     try:
         max_pages = 5
