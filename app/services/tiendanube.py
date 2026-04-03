@@ -57,10 +57,13 @@ def obtener_snapshot_tiendanube(store_id, token_ref, client_id, _progress_callba
         report(1.0, "Store ID o token inválido.")
         return {"ok": False, "error": "invalid_store_id"}
 
-    base_url = f"https://api.tiendanube.com/v1/{normalized_store_id}"
+    base_url = f"https://api.tiendanube.com/2025-03/{normalized_store_id}"
     headers = {
         "Authorization": f"Bearer {access_token}",
         "User-Agent": f"Flowmerce ({client_id})",
+        "Authentication": f"bearer {token}",
+        "Content-Type": "application/json",
+        "User-Agent": "Flowmerce (walvarezc2@unemi.edu.ec)",
     }
     session = get_http_session()
     try:
